@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://eqariah-backend.southeastasia.cloudapp.azure.com";
+const API_URL = "https://BEeqariah-endpoint-d5akg9g9csfcfqa2.z02.azurefd.net";
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
