@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "EQARIAH",
   description: "EQARIAH WEB",
+  icons: "eqariah_icon.svg",
 };
 
 export default function RootLayout({
