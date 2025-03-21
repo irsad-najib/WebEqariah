@@ -130,6 +130,7 @@ const AdminDashboard: React.FC = () => {
   const [userRole, setUserRole] = useState<string>("");
   const router = useRouter();
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [isLogin, setIsLogin] = useState<boolean>(true);
 
   // Pagination states
   const [currentUserPage, setCurrentUserPage] = useState<number>(1);
@@ -221,6 +222,18 @@ const AdminDashboard: React.FC = () => {
         errorResponse?.response?.data?.message || "Failed to approve mosque."
       );
       console.error("Error approving mosque:", err);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.get("api/auth/logout", {
+        withCredentials: true,
+      });
+      setIsLogin(false);
+      router.replace("/");
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -373,13 +386,21 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen p-6 text-gray-500">
-      {isAuthenticated && userRole === "admin" && (
+      {isAuthenticated && isLogin === true && userRole === "admin" && (
         <div className="max-w-6xl mx-auto">
-          <header className="bg-white p-6 rounded-lg shadow mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">
-              Admin Dashboard
-            </h1>
-            <p className="text-gray-500">Manage users and announcements</p>
+          <header className="bg-white p-6 rounded-lg shadow mb-6 flex justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Admin Dashboard
+              </h1>
+              <p className="text-gray-500">Manage users and announcements</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+            >
+              Logout
+            </button>
           </header>
 
           <div className="bg-white p-4 rounded-lg shadow mb-6 flex">

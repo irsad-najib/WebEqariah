@@ -21,9 +21,9 @@ const NavLink = ({ href, children, className = "" }: NavLinkProps) => (
 
 const navLinks = [
   { href: "/", children: "Home" },
-  { href: "/about", children: "About" },
-  { href: "/contact", children: "Contact" },
-  { href: "/profile", children: "Profile" },
+  { href: "/404", children: "About" },
+  { href: "/404", children: "Contact" },
+  { href: "/404", children: "Profile" },
 ];
 
 const Navbar = () => {
@@ -124,14 +124,14 @@ const Navbar = () => {
             ))}
           </div>
 
-          {isLogin ? (
-            <div
-              className="text-xl font-medium text-white cursor-pointer"
-              onClick={handleLogout}
-            >
-              Logout
-            </div>
-          ) : (
+          {/* {isLogin ? ( */}
+          <div
+            className="text-xl font-medium text-white cursor-pointer"
+            onClick={handleLogout}
+          >
+            Logout
+          </div>
+          {/* ) : (
             <div className="flex items-center space-x-2 text-white">
               <Image
                 src="/bx-user.svg"
@@ -144,7 +144,7 @@ const Navbar = () => {
                 Login
               </NavLink>
             </div>
-          )}
+          )} */}
         </div>
       </div>
 
