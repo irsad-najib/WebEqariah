@@ -124,13 +124,14 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* {isLogin ? ( */}
-          <div
-            className="text-xl font-medium text-white cursor-pointer"
-            onClick={handleLogout}
-          >
-            Logout
-          </div>
+          {isLogin ? (
+            <div
+              className="text-xl font-medium text-white cursor-pointer"
+              onClick={handleLogout}
+            >
+              Logout
+            </div>
+          ) : null}
           {/* ) : (
             <div className="flex items-center space-x-2 text-white">
               <Image
@@ -172,7 +173,8 @@ const Navbar = () => {
             >
               Logout
             </div>
-          ) : (
+          ) : null}
+          {/* ) : (
             <div className="flex items-center space-x-[2%] pt-[5%] border-t border-white/20">
               <Image
                 src="/bx-user.svg"
@@ -188,7 +190,7 @@ const Navbar = () => {
                 Login
               </NavLink>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </nav>
