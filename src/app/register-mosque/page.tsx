@@ -444,10 +444,10 @@ const RegisterMosque = () => {
                       </button>
                     </div>
 
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500">
                       Select and preview your image before uploading
                     </p>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500">
                       Maks size image 5 mb
                     </p>
                     <p className="text-sm text-gray-500 mb-4">
@@ -633,7 +633,7 @@ const RegisterMosque = () => {
             type="submit"
             disabled={loading}
             className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50"
-            onClick={() => router.replace("/dashboard")}
+            onClick={() => router.replace("/restration-success")}
           >
             {loading ? "Loading..." : "Register"}
           </button>
