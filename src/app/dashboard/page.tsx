@@ -250,12 +250,6 @@ const DashboardPage = () => {
                       <h3 className="text-lg font-semibold text-gray-700">
                         Upload image for announcement(Optional)
                       </h3>
-                      <p className="text-sm text-gray-500 mb-4">
-                        Maks size image 5 mb
-                      </p>
-                      <p className="text-sm text-gray-500 mb-4">
-                        format file: png, jpg, jpeg, heic, and heif
-                      </p>
                       <button
                         onClick={() => setIsOpen(false)}
                         className="text-gray-500 hover:text-gray-700"
@@ -264,8 +258,14 @@ const DashboardPage = () => {
                       </button>
                     </div>
 
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500 ">
                       Select and preview your image before uploading
+                    </p>
+                    <p className="text-sm text-gray-500 ">
+                      Maks size image 5 mb
+                    </p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      format file: png, jpg, jpeg, heic, and heif
                     </p>
 
                     <div className="space-y-4">
