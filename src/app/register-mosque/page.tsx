@@ -447,6 +447,12 @@ const RegisterMosque = () => {
                     <p className="text-sm text-gray-500 mb-4">
                       Select and preview your image before uploading
                     </p>
+                    <p className="text-lg font-semibold text-gray-700">
+                      Maks size image 5 mb
+                    </p>
+                    <p className="text-lg font-semibold text-gray-700">
+                      format file: png, jpg, jpeg, heic, and heif
+                    </p>
 
                     <div className="space-y-4">
                       <div className="flex items-center justify-center">
