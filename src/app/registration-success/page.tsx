@@ -29,7 +29,7 @@ const WaitingPage = () => {
         </p>
         <div className="flex flex-col md:flex-row gap-4 justify-center pt-4">
           <Link
-            href="/dashboard"
+            href="/"
             className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors"
           >
             <Home size={20} />
