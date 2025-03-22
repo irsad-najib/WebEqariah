@@ -250,10 +250,10 @@ const DashboardPage = () => {
                       <h3 className="text-lg font-semibold text-gray-700">
                         Upload image for announcement(Optional)
                       </h3>
-                      <p className="text-lg font-semibold text-gray-700">
+                      <p className="text-sm text-gray-500 mb-4">
                         Maks size image 5 mb
                       </p>
-                      <p className="text-lg font-semibold text-gray-700">
+                      <p className="text-sm text-gray-500 mb-4">
                         format file: png, jpg, jpeg, heic, and heif
                       </p>
                       <button
