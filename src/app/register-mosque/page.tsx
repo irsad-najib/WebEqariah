@@ -223,6 +223,7 @@ const RegisterMosque = () => {
         formData
       );
       if (response.status === 200) {
+        alert("Registration Mosque was succesfull");
         router.push("/registration-success");
       } else {
         throw new Error(response.data.error || "Registration failed");
@@ -633,7 +634,6 @@ const RegisterMosque = () => {
             type="submit"
             disabled={loading}
             className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50"
-            onClick={() => router.replace("/registration-success")}
           >
             {loading ? "Loading..." : "Register"}
           </button>

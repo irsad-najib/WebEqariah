@@ -59,7 +59,6 @@ const Login = () => {
 
       if (response.data.success) {
         setIsLoggedIn(true);
-
         router.replace("/dashboard");
       } else {
         setError("login Failed :" + (response.data.message || "unknown error"));
