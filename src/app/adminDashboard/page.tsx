@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Search, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import axiosInstance from "../component/API";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // Define interfaces for our data types
 interface User {
@@ -131,6 +132,7 @@ const AdminDashboard: React.FC = () => {
   const router = useRouter();
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [isLogin, setIsLogin] = useState<boolean>(true);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   // Pagination states
   const [currentUserPage, setCurrentUserPage] = useState<number>(1);
@@ -146,11 +148,13 @@ const AdminDashboard: React.FC = () => {
         const auth = await axiosInstance.get("api/auth/verify", {
           withCredentials: true,
         });
-        if (auth.data.Authenticated === true) {
-          setIsAuthenticated(true);
-          setUserRole(auth.data.user.role);
-        } else {
-          router.replace("/");
+        if (auth.data.user.role === "admin") {
+          if (auth.data.Authenticated === true) {
+            setIsAuthenticated(true);
+            setUserRole(auth.data.user.role);
+          } else {
+            router.replace("/");
+          }
         }
       } catch (err) {
         console.error(err);
@@ -263,6 +267,11 @@ const AdminDashboard: React.FC = () => {
     setCurrentMosquePage(1);
   }, [searchTerm]);
 
+  const openImagePreview = (imageUrl: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPreviewImage(imageUrl);
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderTable = <T extends Record<string, any>>(
     data: T[],
@@ -274,6 +283,23 @@ const AdminDashboard: React.FC = () => {
         const [parent, child] = col.split(".");
         return item[parent] ? item[parent][child] : "";
       }
+
+      // Check if the column is imageUrl and display as an image
+      if (col === "imageUrl" && item[col]) {
+        return (
+          <div className="relative h-16 w-16">
+            <Image
+              src={item[col]}
+              alt="Preview"
+              fill
+              sizes="64px"
+              className="object-cover rounded cursor-pointer"
+              onClick={(e) => openImagePreview(item[col], e)}
+            />
+          </div>
+        );
+      }
+
       return item[col];
     };
 
@@ -383,7 +409,6 @@ const AdminDashboard: React.FC = () => {
       </div>
     );
   };
-
   return (
     <div className="bg-gray-100 min-h-screen p-6 text-gray-500">
       {isAuthenticated && isLogin === true && userRole === "admin" && (
@@ -585,6 +610,32 @@ const AdminDashboard: React.FC = () => {
               </div>
             )}
           </div>
+          {previewImage && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+              onClick={() => setPreviewImage(null)}
+            >
+              <div
+                className="bg-white p-4 rounded-lg overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="relative w-96 h-96 md:w-[500px] md:h-[700px]">
+                  <Image
+                    src={previewImage}
+                    alt="Preview"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <button
+                  className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded w-full"
+                  onClick={() => setPreviewImage(null)}
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

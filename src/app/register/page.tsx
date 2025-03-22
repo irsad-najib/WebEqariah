@@ -134,7 +134,7 @@ const Register = () => {
       );
 
       if (response.data.success) {
-        router.replace("/login");
+        router.replace("/");
       }
     } catch (error) {
       console.error("Registration error:", error);
