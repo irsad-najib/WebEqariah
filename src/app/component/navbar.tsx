@@ -21,9 +21,9 @@ const NavLink = ({ href, children, className = "" }: NavLinkProps) => (
 
 const navLinks = [
   { href: "/", children: "Home" },
-  { href: "/404", children: "About" },
-  { href: "/404", children: "Contact" },
-  { href: "/404", children: "Profile" },
+  { href: "/Not-Found", children: "About" },
+  // { href: "/Not-Found", children: "Contact" },
+  { href: "/profile", children: "Profile" },
 ];
 
 const Navbar = () => {

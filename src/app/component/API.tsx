@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://api.eqariah.com";
+const API_URL = "http://localhost:5000/"; // Replace with your API URL
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
