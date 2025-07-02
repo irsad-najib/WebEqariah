@@ -19,21 +19,41 @@ type MosqueProps = {
 };
 const Mosque: React.FC<MosqueProps> = ({ onClick }) => {
   const [mosqueData, setMosqueData] = useState<Mosque[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     const fetchMosque = async () => {
       try {
         const response = await axiosInstance.get("/api/mosque");
-        console.log(response.data);
-        setMosqueData(response.data);
-      } catch (error) {
-        console.error("Error fetching mosque data:", error);
+        console.log("Mosque API response:", response.data);
+        // If response.data is an object with a property holding the array, adjust here
+        const data = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+            ? response.data.data
+            : [];
+        setMosqueData(data);
+      } catch (err: any) {
+        setError("Error fetching mosque data");
+        console.error("Error fetching mosque data:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchMosque();
   }, []);
 
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+  if (error) {
+    return <div className="flex items-center justify-center min-h-screen text-red-500">{error}</div>;
+  }
+  if (!Array.isArray(mosqueData) || mosqueData.length === 0) {
+    return <div className="flex items-center justify-center min-h-screen">No mosque data found.</div>;
+  }
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-black md:flex-row">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-black md:flex-row md:flex-wrap">
       {mosqueData.map((mosque) => (
         <div
           key={mosque.id}
