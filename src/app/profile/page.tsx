@@ -1,6 +1,9 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import Navbar from "../component/navbar";
+import Sidebar from "../component/sidebar";
+import ChatSidebar from "../component/chatSidebar";
 
 const Settings = () => {
   return (
@@ -37,45 +40,54 @@ const Profile = () => {
     }
   };
   return (
-    <div className="flex h-screen text-black">
-      <div className="w-1/4 bg-gray-200 border-r flex flex-col items-center py-20 relative">
-        <h1 className="text-2xl font-bold mb-4">Profile</h1>
-        <div className="w-40 h-40 rounded-full overflow-auto border-2 shadow-xl mb-4">
-          <Image
-            src="/bx-user.svg"
-            width={1000}
-            height={1000}
-            alt="User Icon"
-            className="object-scale-down w-full h-full"
-          />
+    <>
+      <Navbar />
+      <div className="flex h-screen text-black">
+        {/* Left Sidebar */}
+        <Sidebar />
+        {/* Original Profile Content */}
+        <div className="w-1/4 bg-gray-200 border-r flex flex-col items-center py-20 relative">
+          <h1 className="text-2xl font-bold mb-4">Profile</h1>
+          <div className="w-40 h-40 rounded-full overflow-auto border-2 shadow-xl mb-4">
+            <Image
+              src="/bx-user.svg"
+              width={1000}
+              height={1000}
+              alt="User Icon"
+              className="object-scale-down w-full h-full"
+            />
+          </div>
+          <h1 className="text-lg mb-10">nama</h1>
+          <ul className="mt-4 space-y-3 text-lg items-center justify-center text-center">
+            <li
+              className={`hover:bg-gray-300 hover:px-20 hover:py-4 cursor-pointer ${
+                activePage === "Settings"
+                  ? "border rounded-lg bg-gray-300 px-20 py-4 items-center"
+                  : ""
+              }`}
+              onClick={() => setActivePage("Settings")}
+            >
+              Settings
+            </li>
+            <li
+              className={`hover:bg-gray-300 hover:px-20 hover:py-4 cursor-pointer ${
+                activePage === "Mosque"
+                  ? "border rounded-lg bg-gray-300 px-20 py-4 items-center"
+                  : ""
+              }`}
+              onClick={() => setActivePage("Mosque")}
+            >
+              Mosque
+            </li>
+          </ul>
+          <div className="absolute top-[5%] right-0 h-[90%] w-[3px] bg-black" />
         </div>
-        <h1 className="text-lg mb-10">nama</h1>
-        <ul className="mt-4 space-y-3 text-lg items-center justify-center text-center">
-          <li
-            className={`hover:bg-gray-300 hover:px-20 hover:py-4 cursor-pointer ${
-              activePage === "Settings"
-                ? "border rounded-lg bg-gray-300 px-20 py-4 items-center"
-                : ""
-            }`}
-            onClick={() => setActivePage("Settings")}
-          >
-            Settings
-          </li>
-          <li
-            className={`hover:bg-gray-300 hover:px-20 hover:py-4 cursor-pointer ${
-              activePage === "Mosque"
-                ? "border rounded-lg bg-gray-300 px-20 py-4 items-center"
-                : ""
-            }`}
-            onClick={() => setActivePage("Mosque")}
-          >
-            Mosque
-          </li>
-        </ul>
-        <div className="absolute top-[5%] right-0 h-[90%] w-[3px] bg-black" />
+        {/* Main Content */}
+        <div className="flex-1">{handlePageChange()}</div>
+        {/* Right Sidebar (Chat) */}
+        <ChatSidebar />
       </div>
-      <div className="flex-1">{handlePageChange()}</div>
-    </div>
+    </>
   );
 };
 export default Profile;

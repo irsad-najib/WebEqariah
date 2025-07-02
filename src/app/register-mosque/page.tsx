@@ -1,4 +1,5 @@
 "use client";
+import Navbar from "../component/navbar";
 import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -240,8 +241,10 @@ const RegisterMosque = () => {
   };
 
   return (
-    <div className="bg-gray-200 flex items-center justify-center min-h-screen pt-10 pb-10">
-      <div className="bg-gray-50 p-12 pt-10 rounded-lg shadow-lg w-full md:w-[70%] lg:w-[538px]">
+    <>
+      <Navbar />
+      <div className="bg-gray-200 flex items-center justify-center min-h-screen pt-10 pb-10">
+        <div className="bg-gray-50 p-12 pt-10 rounded-lg shadow-lg w-full md:w-[70%] lg:w-[538px]">
         <h1 className="text-[6vw] font-bold text-center text-green-600 mb-[4%] md:text-[3vw] lg:text-2xl">
           Register Mosque
         </h1>
@@ -640,6 +643,7 @@ const RegisterMosque = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

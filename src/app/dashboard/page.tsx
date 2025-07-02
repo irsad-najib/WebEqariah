@@ -5,6 +5,7 @@ import axiosInstance from "../component/API";
 import Image from "next/image";
 import { Upload } from "lucide-react";
 import Navbar from "../component/navbar";
+import Sidebar from "../component/sidebar";
 
 interface Mosque {
   id: number;
@@ -189,7 +190,9 @@ const DashboardPage = () => {
   return (
     <div className="bg-gray-200 min-h-screen">
       <Navbar />
-      <div className="container mx-auto px-4">
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 container mx-auto px-4">
         {isAuthenticated && userRole === "mosque_admin" && (
           <div className="bg-white text-black shadow-md rounded-lg mb-6 p-6">
             <div className="flex justify-between items-center mb-4">
@@ -389,6 +392,7 @@ const DashboardPage = () => {
               <p>No announcements available.</p>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

@@ -23,7 +23,7 @@ const navLinks = [
   { href: "/", children: "Home" },
   { href: "/Not-Found", children: "About" },
   // { href: "/Not-Found", children: "Contact" },
-  { href: "/profile", children: "Profile" },
+  // { href: "/profile", children: "Profile" },
 ];
 
 const Navbar = () => {
@@ -77,19 +77,19 @@ const Navbar = () => {
 
   return (
     <nav className="bg-[#4caf4f] py-[3%] lg:py-4 sticky top-0 z-50">
-      <div className="container mx-auto flex justify-between items-center px-[4%]">
-        <div className="flex items-center">
+      <div className="w-full flex justify-between items-center px-2 lg:px-[4%]">
+        <div className="flex items-center gap-2 min-w-0">
           <Image
             src="/eqariah.svg"
-            width={20}
-            height={20}
+            width={30}
+            height={30}
             alt="Eqariah logo"
             className="w-[30px] h-[30px] object-contain scale-150"
             priority
           />
           <NavLink
             href="/"
-            className="ml-[10%] text-white text-[4vw] md:text-[4.8vw] lg:text-2xl font-bold"
+            className="text-white text-[4vw] md:text-[4.8vw] lg:text-2xl font-bold truncate"
           >
             Eqariah
           </NavLink>
@@ -132,12 +132,12 @@ const Navbar = () => {
               Logout
             </div>
           ) : null}
-          {/* ) : (
+          { 
             <div className="flex items-center space-x-2 text-white">
               <Image
                 src="/bx-user.svg"
-                width={32}
-                height={32}
+                width={30}
+                height={30}
                 alt="User Icon"
                 className="w-8 h-8"
               />
@@ -145,7 +145,7 @@ const Navbar = () => {
                 Login
               </NavLink>
             </div>
-          )} */}
+          } 
         </div>
       </div>
 
