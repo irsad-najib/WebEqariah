@@ -1,5 +1,5 @@
 "use client";
-import axiosInstance from "./API";
+import { axiosInstance } from "@/lib/utils/api";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
@@ -10,33 +10,46 @@ type Mosque = {
   addressLine2: string;
   city: string;
   state: string;
-  zipcode: string;
+  postalCode: string;
   imageUrl: string;
 };
 
 type MosqueProps = {
   onClick: (id: number) => void;
 };
-const Mosque: React.FC<MosqueProps> = ({ onClick }) => {
+export const Mosque: React.FC<MosqueProps> = ({ onClick }) => {
   const [mosqueData, setMosqueData] = useState<Mosque[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     const fetchMosque = async () => {
       try {
-        const response = await axiosInstance.get("/api/mosque");
-        console.log(response.data);
-        setMosqueData(response.data);
+        setLoading(true);
+        const response = await axiosInstance.get("/api/mosque/");
+        console.log("Mosque response:", response.data);
+
+        // Handle response format yang dibungkus dalam success object
+        if (response.data.success && response.data.data) {
+          setMosqueData(response.data.data);
+        } else if (Array.isArray(response.data)) {
+          setMosqueData(response.data);
+        } else {
+          setError("Invalid response format");
+        }
       } catch (error) {
         console.error("Error fetching mosque data:", error);
+        setError("Failed to fetch mosque data");
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchMosque();
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-gray-100 flex items-center justify-center min-h-screen text-black">
         Loading...
       </div>
     );
@@ -76,11 +89,9 @@ const Mosque: React.FC<MosqueProps> = ({ onClick }) => {
           <p>{mosque.addressLine2}</p>
           <p>{mosque.city}</p>
           <p>{mosque.state}</p>
-          <p>{mosque.zipcode}</p>
+          <p>{mosque.postalCode}</p> {/* Ubah dari zipcode ke postalCode */}
         </div>
       ))}
     </div>
   );
 };
-
-export default Mosque;

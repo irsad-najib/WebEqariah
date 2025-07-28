@@ -1,9 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import Navbar from "../component/navbar";
-import Sidebar from "../component/sidebar";
-import ChatSidebar from "../component/chatSidebar";
+import { Navbar } from "@/components/layout/Navbar";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 
 const Settings = () => {
   return (
@@ -27,7 +27,7 @@ const Mosque = () => {
 };
 
 const Profile = () => {
-  const [activePage, setActivePage] = React.useState("Settings");
+  const [activePage, setActivePage] = useState<string>("Settings");
 
   const handlePageChange = () => {
     switch (activePage) {
@@ -40,11 +40,12 @@ const Profile = () => {
     }
   };
   return (
-    <>
+    <div className="bg-gray-200 text-black">
       <Navbar />
-      <div className="flex h-screen text-black">
-        {/* Left Sidebar */}
-        <Sidebar />
+      <div className="flex bg-gray-100 min-h-screen">
+        <div className="sticky top-0 h-screen z-30">
+          <Sidebar />
+        </div>
         {/* Original Profile Content */}
         <div className="w-1/4 bg-gray-200 border-r flex flex-col items-center py-20 relative">
           <h1 className="text-2xl font-bold mb-4">Profile</h1>
@@ -85,9 +86,12 @@ const Profile = () => {
         {/* Main Content */}
         <div className="flex-1">{handlePageChange()}</div>
         {/* Right Sidebar (Chat) */}
-        <ChatSidebar />
+        <div className="sticky top-0 h-screen z-30">
+          <ChatSidebar />
+        </div>
       </div>
-    </>
+    </div>
   );
 };
+
 export default Profile;

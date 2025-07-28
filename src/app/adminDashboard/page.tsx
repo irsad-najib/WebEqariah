@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Search, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-import axiosInstance from "../component/API";
+import { axiosInstance } from "@/lib/utils/api";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -63,7 +63,8 @@ const fetchData = async (
   try {
     setLoading(true);
     const response = await axiosInstance.get(url, { withCredentials: true });
-    setData(response.data.data);
+    console.log("Fetched data:", response.data);
+    setData(response.data);
     setError(null);
   } catch (er) {
     if (er && typeof er === "object" && "response" in er) {
@@ -148,13 +149,17 @@ const AdminDashboard: React.FC = () => {
         const auth = await axiosInstance.get("api/auth/verify", {
           withCredentials: true,
         });
-        if (auth.data.user.role === "admin") {
-          if (auth.data.Authenticated === true) {
-            setIsAuthenticated(true);
-            setUserRole(auth.data.user.role);
-          } else {
-            router.replace("/");
-          }
+        console.log("Auth response:", auth.data);
+
+        // Perbaiki logic authentication check
+        if (
+          auth.data?.Authenticated === true &&
+          auth.data?.user?.role === "admin"
+        ) {
+          setIsAuthenticated(true);
+          setUserRole(auth.data.user.role);
+        } else {
+          router.replace("/");
         }
       } catch (err) {
         console.error(err);
@@ -241,18 +246,18 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const filteredUsers = users.filter(
+  const filteredUsers = (users || []).filter(
     (user) =>
-      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      user?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const filteredAnnouncements = announcements.filter(
+  const filteredAnnouncements = (announcements || []).filter(
     (announcement) =>
-      announcement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      announcement.content.toLowerCase().includes(searchTerm.toLowerCase())
+      announcement?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      announcement?.content?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const filteredMosque = mosques.filter((mosque) =>
-    mosque.mosqueName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMosque = (mosques || []).filter((mosque) =>
+    mosque?.mosqueName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const paginate = (pageNumber: number, type: string): void => {
@@ -278,14 +283,17 @@ const AdminDashboard: React.FC = () => {
     columns: string[],
     type: string
   ) => {
+    // Safety check untuk data
+    const safeData = data || [];
+
     const getCellValue = (item: T, col: string) => {
       if (col.includes(".")) {
         const [parent, child] = col.split(".");
-        return item[parent] ? item[parent][child] : "";
+        return item?.[parent] ? item[parent][child] : "";
       }
 
       // Check if the column is imageUrl and display as an image
-      if (col === "imageUrl" && item[col]) {
+      if (col === "imageUrl" && item?.[col]) {
         return (
           <div className="relative h-16 w-16">
             <Image
@@ -300,7 +308,7 @@ const AdminDashboard: React.FC = () => {
         );
       }
 
-      return item[col];
+      return item?.[col] || "";
     };
 
     return (
@@ -322,19 +330,20 @@ const AdminDashboard: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {data.length > 0 ? (
-              data.map((item) => (
-                <React.Fragment key={item.id}>
+            {safeData.length > 0 ? (
+              safeData.map((item) => (
+                <React.Fragment key={item?.id || Math.random()}>
                   <tr
-                    key={item.id}
+                    key={item?.id || Math.random()}
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() =>
-                      setExpandedRow(expandedRow === item.id ? null : item.id)
+                      setExpandedRow(expandedRow === item?.id ? null : item?.id)
                     }
                   >
                     {columns.map((col) => {
                       const value = getCellValue(item, col);
-                      const isLongContent = value && value.length > 50;
+                      const isLongContent =
+                        value && typeof value === "string" && value.length > 50;
 
                       return (
                         <td
@@ -351,10 +360,10 @@ const AdminDashboard: React.FC = () => {
                         {type === "mosque" && (
                           <button
                             className="text-green-600 hover:text-green-900"
-                            onClick={() => handleApproveMosque(item.id)}
-                            disabled={item.status === "APPROVED"}
+                            onClick={() => handleApproveMosque(item?.id)}
+                            disabled={item?.status === "APPROVED"}
                           >
-                            {item.status === "APPROVED"
+                            {item?.status === "APPROVED"
                               ? "Approved"
                               : "Approve"}
                           </button>
@@ -368,7 +377,7 @@ const AdminDashboard: React.FC = () => {
                       </div>
                     </td>
                   </tr>
-                  {expandedRow === item.id && (
+                  {expandedRow === item?.id && (
                     <tr>
                       <td
                         colSpan={columns.length + 1}
@@ -377,7 +386,9 @@ const AdminDashboard: React.FC = () => {
                         <div className="p-2">
                           {columns.map((col) => {
                             const value = getCellValue(item, col);
-                            return value && value.length > 50 ? (
+                            return value &&
+                              typeof value === "string" &&
+                              value.length > 50 ? (
                               <div key={col} className="mb-2">
                                 <span className="font-medium">{col}: </span>
                                 <span className="whitespace-pre-wrap">
@@ -489,7 +500,8 @@ const AdminDashboard: React.FC = () => {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-medium">
-                    Users (Showing {filteredUsers.length} of {users.length})
+                    Users (Showing {filteredUsers?.length || 0} of{" "}
+                    {users?.length || 0})
                   </h2>
                 </div>
                 {loading ? (
@@ -499,15 +511,15 @@ const AdminDashboard: React.FC = () => {
                 ) : (
                   <>
                     {renderTable(
-                      filteredUsers,
+                      filteredUsers || [],
                       ["username", "email", "role", "affiliatedMosqueId"],
                       "users"
                     )}
-                    {filteredUsers.length > 0 && (
+                    {(filteredUsers?.length || 0) > 0 && (
                       <Pagination
                         currentPage={currentUserPage}
                         totalPages={Math.ceil(
-                          filteredUsers.length / itemsPerPage
+                          (filteredUsers?.length || 0) / itemsPerPage
                         )}
                         paginate={paginate}
                         type="users"
@@ -522,8 +534,8 @@ const AdminDashboard: React.FC = () => {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-medium">
-                    Announcements (Showing {filteredAnnouncements.length} of{" "}
-                    {announcements.length})
+                    Announcements (Showing {filteredAnnouncements?.length || 0}{" "}
+                    of {announcements?.length || 0})
                   </h2>
                   {/* <button className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
                   <PlusCircle size={16} className="mr-2" />
@@ -537,7 +549,7 @@ const AdminDashboard: React.FC = () => {
                 ) : (
                   <>
                     {renderTable(
-                      filteredAnnouncements,
+                      filteredAnnouncements || [],
                       [
                         "title",
                         "content",
@@ -549,11 +561,11 @@ const AdminDashboard: React.FC = () => {
                       ],
                       "announcements"
                     )}
-                    {filteredAnnouncements.length > 0 && (
+                    {(filteredAnnouncements?.length || 0) > 0 && (
                       <Pagination
                         currentPage={currentAnnouncementPage}
                         totalPages={Math.ceil(
-                          filteredAnnouncements.length / itemsPerPage
+                          (filteredAnnouncements?.length || 0) / itemsPerPage
                         )}
                         paginate={paginate}
                         type="announcements"
@@ -568,7 +580,8 @@ const AdminDashboard: React.FC = () => {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-medium">
-                    Mosque (Showing {filteredMosque.length} of {mosques.length})
+                    Mosque (Showing {filteredMosque?.length || 0} of{" "}
+                    {mosques?.length || 0})
                   </h2>
                 </div>
                 {loading ? (
@@ -578,7 +591,7 @@ const AdminDashboard: React.FC = () => {
                 ) : (
                   <>
                     {renderTable(
-                      filteredMosque,
+                      filteredMosque || [],
                       [
                         "mosqueName",
                         "addressLine1",
@@ -595,11 +608,11 @@ const AdminDashboard: React.FC = () => {
                       ],
                       "mosque"
                     )}
-                    {filteredMosque.length > 0 && (
+                    {(filteredMosque?.length || 0) > 0 && (
                       <Pagination
                         currentPage={currentMosquePage}
                         totalPages={Math.ceil(
-                          filteredMosque.length / itemsPerPage
+                          (filteredMosque?.length || 0) / itemsPerPage
                         )}
                         paginate={paginate}
                         type="mosque"

@@ -1,10 +1,10 @@
 "use client";
-import Navbar from "../component/navbar";
+import { Navbar } from "@/components/layout/Navbar";
 import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Eye, EyeOff, Upload } from "lucide-react";
-import axiosInstance from "../component/API";
+import { axiosInstance } from "@/lib/utils/api";
 
 interface CustomAlertProps {
   children: React.ReactNode;
@@ -177,10 +177,12 @@ const RegisterMosque = () => {
         }
       );
 
+      console.log("Upload response:", response.data);
+
       if (response.data.success) {
         setFormData((prev) => ({
           ...prev,
-          imageUrl: response.data.data.imageUrl,
+          imageUrl: response.data.url,
         }));
         setErrors((prev) => ({ ...prev, imageUrl: "" }));
         setIsOpen(false);
@@ -245,404 +247,418 @@ const RegisterMosque = () => {
       <Navbar />
       <div className="bg-gray-200 flex items-center justify-center min-h-screen pt-10 pb-10">
         <div className="bg-gray-50 p-12 pt-10 rounded-lg shadow-lg w-full md:w-[70%] lg:w-[538px]">
-        <h1 className="text-[6vw] font-bold text-center text-green-600 mb-[4%] md:text-[3vw] lg:text-2xl">
-          Register Mosque
-        </h1>
+          <h1 className="text-[6vw] font-bold text-center text-green-600 mb-[4%] md:text-[3vw] lg:text-2xl">
+            Register Mosque
+          </h1>
 
-        {errors.submit && (
-          <CustomAlert variant="error">
-            <AlertCircle className="h-4 w-4" />
-            <span>{errors.submit}</span>
-          </CustomAlert>
-        )}
+          {errors.submit && (
+            <CustomAlert variant="error">
+              <AlertCircle className="h-4 w-4" />
+              <span>{errors.submit}</span>
+            </CustomAlert>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="bg-white flex p-12 rounded-lg shadow-lg w-full">
-            {/* Mosque Information */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                  Mosque Name
-                </label>
-                <input
-                  type="text"
-                  name="mosqueName"
-                  value={formData.mosqueName}
-                  onChange={handleChange}
-                  className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                    errors.mosqueName ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter Mosque Name"
-                />
-                {errors.mosqueName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.mosqueName}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                  Contact Person
-                </label>
-                <input
-                  type="text"
-                  name="contactPerson"
-                  value={formData.contactPerson}
-                  onChange={handleChange}
-                  className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                    errors.contactPerson ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter the Name of the Mosque Administrator"
-                />
-                {errors.contactPerson && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.contactPerson}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                  Contact Phone
-                </label>
-                <input
-                  type="tel"
-                  name="contactPhone"
-                  value={formData.contactPhone}
-                  onChange={handleChange}
-                  className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                    errors.contactPhone ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter Number Phone of Mosque Administrator"
-                />
-                {errors.contactPhone && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.contactPhone}
-                  </p>
-                )}
-              </div>
-
-              {/* Address Section */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="bg-white flex p-12 rounded-lg shadow-lg w-full">
+              {/* Mosque Information */}
               <div className="space-y-4">
                 <div>
                   <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                    Address Line 1
+                    Mosque Name
                   </label>
                   <input
                     type="text"
-                    name="addressLine1"
-                    value={formData.addressLine1}
+                    name="mosqueName"
+                    value={formData.mosqueName}
                     onChange={handleChange}
                     className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                      errors.addressLine1 ? "border-red-500" : "border-gray-300"
+                      errors.mosqueName ? "border-red-500" : "border-gray-300"
                     }`}
-                    placeholder="Enter Street Name"
+                    placeholder="Enter Mosque Name"
                   />
-                  {errors.addressLine1 && (
+                  {errors.mosqueName && (
                     <p className="text-red-500 text-sm mt-1">
-                      {errors.addressLine1}
+                      {errors.mosqueName}
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                    Address Line 2 (Optional)
+                    Contact Person
                   </label>
                   <input
                     type="text"
-                    name="addressLine2"
-                    value={formData.addressLine2}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                      City
-                    </label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                      className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                        errors.city ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                    {errors.city && (
-                      <p className="text-red-500 text-sm mt-1">{errors.city}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                      State
-                    </label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
-                      className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                        errors.state ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                    {errors.state && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.state}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                      Postal Code
-                    </label>
-                    <input
-                      type="text"
-                      name="postalCode"
-                      value={formData.postalCode}
-                      onChange={handleChange}
-                      className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                        errors.postalCode ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                    {errors.postalCode && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.postalCode}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Image Upload Section */}
-              <button
-                onClick={() => setIsOpen(true)}
-                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                Select Mosque Image
-              </button>
-
-              {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                  <div
-                    className="absolute inset-0 bg-black bg-opacity-50"
-                    onClick={() => setIsOpen(false)}
-                  />
-
-                  <div className="relative bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-semibold text-gray-700">
-                        Upload Mosque Image
-                      </h3>
-                      <button
-                        onClick={() => setIsOpen(false)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        ✕
-                      </button>
-                    </div>
-
-                    <p className="text-sm text-gray-500">
-                      Select and preview your image before uploading
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Maks size image 5 mb
-                    </p>
-                    <p className="text-sm text-gray-500 mb-4">
-                      format file: png, jpg, jpeg, heic, and heif
-                    </p>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-center">
-                        <input
-                          type="file"
-                          onChange={handleFileChange}
-                          accept="image/*"
-                          className="hidden"
-                          id="mosque-image-modal"
-                        />
-                        <label
-                          htmlFor="mosque-image-modal"
-                          className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer"
-                        >
-                          <Upload className="h-6 w-6 mb-2" />
-                          Choose Image
-                        </label>
-                      </div>
-
-                      {errors?.imageUrl && (
-                        <p className="text-red-500 text-sm text-center">
-                          {errors.imageUrl}
-                        </p>
-                      )}
-
-                      {preview && (
-                        <div className="space-y-4">
-                          <div className="relative w-full h-96">
-                            <Image
-                              src={preview}
-                              alt="Preview"
-                              className="rounded-md object-cover"
-                              fill
-                            />
-                          </div>
-
-                          <div className="flex justify-end gap-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setPreview(null);
-                                setFile(null);
-                              }}
-                              className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleUpload}
-                              disabled={uploading}
-                              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-                            >
-                              {uploading ? "Uploading..." : "Upload"}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="bg-white flex p-12 rounded-lg shadow-lg w-full">
-            <div className="space-y-5">
-              <p className="text-black font-bold text-xl text-center">
-                Register an Acount to Login into Mosque Admin Dashboard
-              </p>
-              <div>
-                <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                    errors.username ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter an Username"
-                />
-                {errors.username && (
-                  <p className="text-red-500 text-sm mt-1">{errors.username}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                    errors.email ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter Email"
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
-              </div>
-
-              <div className="relative">
-                <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
+                    name="contactPerson"
+                    value={formData.contactPerson}
                     onChange={handleChange}
                     className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                      errors.password ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="Enter Pashword"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-black"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
-                      errors.confirmPassword
+                      errors.contactPerson
                         ? "border-red-500"
                         : "border-gray-300"
                     }`}
-                    placeholder="Enter confirm Pashword"
+                    placeholder="Enter the Name of the Mosque Administrator"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-black"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
+                  {errors.contactPerson && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.contactPerson}
+                    </p>
+                  )}
                 </div>
-                {errors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.confirmPassword}
-                  </p>
+
+                <div>
+                  <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                    Contact Phone
+                  </label>
+                  <input
+                    type="tel"
+                    name="contactPhone"
+                    value={formData.contactPhone}
+                    onChange={handleChange}
+                    className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
+                      errors.contactPhone ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="Enter Number Phone of Mosque Administrator"
+                  />
+                  {errors.contactPhone && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.contactPhone}
+                    </p>
+                  )}
+                </div>
+
+                {/* Address Section */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                      Address Line 1
+                    </label>
+                    <input
+                      type="text"
+                      name="addressLine1"
+                      value={formData.addressLine1}
+                      onChange={handleChange}
+                      className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
+                        errors.addressLine1
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
+                      placeholder="Enter Street Name"
+                    />
+                    {errors.addressLine1 && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.addressLine1}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                      Address Line 2 (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      name="addressLine2"
+                      value={formData.addressLine2}
+                      onChange={handleChange}
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
+                          errors.city ? "border-red-500" : "border-gray-300"
+                        }`}
+                      />
+                      {errors.city && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.city}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
+                        className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
+                          errors.state ? "border-red-500" : "border-gray-300"
+                        }`}
+                      />
+                      {errors.state && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.state}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                        Postal Code
+                      </label>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={handleChange}
+                        className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
+                          errors.postalCode
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
+                      />
+                      {errors.postalCode && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.postalCode}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Image Upload Section */}
+                <button
+                  onClick={() => setIsOpen(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                  Select Mosque Image
+                </button>
+
+                {isOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div
+                      className="absolute inset-0 bg-black bg-opacity-50"
+                      onClick={() => setIsOpen(false)}
+                    />
+
+                    <div className="relative bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold text-gray-700">
+                          Upload Mosque Image
+                        </h3>
+                        <button
+                          onClick={() => setIsOpen(false)}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      <p className="text-sm text-gray-500">
+                        Select and preview your image before uploading
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Maks size image 5 mb
+                      </p>
+                      <p className="text-sm text-gray-500 mb-4">
+                        format file: png, jpg, jpeg, heic, and heif
+                      </p>
+
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center">
+                          <input
+                            type="file"
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            className="hidden"
+                            id="mosque-image-modal"
+                          />
+                          <label
+                            htmlFor="mosque-image-modal"
+                            className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer"
+                          >
+                            <Upload className="h-6 w-6 mb-2" />
+                            Choose Image
+                          </label>
+                        </div>
+
+                        {errors?.imageUrl && (
+                          <p className="text-red-500 text-sm text-center">
+                            {errors.imageUrl}
+                          </p>
+                        )}
+
+                        {preview && (
+                          <div className="space-y-4">
+                            <div className="relative w-full h-96">
+                              <Image
+                                src={preview}
+                                alt="Preview"
+                                className="rounded-md object-cover"
+                                fill
+                              />
+                            </div>
+
+                            <div className="flex justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPreview(null);
+                                  setFile(null);
+                                }}
+                                className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleUpload}
+                                disabled={uploading}
+                                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+                              >
+                                {uploading ? "Uploading..." : "Upload"}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50"
-          >
-            {loading ? "Loading..." : "Register"}
-          </button>
-        </form>
+            <div className="bg-white flex p-12 rounded-lg shadow-lg w-full">
+              <div className="space-y-5">
+                <p className="text-black font-bold text-xl text-center">
+                  Register an Acount to Login into Mosque Admin Dashboard
+                </p>
+                <div>
+                  <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                      errors.username ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="Enter an Username"
+                  />
+                  {errors.username && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.username}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
+                      errors.email ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="Enter Email"
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
+                        errors.password ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="Enter Pashword"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-black"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
+                        errors.confirmPassword
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
+                      placeholder="Enter confirm Pashword"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-black"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50"
+            >
+              {loading ? "Loading..." : "Register"}
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
     </>
   );
 };

@@ -2,11 +2,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axiosInstance from "../component/API";
+import { axiosInstance } from "@/lib/utils/api";
 import { Eye, EyeOff } from "lucide-react";
-import Navbar from "../component/navbar";
-import Sidebar from "../component/sidebar";
-import Footer from "../component/footer";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+// import { User, FormState } from "../lib/types";
 
 const Login = () => {
   const router = useRouter();
@@ -32,7 +32,10 @@ const Login = () => {
           withCredentials: true,
         });
 
-        if (authRes.data.authenticated) {
+        if (authRes.data.role === "user") {
+          setIsLoggedIn(true);
+          router.replace("/");
+        } else {
           setIsLoggedIn(true);
           router.replace("/dashboard");
         }
@@ -96,7 +99,6 @@ const Login = () => {
     <>
       <Navbar />
       <div className="min-h-screen flex bg-gray-100">
-        <Sidebar />
         <div className="flex-1 flex flex-col md:flex-row lg:flex-row items-center">
           {/* Left Section */}
           <div className="flex-1 flex flex-col justify-center p-[6%] lg:p-38">
@@ -165,7 +167,10 @@ const Login = () => {
                 </button>
               </form>
               <p className="mt-6 text-center">
-                <a href="#" className="text-green-500 hover:text-green-700 text-sm">
+                <a
+                  href="#"
+                  className="text-green-500 hover:text-green-700 text-sm"
+                >
                   Forgotten password?
                 </a>
               </p>

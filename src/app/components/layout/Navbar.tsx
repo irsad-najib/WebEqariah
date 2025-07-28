@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import axiosInstance from "./API";
+import { axiosInstance } from "@/lib/utils/api";
 
 interface NavLinkProps {
   href: string;
@@ -26,38 +26,31 @@ const navLinks = [
   // { href: "/profile", children: "Profile" },
 ];
 
-const Navbar = () => {
+export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const authsession = async () => {
-      try {
-        const auth = await axiosInstance.get("api/auth/verify", {
-          withCredentials: true,
-        });
-        console.log(auth.data);
-        if (auth.data.Authenticated === true) {
-          setIsLogin(true);
-        }
-      } catch (errr) {
-        console.log(errr);
-      }
-    };
-    authsession();
-
     // Define checkLoginStatus function
     const checkLoginStatus = async () => {
       try {
         const auth = await axiosInstance.get("api/auth/verify", {
           withCredentials: true,
         });
-        setIsLogin(auth.data.Authenticated === true);
+        console.log("Auth response:", auth.data);
+
+        // Perbaiki field name - gunakan Authenticated sesuai response backend
+        const isAuthenticated = auth.data.Authenticated === true;
+        setIsLogin(isAuthenticated);
+        console.log("Setting isLogin to:", isAuthenticated);
       } catch (error) {
-        console.log(error);
+        console.log("Auth error:", error);
+        setIsLogin(false);
       }
     };
+    // Initial check
+    checkLoginStatus();
 
     const intervalId = setInterval(checkLoginStatus, 5 * 60 * 1000);
     return () => clearInterval(intervalId);
@@ -124,15 +117,15 @@ const Navbar = () => {
             ))}
           </div>
 
-          {isLogin ? (
+          {/* Perbaiki conditional rendering */}
+          {isLogin === true ? (
             <div
-              className="text-xl font-medium text-white cursor-pointer"
+              className="text-xl font-medium text-white cursor-pointer hover:text-gray-200"
               onClick={handleLogout}
             >
               Logout
             </div>
-          ) : null}
-          { 
+          ) : (
             <div className="flex items-center space-x-2 text-white">
               <Image
                 src="/bx-user.svg"
@@ -145,7 +138,7 @@ const Navbar = () => {
                 Login
               </NavLink>
             </div>
-          } 
+          )}
         </div>
       </div>
 
@@ -166,15 +159,15 @@ const Navbar = () => {
             </NavLink>
           ))}
 
-          {isLogin ? (
+          {/* Perbaiki mobile conditional rendering */}
+          {isLogin === true ? (
             <div
-              className="text-white text-[3.3vw] font-medium cursor-pointer"
+              className="text-white text-[3.3vw] font-medium cursor-pointer pt-[5%] border-t border-white/20"
               onClick={handleLogout}
             >
               Logout
             </div>
-          ) : null}
-          {/* ) : (
+          ) : (
             <div className="flex items-center space-x-[2%] pt-[5%] border-t border-white/20">
               <Image
                 src="/bx-user.svg"
@@ -190,11 +183,9 @@ const Navbar = () => {
                 Login
               </NavLink>
             </div>
-          )} */}
+          )}
         </div>
       </div>
     </nav>
   );
 };
-
-export default Navbar;
