@@ -177,8 +177,6 @@ const RegisterMosque = () => {
         }
       );
 
-      console.log("Upload response:", response.data);
-
       if (response.data.success) {
         setFormData((prev) => ({
           ...prev,
@@ -205,9 +203,7 @@ const RegisterMosque = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submission started");
     const newErrors = validateForm();
-    console.log("Validation errors:", newErrors);
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);

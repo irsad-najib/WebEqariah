@@ -1,75 +1,21 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
+// testing untuk menampilkan video di website
+import React from "react";
+import MyEditor from "@/components/features/form/form";
 
-export default function TestWebSocketPage() {
-  const socketRef = useRef<WebSocket | null>(null);
-  const [messages, setMessages] = useState<string[]>([]);
-  const [input, setInput] = useState("");
-
-  useEffect(() => {
-    const socket = new WebSocket("ws://localhost:5000/api/ws"); // Ganti port sesuai BE lo
-
-    socketRef.current = socket;
-
-    socket.onopen = () => {
-      console.log("WebSocket connected");
-      socket.send("Hello from Next.js!");
-    };
-
-    socket.onmessage = (event) => {
-      console.log("Received:", event.data);
-      setMessages((prev) => [...prev, event.data]);
-    };
-
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    socket.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    return () => {
-      socket.close();
-    };
-  }, []);
-
-  const sendMessage = () => {
-    if (socketRef.current && input.trim() !== "") {
-      socketRef.current.send(input);
-      setInput("");
-    }
-  };
-
+const VideoPage = () => {
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">WebSocket Test</h1>
-
-      <div className="mb-4">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="border px-2 py-1 mr-2"
-          placeholder="Type message"
+    <div>
+      <h1>Video Page</h1>
+      <video width="1000" controls autoPlay muted>
+        <source
+          src="/test/(625) Flashmob HiVi - PORSTAT IPB 2021 - YouTube - Google Chrome 2024-07-08 19-44-05.mp4"
+          type="video/mp4"
         />
-        <button
-          onClick={sendMessage}
-          className="bg-blue-500 text-white px-3 py-1 rounded"
-        >
-          Send
-        </button>
-      </div>
-
-      <div className="bg-gray-100 p-4 rounded">
-        <h2 className="font-semibold mb-2">Messages:</h2>
-        <ul>
-          {messages.map((msg, idx) => (
-            <li key={idx} className="mb-1">
-              {msg}
-            </li>
-          ))}
-        </ul>
-      </div>
+        Your browser does not support the video tag.
+      </video>
+      <MyEditor />
     </div>
   );
-}
+};
+
+export default VideoPage;

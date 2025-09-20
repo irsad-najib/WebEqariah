@@ -14,7 +14,7 @@ interface WebSocketHook {
   sendMessage: (message: Message) => void;
 }
 
-export const useWebSocket = (url: string, mosqueId?: string): WebSocketHook => {
+export const useWebSocket = (url: string, userId?: string): WebSocketHook => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<
     "Connecting" | "Open" | "Closing" | "Closed"
@@ -30,7 +30,8 @@ export const useWebSocket = (url: string, mosqueId?: string): WebSocketHook => {
 
     const connect = () => {
       try {
-        const wsUrl = mosqueId ? `${url}?mosqueId=${mosqueId}` : url;
+        // Use userId instead of mosqueId for personal chat rooms
+        const wsUrl = userId ? `${url}?userId=${userId}` : url;
         wsref.current = new WebSocket(wsUrl);
         ws = wsref.current;
         setSocket(ws);
@@ -38,45 +39,41 @@ export const useWebSocket = (url: string, mosqueId?: string): WebSocketHook => {
 
         ws.onopen = () => {
           setConnectionStatus("Open");
-          console.log("[fe jembut ] WebSocket connected");
-          // Kirim join room jika mosqueId ada
-          if (mosqueId) {
+          console.log("[Chat WebSocket] connected");
+          // Join personal room for direct messages
+          if (userId) {
             ws.send(
               JSON.stringify({
                 type: "join_room",
-                room: `${mosqueId}`,
+                room: `user_${userId}`,
               })
             );
-            console.log("[fe jembut ] Sent join_room:", `${mosqueId}`);
+            console.log("[Chat WebSocket] Joined room:", `user_${userId}`);
           }
         };
 
         ws.onmessage = (event) => {
           try {
-            console.log("[fe jembut ] WebSocket message received:", event.data);
+            console.log("[Chat WebSocket] message received:", event.data);
             const message: Message = JSON.parse(event.data);
             setLastMessage(message);
           } catch (error) {
-            console.error(
-              "[fe jembut ] Error parsing WebSocket message:",
-              error
-            );
+            console.error("[Chat WebSocket] Error parsing message:", error);
           }
         };
 
         ws.onclose = () => {
           setConnectionStatus("Closed");
           setSocket(null);
-          console.log("WebSocket disconnected");
+          console.log("[Chat WebSocket] disconnected");
 
-          // Reconnect after 3 seconds if should reconnect
           if (shouldReconnect.current) {
             reconnectTimeoutRef.current = setTimeout(connect, 3000);
           }
         };
 
         ws.onerror = (error) => {
-          console.error("WebSocket error:", error);
+          console.error("[Chat WebSocket] error:", error);
           setConnectionStatus("Closed");
         };
       } catch (error) {
@@ -85,7 +82,9 @@ export const useWebSocket = (url: string, mosqueId?: string): WebSocketHook => {
       }
     };
 
-    connect();
+    if (userId) {
+      connect();
+    }
 
     return () => {
       shouldReconnect.current = false;
@@ -96,7 +95,7 @@ export const useWebSocket = (url: string, mosqueId?: string): WebSocketHook => {
         ws.close();
       }
     };
-  }, [url, mosqueId]);
+  }, [url, userId]);
 
   const sendMessage = (message: Message) => {
     if (socket && socket.readyState === WebSocket.OPEN) {

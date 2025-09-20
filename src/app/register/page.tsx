@@ -13,17 +13,11 @@ import { axiosInstance } from "@/lib/utils/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 // import { Loading } from "@/components/ui/Loading";
-import { Navbar } from "@/app/components/layout/Navbar";
-import { Footer } from "@/app/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { RegisterFormData } from "@/lib/types";
 
 // Form data type
-interface RegisterFormData {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  affiliateMosqueID?: number;
-}
 
 const Register = () => {
   const router = useRouter();

@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
-import { Sidebar } from "@/components/layout/Sidebar";
 import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 
 const Settings = () => {
@@ -43,9 +42,6 @@ const Profile = () => {
     <div className="bg-gray-200 text-black">
       <Navbar />
       <div className="flex bg-gray-100 min-h-screen">
-        <div className="sticky top-0 h-screen z-30">
-          <Sidebar />
-        </div>
         {/* Original Profile Content */}
         <div className="w-1/4 bg-gray-200 border-r flex flex-col items-center py-20 relative">
           <h1 className="text-2xl font-bold mb-4">Profile</h1>

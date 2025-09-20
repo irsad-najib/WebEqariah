@@ -1,14 +1,16 @@
 // src/app/components/layout/PageLayout.tsx
+import React from "react";
+import { Navbar } from "@/components/layout/Navbar";
+import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+
 interface PageLayoutProps {
   children: React.ReactNode;
-  showSidebar?: boolean;
   showChat?: boolean;
   title?: string;
 }
 
 export const PageLayout: React.FC<PageLayoutProps> = ({
   children,
-  showSidebar = true,
   showChat = true,
   title,
 }) => {
@@ -16,11 +18,6 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
     <>
       <Navbar />
       <div className="flex bg-gray-100 min-h-screen">
-        {showSidebar && (
-          <div className="sticky top-0 h-screen z-30">
-            <Sidebar />
-          </div>
-        )}
         <main className="flex-1 p-4">
           {title && (
             <header className="mb-6">

@@ -6,45 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 // Define interfaces for our data types
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-  affiliatedMosqueId: string;
-}
-
-interface Announcement {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  authorId: string;
-  imageUrl: string;
-  mosqueId: string;
-  mosqueName: string;
-  mosque: {
-    contactPerson: string;
-    contactPhone: string;
-  };
-}
-
-interface Mosque {
-  id: string;
-  mosqueName: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  contactPerson: string;
-  contactPhone: string;
-  imageUrl: string;
-  status: string;
-  createdAt: string;
-  adminId: string;
-}
-
+import type { User, Announcement, Mosque } from "@/lib/types";
 // Define props for the Pagination component
 interface PaginationProps {
   currentPage: number;
@@ -63,7 +25,6 @@ const fetchData = async (
   try {
     setLoading(true);
     const response = await axiosInstance.get(url, { withCredentials: true });
-    console.log("Fetched data:", response.data);
     setData(response.data);
     setError(null);
   } catch (er) {
@@ -149,7 +110,6 @@ const AdminDashboard: React.FC = () => {
         const auth = await axiosInstance.get("api/auth/verify", {
           withCredentials: true,
         });
-        console.log("Auth response:", auth.data);
 
         // Perbaiki logic authentication check
         if (
@@ -217,7 +177,9 @@ const AdminDashboard: React.FC = () => {
       if (response.data.success) {
         setMosques((prevMosques) =>
           prevMosques.map((mosque) =>
-            mosque.id === mosqueId ? { ...mosque, status: "APPROVED" } : mosque
+            String(mosque.id) === mosqueId
+              ? { ...mosque, status: "APPROVED" }
+              : mosque
           )
         );
         setError(null);

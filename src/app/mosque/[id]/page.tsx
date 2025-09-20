@@ -2,7 +2,6 @@
 import { axiosInstance } from "@/lib/utils/api";
 import { useRouter, useParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
-import { Sidebar } from "@/components/layout/Sidebar";
 import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import Link from "next/link";
@@ -12,70 +11,13 @@ import { useState, useEffect } from "react";
 /**
  * Type definitions for the mosque page
  */
-// WebSocket message types
-interface WebSocketMessage {
-  type?: string;
-  data?: WebSocketAnnouncementData;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  content?: any;
-  id?: number | string;
-  title?: string;
-  media_url?: string | null;
-  mosque_id?: number | string;
-  author_name?: string;
-  created_at?: string;
-}
-
-interface WebSocketAnnouncementData {
-  id: number | string;
-  title: string;
-  content: string;
-  media_url?: string | null;
-  mosque_id: number | string;
-  author_name?: string;
-  created_at: string;
-}
-
-// Mosque data structure
-interface Mosque {
-  id: string;
-  mosqueName: string;
-  addressLine1: string;
-  addressLine2?: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  contactPerson: string;
-  contactPhone: string;
-  status: string;
-  imageUrl?: string | null;
-  createdAt: string;
-}
-
-// Announcement data structure
-interface Announcement {
-  id: number | string;
-  title: string;
-  content: string;
-  createdAt: string;
-  url?: string;
-  author?: {
-    username: string;
-  };
-  mosqueId: string | number;
-  like_count?: number;
-  comment_count?: number;
-  liked_by_user?: boolean;
-}
-
-// Comment data structure
-interface Comment {
-  id: number | string;
-  content: string;
-  user_id: number | string;
-  username: string;
-  created_at: string;
-}
+import {
+  Mosque,
+  Announcement,
+  WebSocketMessage,
+  WebSocketAnnouncementData,
+  Comment,
+} from "@/lib/types";
 
 /**
  * Format a date string to localized format
@@ -148,6 +90,8 @@ export default function MosquePage() {
     [key: string]: boolean;
   }>({});
   const [commentInput, setCommentInput] = useState("");
+  const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false); // ✅ Add mobile chat sidebar state
+  const [showScrollTop, setShowScrollTop] = useState(false); // ✅ Add scroll to top state
 
   const router = useRouter();
 
@@ -173,6 +117,35 @@ export default function MosquePage() {
     };
     checkLoginStatus();
   }, []);
+
+  // ✅ Add scroll listener untuk scroll to top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const truncateHtmlContent = (content: string, maxLength: number) => {
+    // Create a temporary div to parse HTML
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = content;
+
+    const textContent = tempDiv.textContent || tempDiv.innerText;
+
+    if (textContent.length <= maxLength) {
+      return content; // Return original content if it's short enough
+    }
+
+    // Return shortened version for display
+    return content.substring(0, maxLength) + "...";
+  };
 
   /**
    * Fetch mosque data and its announcements
@@ -219,7 +192,8 @@ export default function MosquePage() {
                 comment_count: a.commentCount ?? a.comment_count ?? 0,
                 liked_by_user: a.likedByUser ?? a.liked_by_user ?? false,
                 author: a.author_name ? { username: a.author_name } : undefined,
-              }))
+                mosque: mosque, // Add the mosque object here
+              })) as Announcement[]
             );
           }
         } catch (announcementError) {
@@ -320,7 +294,7 @@ export default function MosquePage() {
     }
 
     // Handle new announcements
-    if (messageType === "new_announcement" && messageData) {
+    if (messageType === "new_announcement" && messageData && mosque) {
       const announcementId =
         typeof messageData.id === "string"
           ? parseInt(messageData.id, 10)
@@ -333,6 +307,7 @@ export default function MosquePage() {
         url: messageData.media_url ?? undefined,
         mosqueId: Number(messageData.mosque_id),
         createdAt: messageData.created_at,
+        mosque: mosque, // Add the mosque object from state
       };
 
       // Add new announcement if it doesn't already exist
@@ -342,7 +317,7 @@ export default function MosquePage() {
         return sortAnnouncementsByLatestId([newAnnouncement, ...prev]);
       });
     }
-  }, [lastMessage]);
+  }, [lastMessage, mosque]);
 
   /**
    * Handle like action for an announcement
@@ -498,11 +473,9 @@ export default function MosquePage() {
   return (
     <>
       <Navbar />
-      <div className="flex bg-gray-100 min-h-screen">
-        <div className="sticky top-0 h-screen z-30">
-          <Sidebar />
-        </div>
-        <div className="flex-1 px-4 py-8">
+      <div className="flex bg-gray-100 min-h-screen relative">
+        {/* Main Content */}
+        <div className="flex-1 px-4 py-8 lg:pr-80 pb-24">
           {/* WebSocket Status Indicator */}
           <div className="max-w-5xl mx-auto mb-4">
             <span
@@ -578,9 +551,14 @@ export default function MosquePage() {
                           </div>
 
                           {/* Announcement Content */}
-                          <p className="text-gray-700 whitespace-pre-wrap">
-                            {announcement.content}
-                          </p>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: truncateHtmlContent(
+                                announcement.content,
+                                100
+                              ),
+                            }}
+                          />
 
                           {/* Announcement Image */}
                           {announcement.url && (
@@ -807,6 +785,7 @@ export default function MosquePage() {
                 )}
               </div>
             </section>
+
             {/* Mosque Details Section */}
             <aside className="md:col-span-1 text-black">
               <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -844,15 +823,24 @@ export default function MosquePage() {
               </div>
             </aside>
           </div>
+        </div>
 
-          {/* Back to Top Button */}
+        {/* Desktop Chat Sidebar - Fixed positioning */}
+        <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
+          <ChatSidebar />
+        </div>
+      </div>
+
+      {/* ✅ Fixed Floating Buttons Container - Same as dashboard */}
+      <div className="fixed bottom-6 right-6 flex flex-col items-end space-y-3 z-50">
+        {/* Scroll to Top Button - Hide on mobile */}
+        {showScrollTop && (
           <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg z-10 transition-opacity hover:opacity-90"
-            aria-label="Back to top"
+            onClick={scrollToTop}
+            className="hidden lg:flex bg-gray-800 hover:bg-gray-900 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
           >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5 group-hover:scale-110 transition-transform"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -865,10 +853,40 @@ export default function MosquePage() {
               />
             </svg>
           </button>
-        </div>
-        <div className="sticky top-0 h-screen z-30">
-          <ChatSidebar />
-        </div>
+        )}
+
+        {/* Mobile Chat Button */}
+        <button
+          onClick={() => setIsChatSidebarOpen(true)}
+          className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group"
+        >
+          <svg
+            className="w-6 h-6 group-hover:scale-110 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
+          </svg>
+
+          {/* Notification Badge */}
+          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+            3
+          </div>
+        </button>
+      </div>
+
+      {/* ✅ Mobile Chat Sidebar Modal */}
+      <div className="lg:hidden">
+        <ChatSidebar
+          isOpen={isChatSidebarOpen}
+          onClose={() => setIsChatSidebarOpen(false)}
+        />
       </div>
     </>
   );
