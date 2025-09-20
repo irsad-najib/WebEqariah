@@ -54,6 +54,7 @@ export class ClientCookies {
  */
 export const authCookies = {
   // Simpan data login (token + user data)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setAuthData: (token: string, userData: any) => {
     ClientCookies.set(COOKIE_NAMES.AUTH_TOKEN, token, 7); // 7 hari
     ClientCookies.set(COOKIE_NAMES.USER_DATA, JSON.stringify(userData), 7);
