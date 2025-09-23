@@ -8,7 +8,12 @@ import Image from "next/image";
 import { Upload } from "lucide-react";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { Announcement } from "@/lib/types";
-import MyEditor from "@/components/features/form/form";
+import dynamic from 'next/dynamic';
+
+// Import MyEditor with no SSR
+const MyEditor = dynamic(() => import("@/components/features/form/form"), {
+  ssr: false
+});
 
 // Interface untuk form pengumuman baru
 interface NewAnnouncementForm {
@@ -185,17 +190,26 @@ const DashboardPage = () => {
   };
 
   const truncateHtmlContent = (content: string, maxLength: number) => {
-    // Create a temporary div to parse HTML
+    // Always check if we're on client side for DOM operations
+    if (typeof window === 'undefined') {
+      // Server-side fallback
+      const stripped = content.replace(/<[^>]*>/g, ''); // Remove HTML tags
+      if (stripped.length <= maxLength) {
+        return content;
+      }
+      return stripped.substring(0, maxLength) + "...";
+    }
+
+    // Client-side DOM parsing
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = content;
 
     const textContent = tempDiv.textContent || tempDiv.innerText;
 
     if (textContent.length <= maxLength) {
-      return content; // Return original content if it's short enough
+      return content;
     }
 
-    // Return shortened version for display
     return content.substring(0, maxLength) + "...";
   };
 

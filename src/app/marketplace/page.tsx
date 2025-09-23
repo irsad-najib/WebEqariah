@@ -5,9 +5,20 @@ import Image from "next/image";
 import { Upload, User, Heart, MessageCircle, ArrowUp } from "lucide-react";
 import { axiosInstance } from "@/lib/utils/api";
 import { useWebSocket } from "@/lib/hooks/useWs";
-import MyEditor from "@/components/features/form/form"; // Import MyEditor component
 import { Navbar } from "@/components/layout/Navbar";
-import { ChatSidebar } from "@/components/features/chat/ChatSidebar"; // Import ChatSidebar
+import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+import dynamic from "next/dynamic";
+
+// Import MyEditor with dynamic import to prevent SSR issues
+const MyEditor = dynamic(() => import("@/components/features/form/form"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center p-4 border border-gray-300 rounded-lg bg-gray-50">
+      <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
+      <span className="ml-2 text-gray-600">Loading editor...</span>
+    </div>
+  ),
+});
 
 // Interface definitions
 interface UserInfo {
@@ -47,12 +58,11 @@ interface MarketplaceComment {
 
 export default function MarketplacePage() {
   // State declarations
-  const [newMarketplaceItem, setNewMarketplaceItem] = useState<
-    NewMarketplaceItemForm
-  >({
-    title: "",
-    content: "",
-  });
+  const [newMarketplaceItem, setNewMarketplaceItem] =
+    useState<NewMarketplaceItemForm>({
+      title: "",
+      content: "",
+    });
   const [error, setError] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -80,7 +90,22 @@ export default function MarketplacePage() {
   const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // const MAX_CONTENT_LENGTH = 150; // Maximum characters to display
+  // Add new state for expanded content
+  const [expandedItems, setExpandedItems] = useState<{
+    [key: number]: boolean;
+  }>({});
+
+  // Add state to track which items need expand button (client-side only)
+  const [itemsNeedExpand, setItemsNeedExpand] = useState<{
+    [key: number]: boolean;
+  }>({});
+
+  // Add state to track if component is mounted
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Scroll to top functionality
   const scrollToTop = () => {
@@ -128,6 +153,29 @@ export default function MarketplacePage() {
     checkAuth();
     fetchMarketplaceItems();
   }, []);
+
+  // Effect to check content length on client side only
+  useEffect(() => {
+    if (!isMounted) return;
+
+    const checkContentLength = () => {
+      const newItemsNeedExpand: { [key: number]: boolean } = {};
+
+      marketplaceItems.forEach((item) => {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = item.content;
+        const textContent = tempDiv.textContent || tempDiv.innerText;
+        const lines = textContent.split("\n").length;
+        newItemsNeedExpand[item.id] = lines > 4 || textContent.length > 200;
+      });
+
+      setItemsNeedExpand(newItemsNeedExpand);
+    };
+
+    if (marketplaceItems.length > 0) {
+      checkContentLength();
+    }
+  }, [marketplaceItems, isMounted]);
 
   // Handler for title changes
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -460,11 +508,6 @@ export default function MarketplacePage() {
     }
   }, [lastMessage]);
 
-  // Add new state for expanded content
-  const [expandedItems, setExpandedItems] = useState<{
-    [key: number]: boolean;
-  }>({});
-
   // Function to toggle content expansion
   const toggleContentExpansion = (itemId: number) => {
     setExpandedItems((prev) => ({
@@ -473,13 +516,9 @@ export default function MarketplacePage() {
     }));
   };
 
-  // Function to count visible lines in content
-  const shouldShowExpand = (content: string) => {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = content;
-    const textContent = tempDiv.textContent || tempDiv.innerText;
-    const lines = textContent.split("\n").length;
-    return lines > 4 || textContent.length > 200; // Show expand if more than 4 lines or 200 chars
+  // Replace the shouldShowExpand function with this simpler version
+  const shouldShowExpand = (itemId: number) => {
+    return itemsNeedExpand[itemId] || false;
   };
 
   // Function to open the full content modal
@@ -491,6 +530,18 @@ export default function MarketplacePage() {
   const closeFullContentModal = () => {
     setFullContentModal(null);
   };
+
+  // Don't render until mounted (client-side only)
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-zinc-200">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-200 text-black">
@@ -713,8 +764,7 @@ export default function MarketplacePage() {
                       <div
                         className={`prose max-w-none text-sm leading-relaxed break-words transition-all duration-300 overflow-hidden ${
                           // Line clamp based on expansion state
-                          !expandedItems[item.id] &&
-                          shouldShowExpand(item.content)
+                          !expandedItems[item.id] && shouldShowExpand(item.id)
                             ? "line-clamp-4"
                             : ""
                         }`}
@@ -729,7 +779,7 @@ export default function MarketplacePage() {
                       />
 
                       {/* Action buttons for long content */}
-                      {shouldShowExpand(item.content) && (
+                      {shouldShowExpand(item.id) && (
                         <div className="mt-2 flex gap-2">
                           <button
                             onClick={() => toggleContentExpansion(item.id)}

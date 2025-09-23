@@ -2,10 +2,27 @@
 
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { axiosInstance } from "@/lib/utils/api";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  Suspense,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
-import MyEditor from "@/components/features/form/form";
+import dynamic from "next/dynamic";
+
+// Import MyEditor with dynamic import to prevent SSR issues
+const MyEditor = dynamic(() => import("@/components/features/form/form"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center p-4 border border-gray-300 rounded-lg bg-gray-50">
+      <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
+      <span className="ml-2 text-gray-600">Loading editor...</span>
+    </div>
+  ),
+});
 
 interface Message {
   id: number;
@@ -24,7 +41,8 @@ interface User {
   affiliatedMosqueId?: number;
 }
 
-const MessagePage = () => {
+// Separate component for search params handling
+function MessagePageContent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
@@ -149,7 +167,17 @@ const MessagePage = () => {
   );
 
   const truncateHtmlContent = (content: string) => {
-    // Create a temporary div to parse HTML
+    // Check if we're on the client side
+    if (typeof window === "undefined") {
+      // Server-side fallback - simple string truncation without DOM
+      const stripped = content.replace(/<[^>]*>/g, ""); // Remove HTML tags
+      if (stripped.length <= 100) {
+        return content;
+      }
+      return stripped.substring(0, 100) + "...";
+    }
+
+    // Client-side DOM parsing
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = content;
 
@@ -423,7 +451,7 @@ const MessagePage = () => {
                     users.map((user) => (
                       <div
                         key={user.id}
-                        onClick={() => handleUserSelect(user.id)} // Updated to use handleUserSelect
+                        onClick={() => handleUserSelect(user.id)}
                         className={`p-4 cursor-pointer transition-all duration-200 border-b border-gray-100 hover:bg-gray-50 ${
                           selectedUserId === user.id
                             ? "bg-blue-50 border-l-4 border-l-blue-500"
@@ -468,7 +496,7 @@ const MessagePage = () => {
                 />
               )}
 
-              {/* Chat Area - rest remains the same */}
+              {/* Chat Area */}
               <div className="flex-1 flex flex-col">
                 {selectedUserId ? (
                   <>
@@ -593,7 +621,7 @@ const MessagePage = () => {
                               )
                             }
                             uploadEndpoint="/api/upload-media"
-                            showSendButton={false} // gunakan tombol kirim eksternal agar styling konsisten
+                            showSendButton={false}
                           />
                         </div>
                         <button
@@ -658,6 +686,24 @@ const MessagePage = () => {
         </div>
       </div>
     </>
+  );
+}
+
+// Main component with Suspense wrapper
+const MessagePage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+            <p className="text-gray-600 font-medium">Loading page...</p>
+          </div>
+        </div>
+      }
+    >
+      <MessagePageContent />
+    </Suspense>
   );
 };
 
