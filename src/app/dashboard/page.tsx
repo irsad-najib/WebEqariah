@@ -98,6 +98,7 @@ const DashboardPage = () => {
             createdAt: ann.created_at,
           })) || [];
         setAnnouncements(sortAnnouncementsByLatestId(transformedAnnouncements));
+        console.log("fetched announcements", transformedAnnouncements);
       } catch (error) {
         console.log("error fetching announcements", error);
       }
