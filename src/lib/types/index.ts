@@ -46,8 +46,8 @@ export interface Announcement {
   author_name?: string; // Backend format, akan dihapus setelah standardisasi
   mosqueId: number;
   mosque_id?: number; // Backend format, akan dihapus setelah standardisasi
-  mosque: Mosque;
   author?: User;
+  mosque: Mosque;
   like_count?: number;
   comment_count?: number;
   liked_by_user?: boolean;

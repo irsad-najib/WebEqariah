@@ -86,19 +86,10 @@ const DashboardPage = () => {
               id: ann.mosque_id,
               name: ann.mosqueInfo?.name,
               image: ann.mosqueInfo?.image || null,
-              addressLine1: "",
-              addressLine2: "",
-              city: "",
-              state: "",
-              postalCode: "",
-              country: "",
-              phone: "",
-              email: "",
             },
-            createdAt: ann.created_at,
+            createdAt: ann.createdAt,
           })) || [];
         setAnnouncements(sortAnnouncementsByLatestId(transformedAnnouncements));
-        console.log("fetched announcements", transformedAnnouncements);
       } catch (error) {
         console.log("error fetching announcements", error);
       }
@@ -508,7 +499,7 @@ const DashboardPage = () => {
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold">
-                          {announcement.mosque?.mosqueName || "Mosque"}
+                          {announcement.mosqueInfo?.name || "Mosque"}
                         </h3>
                         <p className="text-gray-500 mt-2 whitespace-pre-wrap">
                           {new Date(
