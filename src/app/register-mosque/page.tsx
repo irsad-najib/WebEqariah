@@ -52,9 +52,8 @@ const RegisterMosque = () => {
   const [errors, setErrors] = useState<ErrorType>({});
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(
-    false
-  );
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
   const [uploading, setUploading] = useState<boolean>(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -225,13 +224,24 @@ const RegisterMosque = () => {
         alert("Registration Mosque was succesfull");
         router.push("/registration-success");
       } else {
-        throw new Error(response.data.error || "Registration failed");
+        // Ambil pesan error dari response
+        const errorMsg =
+          response.data?.error?.message ||
+          response.data?.error ||
+          "Registration failed";
+        throw new Error(errorMsg);
       }
-    } catch (error) {
-      const err = error as Error;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      // Ambil pesan error dari response jika ada
+      const errMsg =
+        error?.response?.data?.error?.message ||
+        error?.message ||
+        "Error during registration";
       setErrors((prev) => ({
         ...prev,
-        submit: err.message || "Error during registration",
+        submit: errMsg,
       }));
     } finally {
       setLoading(false);

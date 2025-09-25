@@ -51,6 +51,11 @@ export interface Announcement {
   like_count?: number;
   comment_count?: number;
   liked_by_user?: boolean;
+  mosqueInfo?: {
+    id: number;
+    name: string;
+    image: string | null;
+  };
 }
 
 // ========== FORM TYPES ==========

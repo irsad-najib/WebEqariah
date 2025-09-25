@@ -8,11 +8,11 @@ import Image from "next/image";
 import { Upload } from "lucide-react";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { Announcement } from "@/lib/types";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
 // Import MyEditor with no SSR
 const MyEditor = dynamic(() => import("@/components/features/form/form"), {
-  ssr: false
+  ssr: false,
 });
 
 // Interface untuk form pengumuman baru
@@ -84,8 +84,8 @@ const DashboardPage = () => {
             mosqueId: ann.mosque_id,
             mosque: {
               id: ann.mosque_id,
-              mosqueName: "Mosque",
-              url: null,
+              name: ann.mosqueInfo?.name,
+              image: ann.mosqueInfo?.image || null,
               addressLine1: "",
               addressLine2: "",
               city: "",
@@ -121,7 +121,7 @@ const DashboardPage = () => {
   };
 
   const { connectionStatus, lastMessage } = useWebSocket(
-    "ws://localhost:5000/api/ws",
+    "wss://api.eqariah.com/api/ws",
     affiliatedMosqueId ? String(affiliatedMosqueId) : undefined
   );
 
@@ -191,9 +191,9 @@ const DashboardPage = () => {
 
   const truncateHtmlContent = (content: string, maxLength: number) => {
     // Always check if we're on client side for DOM operations
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       // Server-side fallback
-      const stripped = content.replace(/<[^>]*>/g, ''); // Remove HTML tags
+      const stripped = content.replace(/<[^>]*>/g, ""); // Remove HTML tags
       if (stripped.length <= maxLength) {
         return content;
       }
@@ -499,8 +499,8 @@ const DashboardPage = () => {
                     <div className="flex items-center space-x-4">
                       <div className="relative w-12 h-12">
                         <Image
-                          src={announcement.mosque?.url || "/mosque.png"}
-                          alt={announcement.mosque?.mosqueName || "Mosque"}
+                          src={announcement.mosqueInfo?.image || "/mosque.png"}
+                          alt={announcement.mosqueInfo?.name || "Mosque"}
                           className="rounded-full"
                           fill
                         />

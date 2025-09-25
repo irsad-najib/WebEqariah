@@ -450,7 +450,7 @@ export default function MarketplacePage() {
 
   // WebSocket hook untuk menerima update real-time
   const { connectionStatus, lastMessage } = useWebSocket(
-    "ws://localhost:5000/api/ws",
+    "wss://api.eqariah.com/api/ws",
     "marketplace" // Special subscription for marketplace
   );
 

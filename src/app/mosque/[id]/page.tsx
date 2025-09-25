@@ -97,7 +97,7 @@ export default function MosquePage() {
 
   // WebSocket connection
   const { connectionStatus, lastMessage } = useWebSocket(
-    "ws://localhost:5000/api/ws",
+    "wss://api.eqariah.com/api/ws",
     mosqueId
   );
 
