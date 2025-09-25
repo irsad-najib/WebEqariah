@@ -82,7 +82,7 @@ const DashboardPage = () => {
             content: ann.content,
             url: ann.media_url || null,
             mosqueId: ann.mosque_id,
-            mosque: {
+            mosqueInfo: {
               id: ann.mosque_id,
               name: ann.mosqueInfo?.name,
               image: ann.mosqueInfo?.image || null,
@@ -367,13 +367,13 @@ const DashboardPage = () => {
                     showSendButton={false}
                   />
                 </div>
-                <button
+                {/* <button
                   type="button"
                   onClick={() => setIsOpen(true)}
                   className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 >
                   Select images for announcement
-                </button>
+                </button> */}
 
                 {/* Image Upload Modal */}
                 {isOpen && (
