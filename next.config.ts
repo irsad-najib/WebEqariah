@@ -4,15 +4,20 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        // protocol: "https",
-        // hostname: "blobstorageeqariah.blob.core.windows.net",
-        // pathname: "/eqariah-images/**",
+        protocol: "https",
+        hostname: "eqariahblob.blob.core.windows.net",
+        pathname: "/eqariah/**", // atau "/eqariah/images/**" jika lebih spesifik
+      },
+      {
+        // Tetap pertahankan untuk development local
         protocol: "http",
         hostname: "localhost",
         port: "5000",
         pathname: "/static/uploads/**",
       },
     ],
+    // Optional: Jika ingin nonaktifkan optimisasi Next.js sepenuhnya
+    // unoptimized: true,
   },
 };
 
