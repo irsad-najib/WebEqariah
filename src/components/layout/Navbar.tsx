@@ -71,6 +71,26 @@ const mainNavLinks = [
       </svg>
     ),
   },
+  {
+    href: "/register-mosque",
+    children: "Register Mosque",
+    icon: (
+      <svg
+        width="20"
+        height="20"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 3v2m0 0l3 3m-3-3L9 8m3-3v13m-7 0h14a1 1 0 001-1v-7a1 1 0 00-.553-.894l-6.447-3.224a1 1 0 00-.894 0l-6.447 3.224A1 1 0 003 10v7a1 1 0 001 1z"
+        />
+      </svg>
+    ),
+  },
   // Profile dihapus karena sudah ada di profile dropdown
 ];
 
