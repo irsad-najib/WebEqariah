@@ -6,6 +6,8 @@ import { axiosInstance } from "@/lib/utils/api";
 import { Eye, EyeOff } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { useToast, ToastContainer } from "@/components/ui/toast";
+import { handleError } from "@/lib/utils/errorHandler";
 // import { User, FormState } from "../lib/types";
 
 const Login = () => {
@@ -15,14 +17,14 @@ const Login = () => {
     identifier: "",
     password: "",
   });
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const { toasts, closeToast, success, error } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError("");
   };
   //check auth status
   useEffect(() => {
@@ -42,6 +44,8 @@ const Login = () => {
       } catch (er) {
         console.log("session verification failed", er);
         setIsLoggedIn(false);
+      } finally {
+        setIsCheckingAuth(false);
       }
     };
     chekLoggedIn();
@@ -49,11 +53,17 @@ const Login = () => {
   //handler for login submit button
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
+    // Validation
     if (!formData.identifier || !formData.password) {
-      setError("All fields are required");
+      error("Validation Error", "All fields are required");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      error("Validation Error", "Password must be at least 6 characters");
       setLoading(false);
       return;
     }
@@ -64,65 +74,84 @@ const Login = () => {
       });
 
       if (response.data.success) {
+        success(
+          "Login Successful!",
+          "Welcome back! Redirecting to dashboard..."
+        );
         setIsLoggedIn(true);
-        router.replace("/dashboard");
+
+        // Delay redirect to show success message
+        setTimeout(() => {
+          router.replace("/dashboard");
+        }, 1000);
       } else {
-        setError("login Failed :" + (response.data.message || "unknown error"));
+        error(
+          "Login Failed",
+          response.data.message || "Invalid credentials. Please try again."
+        );
       }
     } catch (err) {
       console.error("Login Error", err);
-
-      let errorMessage = "Unknown error";
-
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      } else if (
-        typeof err === "object" &&
-        err !== null &&
-        "response" in err &&
-        typeof (err as { response?: { data?: { message?: string } } }).response
-          ?.data?.message === "string"
-      ) {
-        errorMessage = (err as { response: { data: { message: string } } })
-          .response.data.message;
-      }
-
-      setError("Login Failed: " + errorMessage);
+      const appError = handleError(err);
+      error(
+        appError.message,
+        appError.description || "Please check your credentials and try again."
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  // Show loading state while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoggedIn) {
-    return <p>Redirecting...</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting...</p>
+        </div>
+      </div>
+    );
   }
   return (
     <>
+      <ToastContainer toasts={toasts} onClose={closeToast} />
       <Navbar />
-      <div className="min-h-screen flex bg-gray-100">
+      <div className="min-h-screen flex bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="flex-1 flex flex-col md:flex-row lg:flex-row items-center">
           {/* Left Section */}
           <div className="flex-1 flex flex-col justify-center p-[6%] lg:p-38">
-            <h1 className="text-green-600 text-[10vw] md:text-[7vw] lg:text-7xl font-bold">
+            <h1 className="text-green-600 text-[10vw] md:text-[7vw] lg:text-7xl font-bold animate-fade-in">
               Eqariah
             </h1>
-            <p className="text-gray-700 text-[4vw] md:text-[3vw] lg:text-xl mt-4">
+            <p className="text-gray-700 text-[4vw] md:text-[3vw] lg:text-xl mt-4 animate-fade-in-delay">
               Eqariah helps you connect and share with all moslems in the world.
             </p>
           </div>
           {/* Right Section (Login Box) */}
           <div className="flex justify-center items-center flex-1 p-[6%] lg:p-38">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-              <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">
-                Log in
-              </h2>
-              {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                  {error}
-                </div>
-              )}
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="bg-white p-8 rounded-2xl shadow-2xl w-96 border border-gray-100 hover:shadow-3xl transition-shadow duration-300">
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-gray-800">
+                  Welcome Back
+                </h2>
+                <p className="text-gray-500 mt-2">Sign in to your account</p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-gray-700 font-bold mb-2">
+                  <label className="block text-gray-700 font-semibold mb-2 text-sm">
                     Email or Username
                   </label>
                   <input
@@ -130,13 +159,14 @@ const Login = () => {
                     name="identifier"
                     value={formData.identifier}
                     onChange={handleChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter Email or Username"
                     required
+                    disabled={loading}
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-bold mb-2">
+                  <label className="block text-gray-700 font-semibold mb-2 text-sm">
                     Password
                   </label>
                   <div className="relative">
@@ -145,15 +175,16 @@ const Login = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter password"
                       required
+                      disabled={loading}
                     />
                     <button
                       type="button"
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                       onClick={() => setShowPassword(!showPassword)}
-                    >
+                      disabled={loading}>
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
@@ -161,24 +192,47 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50"
-                >
-                  {loading ? "Loading..." : "Log in"}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-300 w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg">
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Signing in...
+                    </span>
+                  ) : (
+                    "Sign In"
+                  )}
                 </button>
               </form>
               <p className="mt-6 text-center">
                 <a
                   href="#"
-                  className="text-green-500 hover:text-green-700 text-sm"
-                >
+                  className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors">
                   Forgotten password?
                 </a>
               </p>
               <div className="text-center mt-6">
+                <p className="text-gray-600 text-sm mb-3">
+                  Don&apos;t have an account?
+                </p>
                 <a
                   href="/register"
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                >
+                  className="inline-block bg-gray-100 hover:bg-gray-200 text-green-600 font-bold py-2.5 px-6 rounded-lg transition-all duration-200 border-2 border-green-600">
                   Create new account
                 </a>
               </div>
@@ -187,6 +241,25 @@ const Login = () => {
         </div>
       </div>
       <Footer />
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+        .animate-fade-in-delay {
+          animation: fade-in 0.6s ease-out 0.2s both;
+        }
+      `}</style>
     </>
   );
 };

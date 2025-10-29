@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ApiResponse, User, Mosque, Announcement } from "../types";
 import { authCookies } from "./cookies";
+import { handleError } from "./errorHandler";
 
 /**
  * Base API client
@@ -31,13 +32,34 @@ class ApiClient {
       const response = await fetch(`${this.baseURL}${endpoint}`, config);
 
       if (!response.ok) {
-        // Handle 401 - clear cookies
-        if (response.status === 401) {
-          authCookies.clearAuthData();
-          window.location.href = "/login";
+        // Parse error response
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { message: `HTTP error! status: ${response.status}` };
         }
 
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Handle 401 - clear cookies and redirect
+        if (response.status === 401) {
+          authCookies.clearAuthData();
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
+        }
+
+        // Create error with proper structure
+        const error = {
+          type: response.status === 401 ? "AUTHENTICATION" : "SERVER",
+          message:
+            errorData.message ||
+            errorData.error ||
+            `Request failed with status ${response.status}`,
+          statusCode: response.status,
+          description: errorData.description,
+        };
+
+        throw error;
       }
 
       const data = await response.json();
@@ -49,10 +71,12 @@ class ApiClient {
       };
     } catch (error) {
       console.error("API Request failed:", error);
+      const appError = handleError(error);
+
       return {
         success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
-        error: error instanceof Error ? error.message : "Unknown error",
+        message: appError.message,
+        error: appError.description || appError.message,
       };
     }
   }
@@ -97,7 +121,22 @@ class ApiClient {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = {
+            message: `Upload failed with status ${response.status}`,
+          };
+        }
+
+        const error = {
+          type: "SERVER",
+          message: errorData.message || "Upload failed",
+          statusCode: response.status,
+        };
+
+        throw error;
       }
 
       const data = await response.json();
@@ -108,10 +147,11 @@ class ApiClient {
         data,
       };
     } catch (error) {
+      const appError = handleError(error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : "Upload failed",
-        error: error instanceof Error ? error.message : "Upload failed",
+        message: appError.message,
+        error: appError.description || appError.message,
       };
     }
   }
@@ -126,12 +166,22 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// Add interceptors if needed
+// Add interceptors with better error handling
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle global errors
-    console.error("API Error:", error);
+    // Handle global errors with better messaging
+    const appError = handleError(error);
+    console.error("API Error:", appError);
+
+    // Handle 401 globally
+    if (appError.statusCode === 401) {
+      authCookies.clearAuthData();
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
+    }
+
     return Promise.reject(error);
   }
 );

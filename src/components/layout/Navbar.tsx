@@ -22,8 +22,7 @@ const NavLink = ({
   <Link
     href={href}
     onClick={onClick}
-    className={`flex items-center gap-3 hover:text-gray-200 transition-colors duration-200 ${className}`}
-  >
+    className={`flex items-center gap-3 hover:text-gray-200 transition-colors duration-200 ${className}`}>
     {icon && <span className="flex-shrink-0">{icon}</span>}
     {children}
   </Link>
@@ -40,8 +39,7 @@ const mainNavLinks = [
         height="20"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+        stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -60,8 +58,7 @@ const mainNavLinks = [
         height="20"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+        stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -80,8 +77,7 @@ const mainNavLinks = [
         height="20"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+        stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -105,8 +101,7 @@ const featureLinks = [
         height="20"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+        stroke="currentColor">
         <circle cx="12" cy="12" r="10" strokeWidth="2" />
         <path d="M12 6v6l4 2" strokeWidth="2" strokeLinecap="round" />
       </svg>
@@ -121,8 +116,7 @@ const featureLinks = [
         height="20"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+        stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -141,8 +135,7 @@ const featureLinks = [
         height="20"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+        stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -161,8 +154,7 @@ const featureLinks = [
         height="20"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+        stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -242,8 +234,7 @@ export const Navbar = () => {
             <NavLink
               href="/"
               className="text-white text-xl lg:text-2xl font-bold truncate"
-              onClick={closeMenu}
-            >
+              onClick={closeMenu}>
               Eqariah
             </NavLink>
           </div>
@@ -257,26 +248,47 @@ export const Navbar = () => {
                   key={href}
                   href={href}
                   className="text-white text-lg hover:bg-white/10 px-3 py-2 rounded-lg transition-all"
-                  icon={icon}
-                >
+                  icon={icon}>
                   {children}
                 </NavLink>
               ))}
+
+              {/* Dashboard Link - Only for logged in users */}
+              {isLogin && (
+                <NavLink
+                  href="/dashboard"
+                  className="text-white text-lg hover:bg-white/10 px-3 py-2 rounded-lg transition-all"
+                  icon={
+                    <svg
+                      width="20"
+                      height="20"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"
+                      />
+                    </svg>
+                  }>
+                  Dashboard
+                </NavLink>
+              )}
 
               {/* Features Dropdown (only for logged in users) */}
               {isLogin && (
                 <div className="relative">
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-2 text-white text-lg hover:bg-white/10 px-3 py-2 rounded-lg transition-all"
-                  >
+                    className="flex items-center gap-2 text-white text-lg hover:bg-white/10 px-3 py-2 rounded-lg transition-all">
                     <svg
                       width="20"
                       height="20"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                      stroke="currentColor">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -291,8 +303,7 @@ export const Navbar = () => {
                       }`}
                       fill="none"
                       stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                      viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -318,8 +329,7 @@ export const Navbar = () => {
                             key={children}
                             href={href}
                             onClick={closeDropdown}
-                            className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
-                          >
+                            className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
                             <span className="text-gray-500">{icon}</span>
                             {children}
                           </Link>
@@ -339,8 +349,7 @@ export const Navbar = () => {
                   onClick={() =>
                     setIsProfileDropdownOpen(!isProfileDropdownOpen)
                   }
-                  className="flex items-center space-x-3 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm"
-                >
+                  className="flex items-center space-x-3 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm">
                   {/* Avatar */}
                   <div className="w-9 h-9 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
                     <span className="text-white text-sm font-bold">
@@ -365,8 +374,7 @@ export const Navbar = () => {
                     }`}
                     fill="none"
                     stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                    viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -408,19 +416,39 @@ export const Navbar = () => {
 
                       {/* Menu Items */}
                       <div className="py-2">
+                        {/* Dashboard Link */}
                         <Link
-                          href="/profile"
+                          href="/dashboard"
                           onClick={closeProfileDropdown}
-                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
+                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
                           <svg
                             width="20"
                             height="20"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
-                            className="text-gray-500"
-                          >
+                            className="text-gray-500">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"
+                            />
+                          </svg>
+                          <span className="font-medium">Dashboard</span>
+                        </Link>
+
+                        <Link
+                          href="/profile"
+                          onClick={closeProfileDropdown}
+                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                          <svg
+                            width="20"
+                            height="20"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            className="text-gray-500">
                             <circle cx="12" cy="8" r="4" strokeWidth="2" />
                             <path
                               d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4"
@@ -433,16 +461,14 @@ export const Navbar = () => {
                         <Link
                           href="/settings"
                           onClick={closeProfileDropdown}
-                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
+                          className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
                           <svg
                             width="20"
                             height="20"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
-                            className="text-gray-500"
-                          >
+                            className="text-gray-500">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -465,16 +491,14 @@ export const Navbar = () => {
                         {/* Logout Button */}
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors"
-                        >
+                          className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors">
                           <svg
                             width="20"
                             height="20"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
-                            className="text-red-500"
-                          >
+                            className="text-red-500">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -493,15 +517,13 @@ export const Navbar = () => {
               <div className="flex items-center space-x-3">
                 <NavLink
                   href="/login"
-                  className="flex items-center gap-2 text-white bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-xl transition-all font-medium backdrop-blur-sm border border-white/20"
-                >
+                  className="flex items-center gap-2 text-white bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-xl transition-all font-medium backdrop-blur-sm border border-white/20">
                   <svg
                     width="20"
                     height="20"
                     fill="none"
                     viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                    stroke="currentColor">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -519,14 +541,12 @@ export const Navbar = () => {
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="lg:hidden text-white focus:outline-none p-2"
-            aria-label="Toggle menu"
-          >
+            aria-label="Toggle menu">
             <svg
               className="w-6 h-6"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+              viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -550,8 +570,7 @@ export const Navbar = () => {
       <div
         className={`lg:hidden fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
           isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
+        }`}>
         {/* Sidebar Header */}
         <div className="bg-[#4caf4f] p-4 text-white">
           <div className="flex items-center justify-between">
@@ -567,14 +586,12 @@ export const Navbar = () => {
             </div>
             <button
               onClick={closeMenu}
-              className="text-white hover:bg-white/20 p-2 rounded-lg"
-            >
+              className="text-white hover:bg-white/20 p-2 rounded-lg">
               <svg
                 className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+                viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -618,11 +635,35 @@ export const Navbar = () => {
                 href={href}
                 onClick={closeMenu}
                 className="w-full p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                icon={icon}
-              >
+                icon={icon}>
                 {children}
               </NavLink>
             ))}
+
+            {/* Dashboard Link - Only for logged in users */}
+            {isLogin && (
+              <NavLink
+                href="/dashboard"
+                onClick={closeMenu}
+                className="w-full p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                icon={
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"
+                    />
+                  </svg>
+                }>
+                Dashboard
+              </NavLink>
+            )}
           </div>
 
           {/* Feature Links (only for logged in users) */}
@@ -637,8 +678,7 @@ export const Navbar = () => {
                   href={href}
                   onClick={closeMenu}
                   className="w-full p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                  icon={icon}
-                >
+                  icon={icon}>
                   {children}
                 </NavLink>
               ))}
@@ -650,15 +690,13 @@ export const Navbar = () => {
             {isLogin ? (
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
+                className="w-full flex items-center gap-3 p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                 <svg
                   width="20"
                   height="20"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                  stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -681,8 +719,7 @@ export const Navbar = () => {
                     alt="User Icon"
                     className="w-5 h-5"
                   />
-                }
-              >
+                }>
                 Login
               </NavLink>
             )}
