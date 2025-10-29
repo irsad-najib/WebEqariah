@@ -12,43 +12,48 @@ import { handleError } from "@/lib/utils/errorHandler";
 
 const Login = () => {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formData, setFormData] = useState({
     identifier: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const { toasts, closeToast, success, error } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  //check auth status
+
+  // Check auth status sekali aja di background, no loading, no state update
   useEffect(() => {
-    const chekLoggedIn = async () => {
+    let isMounted = true;
+
+    const checkAuth = async () => {
       try {
         const authRes = await axiosInstance.get("api/auth/verify", {
           withCredentials: true,
         });
 
-        if (authRes.data.role === "user") {
-          setIsLoggedIn(true);
-          router.replace("/");
-        } else {
-          setIsLoggedIn(true);
-          router.replace("/dashboard");
+        // Only redirect if component still mounted and user is authenticated
+        if (isMounted && authRes.data.Authenticated) {
+          if (authRes.data.user.role === "admin") {
+            router.replace("/adminDashboard");
+          } else {
+            router.replace("/dashboard");
+          }
         }
-      } catch (er) {
-        console.log("session verification failed", er);
-        setIsLoggedIn(false);
-      } finally {
-        setIsCheckingAuth(false);
+      } catch {
+        // Silent fail - user bisa tetep login manual
+        console.log("Not authenticated, showing login form");
       }
     };
-    chekLoggedIn();
+
+    checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
   //handler for login submit button
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,7 +83,6 @@ const Login = () => {
           "Login Successful!",
           "Welcome back! Redirecting to dashboard..."
         );
-        setIsLoggedIn(true);
 
         // Delay redirect to show success message
         setTimeout(() => {
@@ -102,28 +106,6 @@ const Login = () => {
     }
   };
 
-  // Show loading state while checking authentication
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Redirecting...</p>
-        </div>
-      </div>
-    );
-  }
   return (
     <>
       <ToastContainer toasts={toasts} onClose={closeToast} />
