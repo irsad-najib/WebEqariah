@@ -58,8 +58,7 @@ const Pagination: React.FC<PaginationProps> = ({
         currentPage === 1
           ? "bg-gray-200 cursor-not-allowed"
           : "bg-gray-100 hover:bg-gray-200"
-      }`}
-    >
+      }`}>
       <ChevronLeft size={16} />
     </button>
     <span className="px-3 py-1">
@@ -72,8 +71,7 @@ const Pagination: React.FC<PaginationProps> = ({
         currentPage === totalPages || totalPages === 0
           ? "bg-gray-200 cursor-not-allowed"
           : "bg-gray-100 hover:bg-gray-200"
-      }`}
-    >
+      }`}>
       <ChevronRight size={16} />
     </button>
   </div>
@@ -95,12 +93,18 @@ const AdminDashboard: React.FC = () => {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    show: boolean;
+    type: "users" | "announcements" | "mosque" | null;
+    id: number | null;
+    name: string;
+  }>({ show: false, type: null, id: null, name: "" });
+  const [deleting, setDeleting] = useState<boolean>(false);
 
   // Pagination states
   const [currentUserPage, setCurrentUserPage] = useState<number>(1);
-  const [currentAnnouncementPage, setCurrentAnnouncementPage] = useState<
-    number
-  >(1);
+  const [currentAnnouncementPage, setCurrentAnnouncementPage] =
+    useState<number>(1);
   const [currentMosquePage, setCurrentMosquePage] = useState<number>(1);
   const itemsPerPage: number = 10;
 
@@ -239,6 +243,69 @@ const AdminDashboard: React.FC = () => {
     setPreviewImage(imageUrl);
   };
 
+  const handleDeleteClick = (
+    type: "users" | "announcements" | "mosque",
+    id: number | string,
+    name: string,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+    setDeleteConfirmation({ show: true, type, id: Number(id), name });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirmation.id || !deleteConfirmation.type) return;
+
+    setDeleting(true);
+    try {
+      const endpoint =
+        deleteConfirmation.type === "users"
+          ? `api/admin/users/${deleteConfirmation.id}`
+          : deleteConfirmation.type === "announcements"
+          ? `api/admin/announcements/${deleteConfirmation.id}`
+          : `api/admin/mosques/${deleteConfirmation.id}`;
+
+      await axiosInstance.delete(endpoint, { withCredentials: true });
+
+      // Update local state to remove deleted item
+      if (deleteConfirmation.type === "users") {
+        setUsers(
+          users.filter((user) => Number(user.id) !== deleteConfirmation.id)
+        );
+      } else if (deleteConfirmation.type === "announcements") {
+        setAnnouncements(
+          announcements.filter(
+            (announcement) => announcement.id !== deleteConfirmation.id
+          )
+        );
+      } else if (deleteConfirmation.type === "mosque") {
+        setMosques(
+          mosques.filter((mosque) => mosque.id !== deleteConfirmation.id)
+        );
+      }
+
+      setDeleteConfirmation({ show: false, type: null, id: null, name: "" });
+      setError(null);
+    } catch (err) {
+      if (err && typeof err === "object" && "response" in err) {
+        const errorResponse = err.response as {
+          data?: { error?: string };
+        };
+        setError(
+          errorResponse?.data?.error || "Failed to delete. Please try again."
+        );
+      } else {
+        setError("An unexpected error occurred");
+      }
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmation({ show: false, type: null, id: null, name: "" });
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderTable = <T extends Record<string, any>>(
     data: T[],
@@ -281,8 +348,7 @@ const AdminDashboard: React.FC = () => {
               {columns.map((col) => (
                 <th
                   key={col}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {col}
                 </th>
               ))}
@@ -300,8 +366,7 @@ const AdminDashboard: React.FC = () => {
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() =>
                       setExpandedRow(expandedRow === item?.id ? null : item?.id)
-                    }
-                  >
+                    }>
                     {columns.map((col) => {
                       const value = getCellValue(item, col);
                       const isLongContent =
@@ -311,8 +376,7 @@ const AdminDashboard: React.FC = () => {
                         <td
                           key={col}
                           className="px-3 py-2 text-sm text-gray-500"
-                          title={isLongContent ? value : ""}
-                        >
+                          title={isLongContent ? value : ""}>
                           <div className="truncate max-w-xs">{value}</div>
                         </td>
                       );
@@ -322,18 +386,35 @@ const AdminDashboard: React.FC = () => {
                         {type === "mosque" && (
                           <button
                             className="text-green-600 hover:text-green-900"
-                            onClick={() => handleApproveMosque(item?.id)}
-                            disabled={item?.status === "APPROVED"}
-                          >
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleApproveMosque(item?.id);
+                            }}
+                            disabled={item?.status === "APPROVED"}>
                             {item?.status === "APPROVED"
                               ? "Approved"
                               : "Approve"}
                           </button>
                         )}
-                        <button className="text-blue-600 hover:text-blue-900">
+                        <button
+                          className="text-blue-600 hover:text-blue-900"
+                          onClick={(e) => e.stopPropagation()}>
                           <Edit size={16} />
                         </button>
-                        <button className="text-red-600 hover:text-red-900">
+                        <button
+                          className="text-red-600 hover:text-red-900 transition-colors"
+                          onClick={(e) =>
+                            handleDeleteClick(
+                              type as "users" | "announcements" | "mosque",
+                              item?.id,
+                              type === "users"
+                                ? item?.username
+                                : type === "announcements"
+                                ? item?.title
+                                : item?.mosqueName,
+                              e
+                            )
+                          }>
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -343,8 +424,7 @@ const AdminDashboard: React.FC = () => {
                     <tr>
                       <td
                         colSpan={columns.length + 1}
-                        className="px-3 py-2 bg-gray-50"
-                      >
+                        className="px-3 py-2 bg-gray-50">
                         <div className="p-2">
                           {columns.map((col) => {
                             const value = getCellValue(item, col);
@@ -369,8 +449,7 @@ const AdminDashboard: React.FC = () => {
               <tr>
                 <td
                   colSpan={columns.length + 1}
-                  className="px-6 py-4 text-center text-sm text-gray-500"
-                >
+                  className="px-6 py-4 text-center text-sm text-gray-500">
                   {searchTerm
                     ? `No ${type} match your search criteria`
                     : `No ${type} found`}
@@ -395,8 +474,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-            >
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
               Logout
             </button>
           </header>
@@ -431,8 +509,7 @@ const AdminDashboard: React.FC = () => {
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
-                  onClick={() => setActiveTab("users")}
-                >
+                  onClick={() => setActiveTab("users")}>
                   Users
                 </button>
                 <button
@@ -441,8 +518,7 @@ const AdminDashboard: React.FC = () => {
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
-                  onClick={() => setActiveTab("announcements")}
-                >
+                  onClick={() => setActiveTab("announcements")}>
                   Announcements
                 </button>
                 <button
@@ -451,8 +527,7 @@ const AdminDashboard: React.FC = () => {
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
-                  onClick={() => setActiveTab("mosque")}
-                >
+                  onClick={() => setActiveTab("mosque")}>
                   Mosque
                 </button>
               </div>
@@ -588,12 +663,10 @@ const AdminDashboard: React.FC = () => {
           {previewImage && (
             <div
               className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-              onClick={() => setPreviewImage(null)}
-            >
+              onClick={() => setPreviewImage(null)}>
               <div
                 className="bg-white p-4 rounded-lg overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-              >
+                onClick={(e) => e.stopPropagation()}>
                 <div className="relative w-96 h-96 md:w-[500px] md:h-[700px]">
                   <Image
                     src={previewImage}
@@ -604,10 +677,120 @@ const AdminDashboard: React.FC = () => {
                 </div>
                 <button
                   className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded w-full"
-                  onClick={() => setPreviewImage(null)}
-                >
+                  onClick={() => setPreviewImage(null)}>
                   Tutup
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Delete Confirmation Modal */}
+          {deleteConfirmation.show && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+              onClick={handleDeleteCancel}>
+              <div
+                className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+                onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-start mb-4">
+                  <div className="flex-shrink-0 bg-red-100 rounded-full p-3">
+                    <Trash2 className="h-6 w-6 text-red-600" />
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Confirm Delete
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Are you sure you want to delete{" "}
+                      <span className="font-semibold text-gray-700">
+                        {deleteConfirmation.name}
+                      </span>
+                      ?
+                    </p>
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-4">
+                      <p className="text-sm text-yellow-700">
+                        <strong>Warning:</strong> This action cannot be undone.
+                        All related data will be permanently deleted.
+                      </p>
+                    </div>
+                    {deleteConfirmation.type === "mosque" && (
+                      <div className="text-sm text-gray-600 mb-2">
+                        <p className="font-medium mb-1">
+                          This will also delete:
+                        </p>
+                        <ul className="list-disc list-inside space-y-1 text-xs">
+                          <li>All announcements from this mosque</li>
+                          <li>All likes on those announcements</li>
+                          <li>All comments on those announcements</li>
+                          <li>Update affiliated users</li>
+                        </ul>
+                      </div>
+                    )}
+                    {deleteConfirmation.type === "announcements" && (
+                      <div className="text-sm text-gray-600 mb-2">
+                        <p className="font-medium mb-1">
+                          This will also delete:
+                        </p>
+                        <ul className="list-disc list-inside space-y-1 text-xs">
+                          <li>All likes on this announcement</li>
+                          <li>All comments on this announcement</li>
+                        </ul>
+                      </div>
+                    )}
+                    {deleteConfirmation.type === "users" && (
+                      <div className="text-sm text-gray-600 mb-2">
+                        <p className="font-medium mb-1">
+                          This will also delete:
+                        </p>
+                        <ul className="list-disc list-inside space-y-1 text-xs">
+                          <li>All announcements by this user</li>
+                          <li>All likes by this user</li>
+                          <li>All comments by this user</li>
+                          <li>All messages sent/received</li>
+                          <li>All mosques owned by this user</li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 justify-end">
+                  <button
+                    onClick={handleDeleteCancel}
+                    disabled={deleting}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeleteConfirm}
+                    disabled={deleting}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center">
+                    {deleting ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24">
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Deleting...
+                      </>
+                    ) : (
+                      "Delete"
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           )}
