@@ -19,6 +19,7 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const { toasts, closeToast, success, error } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +44,8 @@ const Login = () => {
       } catch (er) {
         console.log("session verification failed", er);
         setIsLoggedIn(false);
+      } finally {
+        setIsCheckingAuth(false);
       }
     };
     chekLoggedIn();
@@ -99,11 +102,28 @@ const Login = () => {
     }
   };
 
-  // Show simple loading when redirecting after successful login
-  if (isLoggedIn) {
-    return null; // Or return null to avoid flash
+  // Show loading state while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
   }
 
+  if (isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <ToastContainer toasts={toasts} onClose={closeToast} />
