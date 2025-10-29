@@ -191,9 +191,27 @@ export const Navbar = () => {
       }
     };
 
+    // Check login status saat mount
     checkLoginStatus();
-    const intervalId = setInterval(checkLoginStatus, 5 * 60 * 1000);
-    return () => clearInterval(intervalId);
+
+    // Set interval untuk periodic check (setiap 5 menit)
+    // Tapi skip interval check kalau user di halaman login/register
+    const currentPath =
+      typeof window !== "undefined" ? window.location.pathname : "";
+    const isAuthPage =
+      currentPath === "/login" ||
+      currentPath === "/register" ||
+      currentPath === "/register-mosque";
+
+    // Hanya set interval jika BUKAN di halaman auth
+    let intervalId: NodeJS.Timeout | undefined;
+    if (!isAuthPage) {
+      intervalId = setInterval(checkLoginStatus, 5 * 60 * 1000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, []);
 
   const handleLogout = async () => {

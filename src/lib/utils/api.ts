@@ -40,12 +40,10 @@ class ApiClient {
           errorData = { message: `HTTP error! status: ${response.status}` };
         }
 
-        // Handle 401 - clear cookies and redirect
+        // Handle 401 - hanya clear cookies, TIDAK auto-redirect
+        // Biarkan setiap halaman handle redirect sendiri
         if (response.status === 401) {
           authCookies.clearAuthData();
-          if (typeof window !== "undefined") {
-            window.location.href = "/login";
-          }
         }
 
         // Create error with proper structure
@@ -174,12 +172,14 @@ axiosInstance.interceptors.response.use(
     const appError = handleError(error);
     console.error("API Error:", appError);
 
-    // Handle 401 globally
+    // TIDAK ada auto-redirect untuk 401
+    // Biarkan setiap halaman handle redirect sendiri
+    // Ini memungkinkan user yang belum login tetap bisa browse halaman public
+    // (home, mosque list, dll) tanpa di-redirect paksa ke login
+
+    // Hanya clear cookies jika 401, tapi TIDAK redirect
     if (appError.statusCode === 401) {
       authCookies.clearAuthData();
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
     }
 
     return Promise.reject(error);

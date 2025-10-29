@@ -49,17 +49,16 @@ const Register = () => {
   };
 
   // Use form hook
-  const { values, errors, formState, setValue, handleSubmit } = useForm<
-    RegisterFormData
-  >(
-    {
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-    validationRules
-  );
+  const { values, errors, formState, setValue, handleSubmit } =
+    useForm<RegisterFormData>(
+      {
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      },
+      validationRules
+    );
 
   const onSubmit = async (formData: RegisterFormData) => {
     const dataToSend = {
@@ -82,7 +81,7 @@ const Register = () => {
         <div className="flex-1 flex flex-col md:flex-row items-center">
           {/* Left Section */}
           <div className="w-full md:w-1/2 flex items-center justify-center p-8">
-            <div className="max-w-md w-full">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-green-600 mb-2">
                   Create Account
@@ -104,8 +103,7 @@ const Register = () => {
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSubmit(onSubmit);
-                }}
-              >
+                }}>
                 <Input
                   label="Username"
                   type="text"
@@ -136,8 +134,7 @@ const Register = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2 top-8 text-gray-500"
-                  >
+                    className="absolute right-2 top-8 text-gray-500">
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
@@ -156,8 +153,7 @@ const Register = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-2 top-8 text-gray-500"
-                  >
+                    className="absolute right-2 top-8 text-gray-500">
                     {showConfirmPassword ? (
                       <EyeOff size={20} />
                     ) : (
@@ -171,8 +167,7 @@ const Register = () => {
                   variant="success"
                   size="lg"
                   loading={formState.loading}
-                  className="w-full"
-                >
+                  className="w-full">
                   Create Account
                 </Button>
               </form>
@@ -182,8 +177,7 @@ const Register = () => {
                   Already have an account?{" "}
                   <Link
                     href="/login"
-                    className="text-green-600 hover:underline font-medium"
-                  >
+                    className="text-green-600 hover:underline font-medium">
                     Sign in here
                   </Link>
                 </p>

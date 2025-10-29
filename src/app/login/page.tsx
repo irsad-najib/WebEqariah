@@ -1,6 +1,6 @@
 //login page
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { axiosInstance } from "@/lib/utils/api";
 import { Eye, EyeOff } from "lucide-react";
@@ -25,36 +25,6 @@ const Login = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Check auth status sekali aja di background, no loading, no state update
-  useEffect(() => {
-    let isMounted = true;
-
-    const checkAuth = async () => {
-      try {
-        const authRes = await axiosInstance.get("api/auth/verify", {
-          withCredentials: true,
-        });
-
-        // Only redirect if component still mounted and user is authenticated
-        if (isMounted && authRes.data.Authenticated) {
-          if (authRes.data.user.role === "admin") {
-            router.replace("/adminDashboard");
-          } else {
-            router.replace("/dashboard");
-          }
-        }
-      } catch {
-        // Silent fail - user bisa tetep login manual
-        console.log("Not authenticated, showing login form");
-      }
-    };
-
-    checkAuth();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [router]);
   //handler for login submit button
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,24 +54,27 @@ const Login = () => {
           "Welcome back! Redirecting to dashboard..."
         );
 
-        // Delay redirect to show success message
+        // Delay redirect to show success message - loading tetap true selama redirect
         setTimeout(() => {
           router.replace("/dashboard");
         }, 1000);
       } else {
+        // Jangan redirect, hanya tampilkan error
         error(
           "Login Failed",
           response.data.message || "Invalid credentials. Please try again."
         );
+        setLoading(false);
       }
     } catch (err) {
       console.error("Login Error", err);
       const appError = handleError(err);
+
+      // Jangan redirect, hanya tampilkan error message
       error(
         appError.message,
         appError.description || "Please check your credentials and try again."
       );
-    } finally {
       setLoading(false);
     }
   };
@@ -141,7 +114,7 @@ const Login = () => {
                     name="identifier"
                     value={formData.identifier}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter Email or Username"
                     required
                     disabled={loading}
@@ -157,7 +130,7 @@ const Login = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter password"
                       required
                       disabled={loading}
