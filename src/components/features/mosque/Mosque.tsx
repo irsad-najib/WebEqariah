@@ -75,14 +75,13 @@ export const Mosque: React.FC<MosqueProps> = ({ onClick }) => {
           key={mosque.id}
           className="w-60 bg-white overflow-hidden rounded shadow-md m-4 p-4 text-center"
           onClick={() => onClick(mosque.id)}
-          style={{ cursor: "pointer" }}
-        >
+          style={{ cursor: "pointer" }}>
           <Image
             src={mosque.imageUrl}
             alt={mosque.mosqueName}
             width={300}
             height={300}
-            className="rounded "
+            className="rounded w-60 h-40 object-cover mb-4"
           />
           <h2 className="text-xl font-bold">{mosque.mosqueName}</h2>
           <p>{mosque.addressLine1}</p>

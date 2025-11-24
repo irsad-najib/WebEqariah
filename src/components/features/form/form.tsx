@@ -14,6 +14,7 @@ import {
   Play,
   Upload,
 } from "lucide-react";
+import axios from "axios";
 import { axiosInstance } from "@/lib/utils/api";
 
 // Define types for props
@@ -173,14 +174,50 @@ export default function MyEditor({
       formData.append("file", file);
       formData.append("source", "marketplace"); // or make this dynamic
 
-      const response = await axiosInstance.post(uploadEndpoint, formData);
+      console.log("📤 Uploading file:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        endpoint: uploadEndpoint,
+      });
+
+      const response = await axiosInstance.post(uploadEndpoint, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 1)
+          );
+          console.log(`📊 Upload Progress: ${percentCompleted}%`);
+        },
+      });
+
+      console.log("✅ Upload success:", response.data);
 
       // Axios automatically throws for non-2xx responses
       // and parses JSON response data
       return response.data.data?.url || response.data.url || null; // Handle different response formats
     } catch (error) {
-      console.error("Upload error:", error);
-      alert("Failed to upload file. Please try again.");
+      console.error("❌ Upload error:", error);
+
+      // Better error messages
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ECONNABORTED") {
+          alert("Upload timeout. Video terlalu besar atau koneksi lambat.");
+        } else if (error.response?.status === 413) {
+          alert("File terlalu besar. Maksimal 100MB.");
+        } else if (error.response?.status === 401) {
+          alert("Anda harus login terlebih dahulu.");
+        } else {
+          alert(
+            `Upload gagal: ${error.response?.data?.message || error.message}`
+          );
+        }
+      } else {
+        alert("Upload gagal. Silakan coba lagi.");
+      }
+
       return null;
     } finally {
       setIsUploading(false);
@@ -295,8 +332,7 @@ export default function MyEditor({
     <>
       <div
         ref={containerRef}
-        className={`whatsapp-editor-wrapper ${isDragOver ? "drag-over" : ""}`}
-      >
+        className={`whatsapp-editor-wrapper ${isDragOver ? "drag-over" : ""}`}>
         {editorLoaded ? (
           <div className="whatsapp-chat-container">
             {/* Upload Loading Overlay */}
@@ -326,8 +362,7 @@ export default function MyEditor({
                   <button
                     type="button" // Add this
                     onClick={cancelMediaPreview}
-                    className="preview-close-btn"
-                  >
+                    className="preview-close-btn">
                     <X size={16} />
                   </button>
 
@@ -355,8 +390,7 @@ export default function MyEditor({
                       type="button" // Add this
                       onClick={insertMedia}
                       className="preview-insert-btn"
-                      disabled={isUploading}
-                    >
+                      disabled={isUploading}>
                       Upload & Insert {mediaPreview.type}
                     </button>
                   </div>
@@ -371,23 +405,20 @@ export default function MyEditor({
                   type="button" // Add this
                   onClick={() => formatText("bold")}
                   className="toolbar-btn"
-                  title="Bold"
-                >
+                  title="Bold">
                   <Bold size={16} />
                 </button>
                 <button
                   type="button" // Add this
                   onClick={() => formatText("italic")}
                   className="toolbar-btn"
-                  title="Italic"
-                >
+                  title="Italic">
                   <Italic size={16} />
                 </button>
                 <button
                   type="button" // Add this
                   onClick={() => setShowToolbar(false)}
-                  className="toolbar-btn-close"
-                >
+                  className="toolbar-btn-close">
                   ×
                 </button>
               </div>
@@ -402,8 +433,7 @@ export default function MyEditor({
                   onClick={() => handleMediaUpload("image")}
                   className="action-btn"
                   title="Add Image"
-                  disabled={isUploading}
-                >
+                  disabled={isUploading}>
                   <Image size={20} />
                 </button>
 
@@ -412,8 +442,7 @@ export default function MyEditor({
                   onClick={() => handleMediaUpload("video")}
                   className="action-btn"
                   title="Add Video"
-                  disabled={isUploading}
-                >
+                  disabled={isUploading}>
                   <Video size={20} />
                 </button>
 
@@ -421,8 +450,7 @@ export default function MyEditor({
                   type="button" // Add this
                   className="action-btn"
                   title="Attach File"
-                  disabled={isUploading}
-                >
+                  disabled={isUploading}>
                   <Paperclip size={20} />
                 </button>
               </div>
@@ -444,8 +472,7 @@ export default function MyEditor({
                   onClick={handleSend}
                   className="send-btn"
                   title="Send"
-                  disabled={isUploading}
-                >
+                  disabled={isUploading}>
                   <Send size={20} />
                 </button>
               )}

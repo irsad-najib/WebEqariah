@@ -158,10 +158,13 @@ class ApiClient {
 // Create API client instance
 export const apiClient = new ApiClient();
 
-// Configure axios instance
+// Configure axios instance with timeout and size limits for video uploads
 export const axiosInstance = axios.create({
   baseURL: "https://api.eqariah.com",
   withCredentials: true,
+  timeout: 300000, // 5 minutes timeout for large video uploads
+  maxContentLength: 100 * 1024 * 1024, // 100 MB max content length
+  maxBodyLength: 100 * 1024 * 1024, // 100 MB max body length
 });
 
 // Add interceptors with better error handling

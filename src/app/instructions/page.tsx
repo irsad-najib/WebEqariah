@@ -500,7 +500,7 @@ const Instructions = () => {
                 Our support team is here to assist you with any questions
               </p>
               <a
-                href="mailto:support@eqariah.com"
+                href="mailto:irsad.putra270305@gmail.com"
                 className="inline-block bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors duration-300 shadow-lg">
                 Contact Support
               </a>
