@@ -20,6 +20,11 @@ const MyEditor = dynamic(() => import("@/components/features/form/form"), {
   ),
 });
 
+const QuillContentRenderer = dynamic(
+  () => import("@/components/features/form/QuillContentRenderer"),
+  { ssr: false }
+);
+
 // Interface definitions
 interface UserInfo {
   id: string;
@@ -557,8 +562,7 @@ export default function MarketplacePage() {
             <span
               className={`inline-block w-2 h-2 rounded-full mr-2 ${
                 connectionStatus ? "bg-green-500" : "bg-red-500"
-              }`}
-            ></span>
+              }`}></span>
             <span className="text-sm text-gray-600">
               {connectionStatus ? "Connected" : "Disconnected"}
             </span>
@@ -619,8 +623,7 @@ export default function MarketplacePage() {
 
               <form
                 onSubmit={handleMarketplaceItemSubmit}
-                className="space-y-4"
-              >
+                className="space-y-4">
                 <div>
                   <input
                     type="text"
@@ -646,8 +649,7 @@ export default function MarketplacePage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-6"
-                >
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-6">
                   {loading ? "Loading..." : "Post Item"}
                 </button>
               </form>
@@ -669,8 +671,7 @@ export default function MarketplacePage() {
                   </h3>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
+                    className="text-gray-500 hover:text-gray-700">
                     ✕
                   </button>
                 </div>
@@ -694,8 +695,7 @@ export default function MarketplacePage() {
                     />
                     <label
                       htmlFor="item-image-modal"
-                      className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer"
-                    >
+                      className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer">
                       <Upload className="h-6 w-6 mb-2" />
                       Choose Image
                     </label>
@@ -725,16 +725,14 @@ export default function MarketplacePage() {
                             setPreview(null);
                             setFile(null);
                           }}
-                          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
+                          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                           Cancel
                         </button>
                         <button
                           type="button"
                           onClick={handleUpload}
                           disabled={uploading}
-                          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-                        >
+                          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50">
                           {uploading ? "Uploading..." : "Upload"}
                         </button>
                       </div>
@@ -772,26 +770,22 @@ export default function MarketplacePage() {
                           wordWrap: "break-word",
                           overflowWrap: "break-word",
                           hyphens: "auto",
-                        }}
-                        dangerouslySetInnerHTML={{
-                          __html: item.content,
-                        }}
-                      />
+                        }}>
+                        <QuillContentRenderer content={item.content} />
+                      </div>
 
                       {/* Action buttons for long content */}
                       {shouldShowExpand(item.id) && (
                         <div className="mt-2 flex gap-2">
                           <button
                             onClick={() => toggleContentExpansion(item.id)}
-                            className="text-blue-600 hover:text-blue-800 text-sm font-medium bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-full transition-colors"
-                          >
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-full transition-colors">
                             {expandedItems[item.id] ? "Show less" : "Show more"}
                           </button>
 
                           <button
                             onClick={() => openFullContentModal(item.id)}
-                            className="text-gray-600 hover:text-gray-800 text-sm font-medium bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-full transition-colors"
-                          >
+                            className="text-gray-600 hover:text-gray-800 text-sm font-medium bg-gray-50 hover:bg-gray-100 px-3 py-1 rounded-full transition-colors">
                             Full view
                           </button>
                         </div>
@@ -831,8 +825,7 @@ export default function MarketplacePage() {
                           item.likedByUser
                             ? "text-red-500"
                             : "text-gray-500 hover:text-red-500"
-                        }`}
-                      >
+                        }`}>
                         <Heart
                           className={`h-5 w-5 mr-1 ${
                             item.likedByUser
@@ -846,8 +839,7 @@ export default function MarketplacePage() {
                       {/* Comment Button */}
                       <button
                         onClick={() => toggleComments(item.id)}
-                        className="flex items-center text-gray-500 hover:text-blue-500 focus:outline-none group"
-                      >
+                        className="flex items-center text-gray-500 hover:text-blue-500 focus:outline-none group">
                         <MessageCircle className="h-5 w-5 mr-1 group-hover:text-blue-500" />
                         <span className="text-sm">{item.commentCount}</span>
                       </button>
@@ -872,8 +864,7 @@ export default function MarketplacePage() {
                               comments[item.id].map((comment) => (
                                 <div
                                   key={comment.id}
-                                  className="bg-white p-3 rounded-md shadow-sm"
-                                >
+                                  className="bg-white p-3 rounded-md shadow-sm">
                                   <div className="flex items-center mb-1">
                                     <div className="bg-gray-200 rounded-full p-1 mr-2">
                                       <User
@@ -921,8 +912,7 @@ export default function MarketplacePage() {
                             <button
                               onClick={() => handleAddComment(item.id)}
                               disabled={!newComment.trim() || loadingComments}
-                              className="bg-blue-500 text-white px-3 rounded-r-md hover:bg-blue-600 disabled:bg-blue-300 text-sm"
-                            >
+                              className="bg-blue-500 text-white px-3 rounded-r-md hover:bg-blue-600 disabled:bg-blue-300 text-sm">
                               Post
                             </button>
                           </div>
@@ -939,8 +929,7 @@ export default function MarketplacePage() {
                     className="w-8 h-8 text-gray-400"
                     fill="none"
                     stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                    viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -974,28 +963,24 @@ export default function MarketplacePage() {
               </h3>
               <button
                 onClick={closeFullContentModal}
-                className="text-gray-500 hover:text-gray-700"
-              >
+                className="text-gray-500 hover:text-gray-700">
                 ✕
               </button>
             </div>
 
             <div className="overflow-y-auto flex-1 prose max-w-none">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html:
-                    marketplaceItems.find(
-                      (item) => item.id === fullContentModal
-                    )?.content || "",
-                }}
+              <QuillContentRenderer
+                content={
+                  marketplaceItems.find((item) => item.id === fullContentModal)
+                    ?.content || ""
+                }
               />
             </div>
 
             <div className="mt-4 flex justify-end">
               <button
                 onClick={closeFullContentModal}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded"
-              >
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
                 Close
               </button>
             </div>
@@ -1014,8 +999,7 @@ export default function MarketplacePage() {
         {showScrollTop && (
           <button
             onClick={scrollToTop}
-            className="hidden lg:flex bg-gray-800 hover:bg-gray-900 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
-          >
+            className="hidden lg:flex bg-gray-800 hover:bg-gray-900 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group">
             <ArrowUp className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
         )}
@@ -1023,8 +1007,7 @@ export default function MarketplacePage() {
         {/* Mobile Chat Button */}
         <button
           onClick={() => setIsChatSidebarOpen(true)}
-          className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group"
-        >
+          className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group">
           <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
 
           {/* Notification Badge */}

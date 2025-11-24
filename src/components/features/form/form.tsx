@@ -5,7 +5,7 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import {
   Send,
-  Image,
+  Image as ImageIcon,
   Video,
   Paperclip,
   Bold,
@@ -16,6 +16,42 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { axiosInstance } from "@/lib/utils/api";
+
+// Custom Video Blot for Quill
+const BlockEmbed = Quill.import("blots/block/embed");
+
+class VideoBlot extends BlockEmbed {
+  static blotName = "video";
+  static tagName = "video";
+  static className = "ql-video";
+
+  static create(value: string) {
+    const node = super.create() as HTMLVideoElement;
+    node.setAttribute("controls", "");
+    node.setAttribute(
+      "style",
+      "max-width: 100%; border-radius: 8px; margin: 8px 0;"
+    );
+    node.setAttribute("playsinline", "");
+
+    const source = document.createElement("source");
+    source.setAttribute("src", value);
+    source.setAttribute("type", "video/mp4");
+    node.appendChild(source);
+
+    return node;
+  }
+
+  static value(node: HTMLVideoElement) {
+    const source = node.querySelector("source");
+    return source?.getAttribute("src") || "";
+  }
+}
+
+// Register custom video blot
+if (typeof window !== "undefined") {
+  Quill.register(VideoBlot, true);
+}
 
 // Define types for props
 interface MyEditorProps {
@@ -91,7 +127,7 @@ export default function MyEditor({
         }
       });
     }
-  }, [isClient, editorLoaded, onEditorChange]);
+  }, [isClient, editorLoaded, onEditorChange, value]);
 
   // Drag & Drop handlers
   useEffect(() => {
@@ -280,26 +316,9 @@ export default function MyEditor({
       quillRef.current.insertEmbed(range.index, "image", uploadedUrl);
       quillRef.current.setSelection({ index: range.index + 1, length: 0 });
     } else if (mediaPreview.type === "video") {
-      // Insert video HTML directly into editor
-      const videoHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin: 8px 0;"><source src="${uploadedUrl}" type="${mediaPreview.file.type}">Your browser does not support the video tag.</video>`;
-
-      // Get current content and position
-      const currentContent = quillRef.current.root.innerHTML;
-      const editor = quillRef.current.root;
-
-      // Insert video at cursor position or at the end
-      if (range && range.index > 0) {
-        // Try to insert at cursor position
-        const beforeText = editor.innerHTML.substring(0, range.index);
-        const afterText = editor.innerHTML.substring(range.index);
-        editor.innerHTML = beforeText + videoHtml + afterText;
-      } else {
-        // Append to the end
-        editor.innerHTML = currentContent + videoHtml;
-      }
-
-      // Trigger change event
-      onEditorChange(editor.innerHTML);
+      // Insert video using custom VideoBlot
+      quillRef.current.insertEmbed(range.index, "video", uploadedUrl);
+      quillRef.current.setSelection({ index: range.index + 1, length: 0 });
 
       console.log("✅ Video inserted:", uploadedUrl);
     }
@@ -374,6 +393,7 @@ export default function MyEditor({
                   </button>
 
                   {mediaPreview.type === "image" ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={mediaPreview.src}
                       alt="Preview"
@@ -436,12 +456,13 @@ export default function MyEditor({
               {/* Left Actions */}
               <div className="input-actions-left">
                 <button
-                  type="button" // Add this
+                  type="button"
                   onClick={() => handleMediaUpload("image")}
                   className="action-btn"
                   title="Add Image"
+                  aria-label="Add Image"
                   disabled={isUploading}>
-                  <Image size={20} />
+                  <ImageIcon size={20} />
                 </button>
 
                 <button
@@ -903,6 +924,19 @@ export default function MyEditor({
 
         .whatsapp-editor .ql-editor img:hover {
           transform: scale(1.02);
+        }
+
+        /* Video Blot Styling */
+        .whatsapp-editor .ql-editor video.ql-video {
+          max-width: 100%;
+          width: 100%;
+          max-width: 300px;
+          height: auto;
+          border-radius: 12px;
+          margin: 8px 0;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          display: block;
+          background: #000;
         }
 
         .whatsapp-editor .ql-editor .video-container {

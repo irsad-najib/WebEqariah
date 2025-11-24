@@ -7,6 +7,12 @@ import { useWebSocket } from "@/lib/hooks/useWs";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+
+const QuillContentRenderer = dynamic(
+  () => import("@/components/features/form/QuillContentRenderer"),
+  { ssr: false }
+);
 
 /**
  * Type definitions for the mosque page
@@ -481,8 +487,7 @@ export default function MosquePage() {
             <span
               className={`inline-block w-2 h-2 rounded-full mr-2 ${
                 connectionStatus ? "bg-green-500" : "bg-red-500"
-              }`}
-            ></span>
+              }`}></span>
             <span className="text-sm text-gray-600">
               {connectionStatus ? "Connected" : "Disconnected"}
             </span>
@@ -538,8 +543,7 @@ export default function MosquePage() {
                       return (
                         <div
                           key={announcement.id}
-                          className="bg-white rounded-lg shadow-md p-4"
-                        >
+                          className="bg-white rounded-lg shadow-md p-4">
                           {/* Announcement Header */}
                           <div className="flex justify-between items-start mb-2">
                             <h3 className="text-lg font-semibold text-gray-800">
@@ -551,13 +555,11 @@ export default function MosquePage() {
                           </div>
 
                           {/* Announcement Content */}
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: truncateHtmlContent(
-                                announcement.content,
-                                100
-                              ),
-                            }}
+                          <QuillContentRenderer
+                            content={truncateHtmlContent(
+                              announcement.content,
+                              100
+                            )}
                           />
 
                           {/* Announcement Image */}
@@ -589,15 +591,13 @@ export default function MosquePage() {
                                   : "text-gray-600 hover:text-blue-600"
                               }`}
                               onClick={() => handleLike(announcement.id)}
-                              disabled={!isLogin}
-                            >
+                              disabled={!isLogin}>
                               <svg
                                 className="w-5 h-5"
                                 fill="none"
                                 stroke="currentColor"
                                 strokeWidth="2"
-                                viewBox="0 0 24 24"
-                              >
+                                viewBox="0 0 24 24">
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -616,15 +616,13 @@ export default function MosquePage() {
                                     `comment-input-${announcement.id}`
                                   )
                                   ?.focus();
-                              }}
-                            >
+                              }}>
                               <svg
                                 className="w-5 h-5"
                                 fill="none"
                                 stroke="currentColor"
                                 strokeWidth="2"
-                                viewBox="0 0 24 24"
-                              >
+                                viewBox="0 0 24 24">
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -643,8 +641,7 @@ export default function MosquePage() {
                                 className="w-5 h-5 text-gray-500 mr-2"
                                 fill="none"
                                 stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
+                                viewBox="0 0 24 24">
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -679,8 +676,7 @@ export default function MosquePage() {
                                     commentInput,
                                     () => setCommentInput("")
                                   );
-                                }}
-                              >
+                                }}>
                                 <div className="flex bg-gray-100 rounded-full overflow-hidden">
                                   <input
                                     id={`comment-input-${announcement.id}`}
@@ -712,8 +708,7 @@ export default function MosquePage() {
                                         ? "text-gray-400 cursor-not-allowed"
                                         : "text-blue-600 hover:text-blue-700"
                                     }`}
-                                    disabled={!isLogin || !commentInput.trim()}
-                                  >
+                                    disabled={!isLogin || !commentInput.trim()}>
                                     Kirim
                                   </button>
                                 </div>
@@ -738,8 +733,7 @@ export default function MosquePage() {
                                   {comments[announcement.id].map((comment) => (
                                     <div
                                       key={comment.id}
-                                      className="flex gap-2"
-                                    >
+                                      className="flex gap-2">
                                       {/* Avatar */}
                                       <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
                                         <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
@@ -837,14 +831,12 @@ export default function MosquePage() {
         {showScrollTop && (
           <button
             onClick={scrollToTop}
-            className="hidden lg:flex bg-gray-800 hover:bg-gray-900 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
-          >
+            className="hidden lg:flex bg-gray-800 hover:bg-gray-900 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group">
             <svg
               className="w-5 h-5 group-hover:scale-110 transition-transform"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+              viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -858,14 +850,12 @@ export default function MosquePage() {
         {/* Mobile Chat Button */}
         <button
           onClick={() => setIsChatSidebarOpen(true)}
-          className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group"
-        >
+          className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group">
           <svg
             className="w-6 h-6 group-hover:scale-110 transition-transform"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+            viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

@@ -24,6 +24,11 @@ const MyEditor = dynamic(() => import("@/components/features/form/form"), {
   ),
 });
 
+const QuillContentRenderer = dynamic(
+  () => import("@/components/features/form/QuillContentRenderer"),
+  { ssr: false }
+);
+
 interface Message {
   id: number;
   content: string;
@@ -323,8 +328,7 @@ function MessagePageContent() {
               className="w-8 h-8 text-red-500"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+              viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -352,14 +356,12 @@ function MessagePageContent() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors"
-              >
+                className="lg:hidden fixed top-4 left-4 z-50 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors">
                 <svg
                   className="w-6 h-6"
                   fill="none"
                   stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                  viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -373,8 +375,7 @@ function MessagePageContent() {
               <div
                 className={`${
                   isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-                } lg:translate-x-0 fixed lg:relative z-40 w-80 lg:w-1/3 xl:w-1/4 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out`}
-              >
+                } lg:translate-x-0 fixed lg:relative z-40 w-80 lg:w-1/3 xl:w-1/4 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out`}>
                 {/* Sidebar Header */}
                 <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 text-white">
                   <div className="flex items-center justify-between">
@@ -386,14 +387,12 @@ function MessagePageContent() {
                     </div>
                     <button
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="lg:hidden text-white hover:bg-white/20 p-2 rounded-full"
-                    >
+                      className="lg:hidden text-white hover:bg-white/20 p-2 rounded-full">
                       <svg
                         className="w-6 h-6"
                         fill="none"
                         stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                        viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -430,8 +429,7 @@ function MessagePageContent() {
                           className="w-8 h-8 text-gray-400"
                           fill="none"
                           stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
+                          viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -456,8 +454,7 @@ function MessagePageContent() {
                           selectedUserId === user.id
                             ? "bg-blue-50 border-l-4 border-l-blue-500"
                             : ""
-                        }`}
-                      >
+                        }`}>
                         <div className="flex items-center space-x-3">
                           {/* Avatar */}
                           <div
@@ -465,8 +462,7 @@ function MessagePageContent() {
                               selectedUserId === user.id
                                 ? "bg-blue-500"
                                 : "bg-gradient-to-br from-purple-500 to-pink-500"
-                            }`}
-                          >
+                            }`}>
                             {getInitials(user.username)}
                           </div>
 
@@ -531,8 +527,7 @@ function MessagePageContent() {
                               className="w-10 h-10 text-blue-500"
                               fill="none"
                               stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
+                              viewBox="0 0 24 24">
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -571,29 +566,24 @@ function MessagePageContent() {
                                 <div
                                   className={`flex ${
                                     isSender ? "justify-end" : "justify-start"
-                                  }`}
-                                >
+                                  }`}>
                                   <div
                                     className={`max-w-xs sm:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl shadow-sm ${
                                       isSender
                                         ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-md"
                                         : "bg-white text-gray-800 border border-gray-200 rounded-bl-md"
-                                    }`}
-                                  >
-                                    <div
-                                      dangerouslySetInnerHTML={{
-                                        __html: truncateHtmlContent(
-                                          message.content
-                                        ),
-                                      }}
+                                    }`}>
+                                    <QuillContentRenderer
+                                      content={truncateHtmlContent(
+                                        message.content
+                                      )}
                                     />
                                     <p
                                       className={`text-xs mt-2 ${
                                         isSender
                                           ? "text-blue-100"
                                           : "text-gray-500"
-                                      }`}
-                                    >
+                                      }`}>
                                       {formatTime(message.created_at)}
                                     </p>
                                   </div>
@@ -627,14 +617,12 @@ function MessagePageContent() {
                         <button
                           onClick={handleSendMessage}
                           disabled={!newMessage.trim()}
-                          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-full hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
-                        >
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-full hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl">
                           <svg
                             className="w-5 h-5"
                             fill="none"
                             stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
+                            viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -654,8 +642,7 @@ function MessagePageContent() {
                           className="w-12 h-12 text-blue-500"
                           fill="none"
                           stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
+                          viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -673,8 +660,7 @@ function MessagePageContent() {
                       </p>
                       <button
                         onClick={() => setIsMobileMenuOpen(true)}
-                        className="lg:hidden bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition-colors"
-                      >
+                        className="lg:hidden bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition-colors">
                         Open Contacts
                       </button>
                     </div>
@@ -700,8 +686,7 @@ const MessagePage = () => {
             <p className="text-gray-600 font-medium">Loading page...</p>
           </div>
         </div>
-      }
-    >
+      }>
       <MessagePageContent />
     </Suspense>
   );

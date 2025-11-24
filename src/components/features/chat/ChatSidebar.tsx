@@ -74,6 +74,7 @@ export const ChatSidebar = ({
     if (currentUser) {
       loadContacts();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   // Filter users based on search
@@ -109,8 +110,7 @@ export const ChatSidebar = ({
   // Desktop version - always show, tidak pakai isOpen
   const DesktopSidebar = () => (
     <aside
-      className={`hidden lg:flex w-80 bg-white border-l border-gray-200 h-screen flex-col shadow-lg ${className}`}
-    >
+      className={`hidden lg:flex w-80 bg-white border-l border-gray-200 h-screen flex-col shadow-lg ${className}`}>
       <SidebarContent />
     </aside>
   );
@@ -130,8 +130,7 @@ export const ChatSidebar = ({
       <div
         className={`lg:hidden fixed top-0 right-0 h-full w-full max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
           isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
+        }`}>
         <SidebarContent />
       </div>
     </>
@@ -149,8 +148,7 @@ export const ChatSidebar = ({
                 className="w-5 h-5 text-white"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+                viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -171,14 +169,12 @@ export const ChatSidebar = ({
           {onClose && (
             <button
               onClick={onClose}
-              className="lg:hidden text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
-            >
+              className="lg:hidden text-white hover:bg-white/20 p-2 rounded-lg transition-colors">
               <svg
                 className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+                viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -204,8 +200,7 @@ export const ChatSidebar = ({
               className="absolute right-3 top-2.5 w-4 h-4 text-white/70"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+              viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -231,8 +226,7 @@ export const ChatSidebar = ({
                 className="w-8 h-8 text-gray-400"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+                viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -256,8 +250,7 @@ export const ChatSidebar = ({
               <div
                 key={user.id}
                 onClick={() => handleUserClick(user.id)}
-                className="flex items-center px-4 py-3 cursor-pointer hover:bg-white transition-all duration-200 border-b border-gray-100 last:border-b-0"
-              >
+                className="flex items-center px-4 py-3 cursor-pointer hover:bg-white transition-all duration-200 border-b border-gray-100 last:border-b-0">
                 {/* Avatar */}
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">
                   {getInitials(user.username)}
@@ -280,8 +273,7 @@ export const ChatSidebar = ({
                     className="w-4 h-4 text-gray-400"
                     fill="none"
                     stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                    viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -304,8 +296,7 @@ export const ChatSidebar = ({
               className="w-5 h-5"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+              viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -321,8 +312,7 @@ export const ChatSidebar = ({
               className="w-5 h-5"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+              viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

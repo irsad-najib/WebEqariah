@@ -14,6 +14,10 @@ import dynamic from "next/dynamic";
 const MyEditor = dynamic(() => import("@/components/features/form/form"), {
   ssr: false,
 });
+const QuillContentRenderer = dynamic(
+  () => import("@/components/features/form/QuillContentRenderer"),
+  { ssr: false }
+);
 
 // Interface untuk form pengumuman baru
 interface NewAnnouncementForm {
@@ -515,10 +519,8 @@ const DashboardPage = () => {
                   <h2 className="text-2xl font-bold mt-4">
                     {announcement.title}
                   </h2>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: truncateHtmlContent(announcement.content, 100),
-                    }}
+                  <QuillContentRenderer
+                    content={truncateHtmlContent(announcement.content, 100)}
                   />
                   {announcement.url && (
                     <div className="mt-4 inline-block">
