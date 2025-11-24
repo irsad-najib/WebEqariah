@@ -308,7 +308,15 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="bg-gray-200 min-h-screen relative">
+    <div className="min-h-screen relative bg-gradient-to-br from-emerald-50 via-gray-50 to-teal-50">
+      {/* Islamic Pattern Background */}
+      <div
+        className="fixed inset-0 opacity-5 pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23059669' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }}
+      />
+
       <Navbar />
 
       <div className="flex relative">
@@ -319,8 +327,7 @@ const DashboardPage = () => {
             <span
               className={`inline-block w-2 h-2 rounded-full mr-2 ${
                 connectionStatus ? "bg-green-500" : "bg-red-500"
-              }`}
-            ></span>
+              }`}></span>
             <span className="text-sm text-gray-600">
               {connectionStatus ? "Connected" : "Disconnected"}
             </span>
@@ -328,9 +335,11 @@ const DashboardPage = () => {
 
           {/* Create Announcement Form */}
           {isAuthenticated && userRole === "mosque_admin" && (
-            <div className="bg-white text-black shadow-md rounded-lg mb-6 p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Create New Announcement</h2>
+            <div className="bg-white text-black shadow-xl rounded-2xl mb-6 p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold text-gray-800 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                  Create New Announcement
+                </h2>
               </div>
 
               {error && Object.keys(error).length > 0 && (
@@ -390,8 +399,7 @@ const DashboardPage = () => {
                         </h3>
                         <button
                           onClick={() => setIsOpen(false)}
-                          className="text-gray-500 hover:text-gray-700"
-                        >
+                          className="text-gray-500 hover:text-gray-700">
                           ✕
                         </button>
                       </div>
@@ -417,8 +425,7 @@ const DashboardPage = () => {
                           />
                           <label
                             htmlFor="mosque-image-modal"
-                            className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer"
-                          >
+                            className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer">
                             <Upload className="h-6 w-6 mb-2" />
                             Choose Image
                           </label>
@@ -448,16 +455,14 @@ const DashboardPage = () => {
                                   setPreview(null);
                                   setFile(null);
                                 }}
-                                className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                              >
+                                className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Cancel
                               </button>
                               <button
                                 type="button"
                                 onClick={handleUpload}
                                 disabled={uploading}
-                                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-                              >
+                                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50">
                                 {uploading ? "Uploading..." : "Upload"}
                               </button>
                             </div>
@@ -471,8 +476,7 @@ const DashboardPage = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline md:ml-10"
-                >
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline md:ml-10">
                   {loading ? "Loading..." : "Create Announcement"}
                 </button>
               </form>
@@ -485,8 +489,7 @@ const DashboardPage = () => {
               announcements.map((announcement) => (
                 <div
                   key={announcement.id}
-                  className="bg-white p-6 rounded-lg shadow-md"
-                >
+                  className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.01]">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-4">
                       <div className="relative w-12 h-12">
@@ -532,14 +535,13 @@ const DashboardPage = () => {
                 </div>
               ))
             ) : (
-              <div className="bg-white p-6 rounded-lg text-center shadow-md">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="bg-white p-8 rounded-2xl text-center shadow-xl border border-gray-100">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <svg
-                    className="w-8 h-8 text-gray-400"
+                    className="w-10 h-10 text-green-600"
                     fill="none"
                     stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                    viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -548,10 +550,10 @@ const DashboardPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                <h3 className="text-xl font-bold text-gray-800 mb-3">
                   No Announcements Yet
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-gray-600">
                   When announcements are posted, they&apos;ll appear here.
                 </p>
               </div>
@@ -571,14 +573,12 @@ const DashboardPage = () => {
         {showScrollTop && (
           <button
             onClick={scrollToTop}
-            className="hidden lg:flex bg-gray-800 hover:bg-gray-900 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
-          >
+            className="hidden lg:flex bg-gray-800 hover:bg-gray-900 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group">
             <svg
               className="w-5 h-5 group-hover:scale-110 transition-transform"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+              viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -592,14 +592,12 @@ const DashboardPage = () => {
         {/* Mobile Chat Button */}
         <button
           onClick={() => setIsChatSidebarOpen(true)}
-          className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group"
-        >
+          className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group">
           <svg
             className="w-6 h-6 group-hover:scale-110 transition-transform"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+            viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
