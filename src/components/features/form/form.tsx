@@ -278,26 +278,33 @@ export default function MyEditor({
     if (mediaPreview.type === "image") {
       // Insert image with uploaded URL
       quillRef.current.insertEmbed(range.index, "image", uploadedUrl);
+      quillRef.current.setSelection({ index: range.index + 1, length: 0 });
     } else if (mediaPreview.type === "video") {
-      // Insert video with uploaded URL
-      const videoHtml = `
-        <div class="video-container" contenteditable="false">
-          <video controls style="max-width: 100%; border-radius: 8px; margin: 8px 0;">
-            <source src="${uploadedUrl}" type="${mediaPreview.file.type}">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      `;
+      // Insert video HTML directly into editor
+      const videoHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin: 8px 0;"><source src="${uploadedUrl}" type="${mediaPreview.file.type}">Your browser does not support the video tag.</video>`;
 
-      // Insert as HTML
-      const delta = quillRef.current.clipboard.convert(videoHtml);
-      quillRef.current.setContents(
-        quillRef.current.getContents().compose(delta.slice(0))
-      );
+      // Get current content and position
+      const currentContent = quillRef.current.root.innerHTML;
+      const editor = quillRef.current.root;
+
+      // Insert video at cursor position or at the end
+      if (range && range.index > 0) {
+        // Try to insert at cursor position
+        const beforeText = editor.innerHTML.substring(0, range.index);
+        const afterText = editor.innerHTML.substring(range.index);
+        editor.innerHTML = beforeText + videoHtml + afterText;
+      } else {
+        // Append to the end
+        editor.innerHTML = currentContent + videoHtml;
+      }
+
+      // Trigger change event
+      onEditorChange(editor.innerHTML);
+
+      console.log("✅ Video inserted:", uploadedUrl);
     }
 
     setMediaPreview(null);
-    quillRef.current.setSelection({ index: range.index + 1, length: 0 });
   };
 
   const cancelMediaPreview = () => {
