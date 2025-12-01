@@ -25,6 +25,9 @@ interface NewAnnouncementForm {
   content: string;
   url: string;
   imageUrl?: string;
+  type: "announcement" | "kajian";
+  speaker_name?: string;
+  event_date?: string;
 }
 
 const DashboardPage = () => {
@@ -36,6 +39,7 @@ const DashboardPage = () => {
     title: "",
     content: "",
     url: "",
+    type: "announcement",
   });
   const [error, setError] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState("");
@@ -230,9 +234,14 @@ const DashboardPage = () => {
     setLoading(true);
 
     try {
+      const payload = { ...newAnnouncement };
+      if (payload.type === "kajian" && payload.event_date) {
+        payload.event_date = new Date(payload.event_date).toISOString();
+      }
+
       const createAnnouncement = await axiosInstance.post(
         "/api/announcement",
-        newAnnouncement,
+        payload,
         {
           withCredentials: true,
         }
@@ -242,6 +251,7 @@ const DashboardPage = () => {
         title: "",
         content: "",
         url: "",
+        type: "announcement",
       });
     } catch (err) {
       console.error("Error creating announcement:", err);
@@ -361,6 +371,65 @@ const DashboardPage = () => {
               )}
 
               <form onSubmit={handleAnnouncementSubmit} className="space-y-4">
+                {/* Type Selection */}
+                <div className="flex space-x-6 mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="type"
+                      value="announcement"
+                      checked={newAnnouncement.type === "announcement"}
+                      onChange={handleAnnouncementChange}
+                      className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300"
+                    />
+                    <span className="font-medium text-gray-700">
+                      Announcement
+                    </span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="type"
+                      value="kajian"
+                      checked={newAnnouncement.type === "kajian"}
+                      onChange={handleAnnouncementChange}
+                      className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300"
+                    />
+                    <span className="font-medium text-gray-700">Kajian</span>
+                  </label>
+                </div>
+
+                {/* Kajian Specific Fields */}
+                {newAnnouncement.type === "kajian" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-green-50 rounded-lg border border-green-100 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Nama Ustadz
+                      </label>
+                      <input
+                        type="text"
+                        name="speaker_name"
+                        value={newAnnouncement.speaker_name || ""}
+                        onChange={handleAnnouncementChange}
+                        placeholder="Nama Ustadz"
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Waktu Kajian
+                      </label>
+                      <input
+                        type="datetime-local"
+                        name="event_date"
+                        value={newAnnouncement.event_date || ""}
+                        onChange={handleAnnouncementChange}
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <input
                     type="text"
