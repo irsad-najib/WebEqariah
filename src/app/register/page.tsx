@@ -68,7 +68,7 @@ const Register = () => {
     const response = await axiosInstance.post("/api/auth/register", dataToSend);
 
     if (response.data.success) {
-      router.replace("/");
+      router.replace("/registration-success");
     } else {
       throw new Error(response.data.message || "Registration failed");
     }

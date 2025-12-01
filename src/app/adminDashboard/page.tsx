@@ -179,24 +179,26 @@ const AdminDashboard: React.FC = () => {
         { withCredentials: true }
       );
       if (response.data.success) {
+        const newStatus = response.data.status;
         setMosques((prevMosques) =>
           prevMosques.map((mosque) =>
             String(mosque.id) === mosqueId
-              ? { ...mosque, status: "APPROVED" }
+              ? { ...mosque, status: newStatus }
               : mosque
           )
         );
         setError(null);
-        alert("Mosque approved successfully");
+        // alert(`Mosque status updated to ${newStatus}`);
       }
     } catch (err) {
       const errorResponse = err as {
         response?: { data?: { message?: string } };
       };
       setError(
-        errorResponse?.response?.data?.message || "Failed to approve mosque."
+        errorResponse?.response?.data?.message ||
+          "Failed to update mosque status."
       );
-      console.error("Error approving mosque:", err);
+      console.error("Error updating mosque status:", err);
     }
   };
 
@@ -385,14 +387,17 @@ const AdminDashboard: React.FC = () => {
                       <div className="flex space-x-2">
                         {type === "mosque" && (
                           <button
-                            className="text-green-600 hover:text-green-900"
+                            className={`${
+                              item?.status === "APPROVED"
+                                ? "text-yellow-600 hover:text-yellow-900"
+                                : "text-green-600 hover:text-green-900"
+                            }`}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleApproveMosque(item?.id);
-                            }}
-                            disabled={item?.status === "APPROVED"}>
+                            }}>
                             {item?.status === "APPROVED"
-                              ? "Approved"
+                              ? "Unapprove"
                               : "Approve"}
                           </button>
                         )}
