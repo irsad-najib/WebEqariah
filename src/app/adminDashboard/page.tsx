@@ -178,18 +178,34 @@ const AdminDashboard: React.FC = () => {
         {},
         { withCredentials: true }
       );
-      if (response.data.success) {
-        const newStatus = response.data.status;
-        setMosques((prevMosques) =>
-          prevMosques.map((mosque) =>
-            String(mosque.id) === String(mosqueId)
-              ? { ...mosque, status: newStatus }
-              : mosque
-          )
-        );
-        setError(null);
-        // alert(`Mosque status updated to ${newStatus}`);
-      }
+
+      const statusFromServer = response?.data?.status as string | undefined;
+      const fallbackStatus = mosques.find(
+        (mosque) => String(mosque.id) === String(mosqueId)
+      )?.status;
+
+      const normalizedStatus = statusFromServer
+        ? (statusFromServer.toUpperCase() as Mosque["status"])
+        : undefined;
+
+      const toggledStatus: Mosque["status"] = normalizedStatus
+        ? normalizedStatus
+        : fallbackStatus === "APPROVED"
+        ? "PENDING"
+        : "APPROVED";
+
+      setMosques((prevMosques) =>
+        prevMosques.map((mosque) =>
+          String(mosque.id) === String(mosqueId)
+            ? { ...mosque, status: toggledStatus }
+            : mosque
+        )
+      );
+
+      setError(null);
+
+      // Optional: refresh data to stay synced with backend
+      await fetchData("/api/admin/mosques", setMosques, setError, setLoading);
     } catch (err) {
       const errorResponse = err as {
         response?: { data?: { message?: string } };
