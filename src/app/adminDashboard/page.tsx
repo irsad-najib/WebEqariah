@@ -182,7 +182,7 @@ const AdminDashboard: React.FC = () => {
         const newStatus = response.data.status;
         setMosques((prevMosques) =>
           prevMosques.map((mosque) =>
-            String(mosque.id) === mosqueId
+            String(mosque.id) === String(mosqueId)
               ? { ...mosque, status: newStatus }
               : mosque
           )
@@ -394,7 +394,7 @@ const AdminDashboard: React.FC = () => {
                             }`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleApproveMosque(item?.id);
+                              handleApproveMosque(String(item?.id));
                             }}>
                             {item?.status === "APPROVED"
                               ? "Unapprove"
