@@ -197,8 +197,13 @@ export default function MosquePage() {
                 like_count: a.likeCount ?? a.like_count ?? 0,
                 comment_count: a.commentCount ?? a.comment_count ?? 0,
                 liked_by_user: a.likedByUser ?? a.liked_by_user ?? false,
+                type: a.type || "announcement",
+                speaker_name: a.speaker_name ?? a.speakerName ?? null,
+                speakerName: a.speakerName ?? a.speaker_name ?? null,
+                event_date: a.event_date ?? a.eventDate ?? null,
+                eventDate: a.event_date ?? a.eventDate ?? null,
                 author: a.author_name ? { username: a.author_name } : undefined,
-                mosque: mosque, // Add the mosque object here
+                mosque: mosqueData, // Attach the freshly fetched mosque data
               })) as Announcement[]
             );
           }
@@ -313,6 +318,13 @@ export default function MosquePage() {
         url: messageData.media_url ?? undefined,
         mosqueId: Number(messageData.mosque_id),
         createdAt: messageData.created_at,
+        type: messageData.type || "announcement",
+        speaker_name:
+          messageData.speaker_name ?? messageData.speakerName ?? null,
+        speakerName:
+          messageData.speakerName ?? messageData.speaker_name ?? null,
+        event_date: messageData.event_date ?? messageData.eventDate ?? null,
+        eventDate: messageData.event_date ?? messageData.eventDate ?? null,
         mosque: mosque, // Add the mosque object from state
       };
 
@@ -540,233 +552,444 @@ export default function MosquePage() {
                 {announcements && announcements.length > 0 ? (
                   <div className="grid gap-4">
                     {announcements.map((announcement) => {
+                      const isKajian = announcement.type === "kajian";
+                      const eventDateRaw =
+                        announcement.event_date || announcement.eventDate;
+                      const eventDateObject = eventDateRaw
+                        ? new Date(eventDateRaw)
+                        : null;
+                      const hasValidEventDate =
+                        eventDateObject !== null &&
+                        !Number.isNaN(eventDateObject.getTime());
+                      const eventDateLabel = hasValidEventDate
+                        ? eventDateObject.toLocaleDateString("id-ID", {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })
+                        : null;
+                      const eventTimeLabel = hasValidEventDate
+                        ? eventDateObject.toLocaleTimeString("id-ID", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : null;
+                      const statusLabel =
+                        isKajian && hasValidEventDate
+                          ? eventDateObject!.getTime() < Date.now()
+                            ? "Sedang / Baru Selesai"
+                            : "Akan Datang"
+                          : null;
+                      const contentToRender = isKajian
+                        ? announcement.content
+                        : truncateHtmlContent(announcement.content, 100);
+                      const showSpeaker = Boolean(announcement.speaker_name);
+                      const showEventDetails = hasValidEventDate;
+
                       return (
                         <div
                           key={announcement.id}
-                          className="bg-white rounded-lg shadow-md p-4">
-                          {/* Announcement Header */}
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="text-lg font-semibold text-gray-800">
-                              {announcement.title}
-                            </h3>
-                            <span className="text-sm text-gray-500">
-                              {formatDate(announcement.createdAt)}
-                            </span>
-                          </div>
-
-                          {/* Announcement Content */}
-                          <QuillContentRenderer
-                            content={truncateHtmlContent(
-                              announcement.content,
-                              100
-                            )}
-                          />
-
-                          {/* Announcement Image */}
-                          {announcement.url && (
-                            <div className="mt-3">
-                              <Image
-                                src={announcement.url}
-                                alt={announcement.title}
-                                width={300}
-                                height={300}
-                              />
-                            </div>
-                          )}
-
-                          {/* Author info */}
-                          {announcement.author && (
-                            <p className="text-sm text-gray-500 mt-2">
-                              Oleh: {announcement.author.username}
-                            </p>
-                          )}
-
-                          {/* Like and Comment Section */}
-                          <div className="flex border-t border-gray-300 mt-4 pt-2">
-                            {/* Like Button */}
-                            <button
-                              className={`flex-1 flex items-center justify-center gap-2 py-2 font-semibold focus:outline-none ${
-                                announcement.liked_by_user
-                                  ? "text-blue-600"
-                                  : "text-gray-600 hover:text-blue-600"
-                              }`}
-                              onClick={() => handleLike(announcement.id)}
-                              disabled={!isLogin}>
-                              <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24">
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M14 9V5a3 3 0 00-6 0v4M5 15h14a2 2 0 002-2v-5a2 2 0 00-2-2H5a2 2 0 00-2 2v5a2 2 0 002 2z"
-                                />
-                              </svg>
-                              Like ({announcement.like_count || 0})
-                            </button>
-
-                            {/* Comment Button */}
-                            <button
-                              className="flex-1 flex items-center justify-center gap-2 py-2 text-gray-600 hover:text-blue-600 font-semibold focus:outline-none"
-                              onClick={() => {
-                                document
-                                  .getElementById(
-                                    `comment-input-${announcement.id}`
-                                  )
-                                  ?.focus();
-                              }}>
-                              <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24">
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V10a2 2 0 012-2h2m5-4h-4a2 2 0 00-2 2v4a2 2 0 002 2h4a2 2 0 002-2V6a2 2 0 00-2-2z"
-                                />
-                              </svg>
-                              Comment ({announcement.comment_count || 0})
-                            </button>
-                          </div>
-
-                          {/* Comments Section */}
-                          <div className="mt-4 border-t border-gray-200 pt-3">
-                            {/* Comment Counter */}
-                            <div className="flex items-center mb-3">
-                              <svg
-                                className="w-5 h-5 text-gray-500 mr-2"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                                />
-                              </svg>
-                              <span className="text-gray-600 font-medium">
-                                {announcement.comment_count || 0} Komentar
-                              </span>
-                            </div>
-
-                            {/* Comment Input */}
-                            <div className="flex gap-2 mb-4">
-                              <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
-                                <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
-                                  {isLogin ? "U" : "?"}
+                          className={`rounded-xl shadow-lg overflow-hidden border-2 transition-all hover:shadow-xl ${
+                            isKajian
+                              ? "border-emerald-400 bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50"
+                              : "border-gray-200 bg-white"
+                          }`}>
+                          {/* Kajian Header Banner */}
+                          {isKajian && (
+                            <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-4 py-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                                    <svg
+                                      className="w-5 h-5 text-white"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24">
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <span className="text-white font-bold text-sm uppercase tracking-wider">
+                                      Kajian Islam
+                                    </span>
+                                    {statusLabel && (
+                                      <span className="block text-emerald-100 text-xs mt-0.5">
+                                        {statusLabel}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
+                                <span className="text-white/90 text-xs bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                                  {formatDate(announcement.createdAt)}
+                                </span>
                               </div>
-
-                              <form
-                                className="flex-1"
-                                onSubmit={(e) => {
-                                  e.preventDefault();
-                                  if (!isLogin) {
-                                    alert("Silakan login untuk berkomentar.");
-                                    router.push("/login");
-                                    return;
-                                  }
-                                  handleComment(
-                                    announcement.id,
-                                    commentInput,
-                                    () => setCommentInput("")
-                                  );
-                                }}>
-                                <div className="flex bg-gray-100 rounded-full overflow-hidden">
-                                  <input
-                                    id={`comment-input-${announcement.id}`}
-                                    type="text"
-                                    className="flex-1 bg-transparent border-none px-4 py-2 focus:outline-none text-sm"
-                                    placeholder={
-                                      isLogin
-                                        ? "Tulis komentar..."
-                                        : "Login untuk berkomentar"
-                                    }
-                                    value={commentInput}
-                                    onChange={(e) =>
-                                      setCommentInput(e.target.value)
-                                    }
-                                    disabled={!isLogin}
-                                    onClick={() => {
-                                      if (!isLogin) {
-                                        alert(
-                                          "Silakan login untuk berkomentar."
-                                        );
-                                        router.push("/login");
-                                      }
-                                    }}
-                                  />
-                                  <button
-                                    type="submit"
-                                    className={`px-4 py-2 text-sm font-medium ${
-                                      !isLogin || !commentInput.trim()
-                                        ? "text-gray-400 cursor-not-allowed"
-                                        : "text-blue-600 hover:text-blue-700"
-                                    }`}
-                                    disabled={!isLogin || !commentInput.trim()}>
-                                    Kirim
-                                  </button>
-                                </div>
-                              </form>
                             </div>
+                          )}
 
-                            {/* Comments Loading State */}
-                            {loadingComments[announcement.id] && (
-                              <div className="flex items-center justify-center py-3 text-black">
-                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
-                                <span className="ml-2 text-sm text-gray-500">
-                                  Memuat komentar...
+                          {/* Announcement Content Container */}
+                          <div className="p-5">
+                            {/* Regular Announcement Header (non-kajian) */}
+                            {!isKajian && (
+                              <div className="flex justify-between items-start mb-3">
+                                <h3 className="text-xl font-bold text-gray-800 flex-1">
+                                  {announcement.title}
+                                </h3>
+                                <span className="text-sm text-gray-500 whitespace-nowrap ml-4">
+                                  {formatDate(announcement.createdAt)}
                                 </span>
                               </div>
                             )}
 
-                            {/* Comments List */}
-                            {!loadingComments[announcement.id] &&
-                              comments[announcement.id] &&
-                              (comments[announcement.id].length > 0 ? (
-                                <div className="space-y-3">
-                                  {comments[announcement.id].map((comment) => (
-                                    <div
-                                      key={comment.id}
-                                      className="flex gap-2">
-                                      {/* Avatar */}
-                                      <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
-                                        <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
-                                          {comment.username
-                                            .charAt(0)
-                                            .toUpperCase()}
-                                        </div>
-                                      </div>
+                            {/* Kajian Title */}
+                            {isKajian && (
+                              <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
+                                {announcement.title}
+                              </h3>
+                            )}
 
+                            {/* Kajian Event Details Card */}
+                            {isKajian && (showSpeaker || showEventDetails) && (
+                              <div className="mb-4 bg-white rounded-lg shadow-sm border border-emerald-200 p-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  {showSpeaker && (
+                                    <div className="flex items-start gap-3">
+                                      <div className="bg-emerald-100 rounded-full p-2 mt-0.5">
+                                        <svg
+                                          className="w-4 h-4 text-emerald-700"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24">
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                          />
+                                        </svg>
+                                      </div>
                                       <div>
-                                        {/* Comment Bubble */}
-                                        <div className="bg-gray-100 rounded-2xl px-3 py-2 inline-block max-w-md">
-                                          <div className="font-semibold text-sm">
-                                            {comment.username}
-                                          </div>
-                                          <p className="text-gray-700 text-sm">
-                                            {comment.content}
-                                          </p>
-                                        </div>
-                                        {/* Timestamp */}
-                                        <div className="text-xs text-gray-500 mt-1 ml-2">
-                                          {formatDate(comment.created_at)}
-                                        </div>
+                                        <span className="block text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-1">
+                                          Pemateri
+                                        </span>
+                                        <span className="text-gray-900 font-medium">
+                                          {announcement.speaker_name}
+                                        </span>
                                       </div>
                                     </div>
-                                  ))}
+                                  )}
+                                  {showEventDetails && (
+                                    <>
+                                      <div className="flex items-start gap-3">
+                                        <div className="bg-emerald-100 rounded-full p-2 mt-0.5">
+                                          <svg
+                                            className="w-4 h-4 text-emerald-700"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                            />
+                                          </svg>
+                                        </div>
+                                        <div>
+                                          <span className="block text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-1">
+                                            Tanggal
+                                          </span>
+                                          <span className="text-gray-900 font-medium">
+                                            {eventDateLabel}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      {eventTimeLabel && (
+                                        <div className="flex items-start gap-3">
+                                          <div className="bg-emerald-100 rounded-full p-2 mt-0.5">
+                                            <svg
+                                              className="w-4 h-4 text-emerald-700"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24">
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                              />
+                                            </svg>
+                                          </div>
+                                          <div>
+                                            <span className="block text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-1">
+                                              Waktu
+                                            </span>
+                                            <span className="text-gray-900 font-medium">
+                                              {eventTimeLabel} WIB
+                                            </span>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </>
+                                  )}
                                 </div>
-                              ) : (
-                                <div className="text-center py-4 text-gray-500">
-                                  Belum ada komentar. Jadilah yang pertama
-                                  berkomentar!
+                              </div>
+                            )}
+
+                            {/* Announcement Content */}
+                            <div className={isKajian ? "text-gray-700" : ""}>
+                              <QuillContentRenderer content={contentToRender} />
+                            </div>
+
+                            {/* Announcement Image */}
+                            {announcement.url && (
+                              <div className="mt-4 rounded-lg overflow-hidden">
+                                <Image
+                                  src={announcement.url}
+                                  alt={announcement.title}
+                                  width={600}
+                                  height={400}
+                                  className="w-full h-auto object-cover"
+                                />
+                              </div>
+                            )}
+
+                            {/* Author info */}
+                            {announcement.author && (
+                              <p className="text-sm text-gray-600 mt-3 flex items-center gap-2">
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                  />
+                                </svg>
+                                <span>
+                                  Oleh:{" "}
+                                  <span className="font-medium">
+                                    {announcement.author.username}
+                                  </span>
+                                </span>
+                              </p>
+                            )}
+
+                            {/* Like and Comment Section */}
+                            <div
+                              className={`flex border-t mt-4 pt-3 ${
+                                isKajian
+                                  ? "border-emerald-200"
+                                  : "border-gray-300"
+                              }`}>
+                              {/* Like Button */}
+                              <button
+                                className={`flex-1 flex items-center justify-center gap-2 py-2 font-semibold focus:outline-none transition-colors ${
+                                  announcement.liked_by_user
+                                    ? "text-blue-600"
+                                    : isKajian
+                                    ? "text-emerald-700 hover:text-emerald-800"
+                                    : "text-gray-600 hover:text-blue-600"
+                                }`}
+                                onClick={() => handleLike(announcement.id)}
+                                disabled={!isLogin}>
+                                <svg
+                                  className="w-5 h-5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  viewBox="0 0 24 24">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M14 9V5a3 3 0 00-6 0v4M5 15h14a2 2 0 002-2v-5a2 2 0 00-2-2H5a2 2 0 00-2 2v5a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                Like ({announcement.like_count || 0})
+                              </button>
+
+                              {/* Comment Button */}
+                              <button
+                                className={`flex-1 flex items-center justify-center gap-2 py-2 font-semibold focus:outline-none transition-colors ${
+                                  isKajian
+                                    ? "text-emerald-700 hover:text-emerald-800"
+                                    : "text-gray-600 hover:text-blue-600"
+                                }`}
+                                onClick={() => {
+                                  document
+                                    .getElementById(
+                                      `comment-input-${announcement.id}`
+                                    )
+                                    ?.focus();
+                                }}>
+                                <svg
+                                  className="w-5 h-5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  viewBox="0 0 24 24">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V10a2 2 0 012-2h2m5-4h-4a2 2 0 00-2 2v4a2 2 0 002 2h4a2 2 0 002-2V6a2 2 0 00-2-2z"
+                                  />
+                                </svg>
+                                Comment ({announcement.comment_count || 0})
+                              </button>
+                            </div>
+
+                            {/* Comments Section */}
+                            <div
+                              className={`mt-4 border-t pt-3 ${
+                                isKajian
+                                  ? "border-emerald-100"
+                                  : "border-gray-200"
+                              }`}>
+                              {/* Comment Counter */}
+                              <div className="flex items-center mb-3">
+                                <svg
+                                  className="w-5 h-5 text-gray-500 mr-2"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                                  />
+                                </svg>
+                                <span className="text-gray-600 font-medium">
+                                  {announcement.comment_count || 0} Komentar
+                                </span>
+                              </div>
+
+                              {/* Comment Input */}
+                              <div className="flex gap-2 mb-4">
+                                <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
+                                  <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
+                                    {isLogin ? "U" : "?"}
+                                  </div>
                                 </div>
-                              ))}
+
+                                <form
+                                  className="flex-1"
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                    if (!isLogin) {
+                                      alert("Silakan login untuk berkomentar.");
+                                      router.push("/login");
+                                      return;
+                                    }
+                                    handleComment(
+                                      announcement.id,
+                                      commentInput,
+                                      () => setCommentInput("")
+                                    );
+                                  }}>
+                                  <div className="flex bg-gray-100 rounded-full overflow-hidden">
+                                    <input
+                                      id={`comment-input-${announcement.id}`}
+                                      type="text"
+                                      className="flex-1 bg-transparent border-none px-4 py-2 focus:outline-none text-sm"
+                                      placeholder={
+                                        isLogin
+                                          ? "Tulis komentar..."
+                                          : "Login untuk berkomentar"
+                                      }
+                                      value={commentInput}
+                                      onChange={(e) =>
+                                        setCommentInput(e.target.value)
+                                      }
+                                      disabled={!isLogin}
+                                      onClick={() => {
+                                        if (!isLogin) {
+                                          alert(
+                                            "Silakan login untuk berkomentar."
+                                          );
+                                          router.push("/login");
+                                        }
+                                      }}
+                                    />
+                                    <button
+                                      type="submit"
+                                      className={`px-4 py-2 text-sm font-medium ${
+                                        !isLogin || !commentInput.trim()
+                                          ? "text-gray-400 cursor-not-allowed"
+                                          : "text-blue-600 hover:text-blue-700"
+                                      }`}
+                                      disabled={
+                                        !isLogin || !commentInput.trim()
+                                      }>
+                                      Kirim
+                                    </button>
+                                  </div>
+                                </form>
+                              </div>
+
+                              {/* Comments Loading State */}
+                              {loadingComments[announcement.id] && (
+                                <div className="flex items-center justify-center py-3 text-black">
+                                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
+                                  <span className="ml-2 text-sm text-gray-500">
+                                    Memuat komentar...
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Comments List */}
+                              {!loadingComments[announcement.id] &&
+                                comments[announcement.id] &&
+                                (comments[announcement.id].length > 0 ? (
+                                  <div className="space-y-3">
+                                    {comments[announcement.id].map(
+                                      (comment) => (
+                                        <div
+                                          key={comment.id}
+                                          className="flex gap-2">
+                                          {/* Avatar */}
+                                          <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
+                                            <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
+                                              {comment.username
+                                                .charAt(0)
+                                                .toUpperCase()}
+                                            </div>
+                                          </div>
+
+                                          <div>
+                                            {/* Comment Bubble */}
+                                            <div className="bg-gray-100 rounded-2xl px-3 py-2 inline-block max-w-md">
+                                              <div className="font-semibold text-sm">
+                                                {comment.username}
+                                              </div>
+                                              <p className="text-gray-700 text-sm">
+                                                {comment.content}
+                                              </p>
+                                            </div>
+                                            {/* Timestamp */}
+                                            <div className="text-xs text-gray-500 mt-1 ml-2">
+                                              {formatDate(comment.created_at)}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="text-center py-4 text-gray-500">
+                                    Belum ada komentar. Jadilah yang pertama
+                                    berkomentar!
+                                  </div>
+                                ))}
+                            </div>
                           </div>
                         </div>
                       );

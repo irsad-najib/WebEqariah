@@ -56,6 +56,11 @@ export interface Announcement {
     name: string;
     image: string | null;
   };
+  type?: "announcement" | "kajian" | "marketplace" | string;
+  speaker_name?: string | null;
+  speakerName?: string | null;
+  event_date?: string | null;
+  eventDate?: string | null;
 }
 
 // ========== FORM TYPES ==========
@@ -104,6 +109,11 @@ export interface WebSocketAnnouncementData {
   mosque_id: number | string;
   author_name?: string;
   created_at: string;
+  type?: string;
+  speaker_name?: string;
+  speakerName?: string;
+  event_date?: string;
+  eventDate?: string;
 }
 
 // ========== Socket Status ==========

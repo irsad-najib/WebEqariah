@@ -154,6 +154,16 @@ export const KajianSidebar = () => {
                   </span>
                 </div>
 
+                <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                  <Clock className="w-3 h-3" />
+                  <span>
+                    {eventDate.toLocaleTimeString("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+
                 {kajian.mosqueInfo && (
                   <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
                     <MapPin className="w-3 h-3" />
