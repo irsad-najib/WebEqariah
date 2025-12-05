@@ -174,11 +174,38 @@ const AdminDashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchData("/api/speaker/", setSpeakers, setError, setLoading);
-    const intervalId = setInterval(
-      () => fetchData("/api/speaker/", setSpeakers, setError, setLoading),
-      300000
-    );
+    const fetchSpeakers = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get("/api/speaker/", {
+          withCredentials: true,
+        });
+        // speaker routes return { success, data }
+        const list = Array.isArray(response?.data?.data)
+          ? response.data.data
+          : [];
+        setSpeakers(list);
+        setError(null);
+      } catch (er) {
+        if (er && typeof er === "object" && "response" in er) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const errorResponse = (er as any).response as {
+            data?: { message?: Record<string, string> };
+          };
+          const errorMessage = errorResponse?.data?.message
+            ? Object.values(errorResponse.data.message).join(", ")
+            : "An unexpected error occurred";
+          setError(errorMessage);
+        } else {
+          setError("An unexpected error occurred");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSpeakers();
+    const intervalId = setInterval(fetchSpeakers, 300000);
     return () => clearInterval(intervalId);
   }, []);
 
