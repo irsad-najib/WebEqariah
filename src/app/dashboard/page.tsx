@@ -9,6 +9,8 @@ import { Upload } from "lucide-react";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { Announcement } from "@/lib/types";
 import dynamic from "next/dynamic";
+import { RegisterSpeakerModal } from "@/components/features/kajian/RegisterSpeakerModal";
+import { SpeakerSelect } from "@/components/features/kajian/SpeakerSelect";
 
 // Import MyEditor with no SSR
 const MyEditor = dynamic(() => import("@/components/features/form/form"), {
@@ -28,6 +30,7 @@ interface NewAnnouncementForm {
   type: "announcement" | "kajian";
   speaker_name?: string;
   event_date?: string;
+  speaker_id?: number | null;
 }
 
 const DashboardPage = () => {
@@ -53,6 +56,8 @@ const DashboardPage = () => {
     null
   );
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isRegisterSpeakerModalOpen, setIsRegisterSpeakerModalOpen] =
+    useState(false);
 
   useEffect(() => {
     const authsession = async () => {
@@ -401,19 +406,30 @@ const DashboardPage = () => {
 
                 {/* Kajian Specific Fields */}
                 {newAnnouncement.type === "kajian" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-green-50 rounded-lg border border-green-100 mb-4">
+                  <div className="grid grid-cols-1 gap-4 p-4 bg-green-50 rounded-lg border border-green-100 mb-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Nama Ustadz
+                        Pilih Ustadz
                       </label>
-                      <input
-                        type="text"
-                        name="speaker_name"
-                        value={newAnnouncement.speaker_name || ""}
-                        onChange={handleAnnouncementChange}
-                        placeholder="Nama Ustadz"
-                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                      <SpeakerSelect
+                        value={newAnnouncement.speaker_id}
+                        onChange={(speakerId, speakerName) => {
+                          setNewAnnouncement((prev) => ({
+                            ...prev,
+                            speaker_id: speakerId,
+                            speaker_name: speakerName,
+                          }));
+                        }}
+                        placeholder="Pilih ustadz untuk kajian..."
                       />
+                      <div className="mt-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsRegisterSpeakerModalOpen(true)}
+                          className="text-sm text-green-600 hover:text-green-700 underline">
+                          Ustadz tidak ada? Daftar ustadz baru
+                        </button>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -691,6 +707,16 @@ const DashboardPage = () => {
           onClose={() => setIsChatSidebarOpen(false)}
         />
       </div>
+
+      {/* Register Speaker Modal */}
+      <RegisterSpeakerModal
+        isOpen={isRegisterSpeakerModalOpen}
+        onClose={() => setIsRegisterSpeakerModalOpen(false)}
+        onSuccess={() => {
+          // Optionally refresh or show success message
+          setSuccess("Ustadz berhasil didaftarkan!");
+        }}
+      />
     </div>
   );
 };

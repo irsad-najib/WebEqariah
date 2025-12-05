@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 // Define interfaces for our data types
-import type { User, Announcement, Mosque } from "@/lib/types";
+import type { User, Announcement, Mosque, Speaker } from "@/lib/types";
 // Define props for the Pagination component
 interface PaginationProps {
   currentPage: number;
@@ -79,12 +79,13 @@ const Pagination: React.FC<PaginationProps> = ({
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
-    "users" | "announcements" | "mosque"
+    "users" | "announcements" | "mosque" | "speakers"
   >("users");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [mosques, setMosques] = useState<Mosque[]>([]);
+  const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -95,7 +96,7 @@ const AdminDashboard: React.FC = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     show: boolean;
-    type: "users" | "announcements" | "mosque" | null;
+    type: "users" | "announcements" | "mosque" | "speakers" | null;
     id: number | null;
     name: string;
   }>({ show: false, type: null, id: null, name: "" });
@@ -106,6 +107,7 @@ const AdminDashboard: React.FC = () => {
   const [currentAnnouncementPage, setCurrentAnnouncementPage] =
     useState<number>(1);
   const [currentMosquePage, setCurrentMosquePage] = useState<number>(1);
+  const [currentSpeakerPage, setCurrentSpeakerPage] = useState<number>(1);
   const itemsPerPage: number = 10;
 
   useEffect(() => {
@@ -166,6 +168,15 @@ const AdminDashboard: React.FC = () => {
     fetchData("/api/admin/mosques", setMosques, setError, setLoading);
     const intervalId = setInterval(
       () => fetchData("/api/admin/mosques", setMosques, setError, setLoading),
+      300000
+    );
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    fetchData("/api/speaker/", setSpeakers, setError, setLoading);
+    const intervalId = setInterval(
+      () => fetchData("/api/speaker/", setSpeakers, setError, setLoading),
       300000
     );
     return () => clearInterval(intervalId);
@@ -243,17 +254,24 @@ const AdminDashboard: React.FC = () => {
   const filteredMosque = (mosques || []).filter((mosque) =>
     mosque?.mosqueName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const filteredSpeakers = (speakers || []).filter(
+    (speaker) =>
+      speaker?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      speaker?.expertise?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const paginate = (pageNumber: number, type: string): void => {
     if (type === "users") setCurrentUserPage(pageNumber);
     if (type === "announcements") setCurrentAnnouncementPage(pageNumber);
     if (type === "mosque") setCurrentMosquePage(pageNumber);
+    if (type === "speakers") setCurrentSpeakerPage(pageNumber);
   };
 
   useEffect(() => {
     setCurrentUserPage(1);
     setCurrentAnnouncementPage(1);
     setCurrentMosquePage(1);
+    setCurrentSpeakerPage(1);
   }, [searchTerm]);
 
   const openImagePreview = (imageUrl: string, e: React.MouseEvent) => {
@@ -262,7 +280,7 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleDeleteClick = (
-    type: "users" | "announcements" | "mosque",
+    type: "users" | "announcements" | "mosque" | "speakers",
     id: number | string,
     name: string,
     e: React.MouseEvent
@@ -281,6 +299,8 @@ const AdminDashboard: React.FC = () => {
           ? `api/admin/users/${deleteConfirmation.id}`
           : deleteConfirmation.type === "announcements"
           ? `api/admin/announcements/${deleteConfirmation.id}`
+          : deleteConfirmation.type === "speakers"
+          ? `api/speaker/${deleteConfirmation.id}`
           : `api/admin/mosques/${deleteConfirmation.id}`;
 
       await axiosInstance.delete(endpoint, { withCredentials: true });
@@ -299,6 +319,10 @@ const AdminDashboard: React.FC = () => {
       } else if (deleteConfirmation.type === "mosque") {
         setMosques(
           mosques.filter((mosque) => mosque.id !== deleteConfirmation.id)
+        );
+      } else if (deleteConfirmation.type === "speakers") {
+        setSpeakers(
+          speakers.filter((speaker) => speaker.id !== deleteConfirmation.id)
         );
       }
 
@@ -322,6 +346,38 @@ const AdminDashboard: React.FC = () => {
 
   const handleDeleteCancel = () => {
     setDeleteConfirmation({ show: false, type: null, id: null, name: "" });
+  };
+
+  const handleUpdateSpeakerStatus = async (
+    speakerId: number,
+    status: "approved" | "rejected"
+  ) => {
+    try {
+      const response = await axiosInstance.put(
+        `/api/speaker/${speakerId}/status`,
+        { status },
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        // Update local state
+        setSpeakers((prevSpeakers) =>
+          prevSpeakers.map((speaker) =>
+            speaker.id === speakerId ? { ...speaker, status } : speaker
+          )
+        );
+        setError(null);
+      }
+    } catch (err) {
+      const errorResponse = err as {
+        response?: { data?: { message?: string } };
+      };
+      setError(
+        errorResponse?.response?.data?.message ||
+          "Failed to update speaker status."
+      );
+      console.error("Error updating speaker status:", err);
+    }
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -551,6 +607,15 @@ const AdminDashboard: React.FC = () => {
                   onClick={() => setActiveTab("mosque")}>
                   Mosque
                 </button>
+                <button
+                  className={`px-6 py-3 text-sm font-medium ${
+                    activeTab === "speakers"
+                      ? "text-blue-600 border-b-2 border-blue-600"
+                      : "text-gray-500 hover:text-blue-500"
+                  }`}
+                  onClick={() => setActiveTab("speakers")}>
+                  Speakers
+                </button>
               </div>
             </div>
 
@@ -674,6 +739,157 @@ const AdminDashboard: React.FC = () => {
                         )}
                         paginate={paginate}
                         type="mosque"
+                      />
+                    )}
+                  </>
+                )}{" "}
+              </div>
+            )}
+
+            {activeTab === "speakers" && (
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-medium">
+                    Speakers (Showing {filteredSpeakers?.length || 0} of{" "}
+                    {speakers?.length || 0})
+                  </h2>
+                </div>
+                {loading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              ID
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Name
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Expertise
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Created At
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {filteredSpeakers
+                            .slice(
+                              (currentSpeakerPage - 1) * itemsPerPage,
+                              currentSpeakerPage * itemsPerPage
+                            )
+                            .map((speaker) => (
+                              <tr key={speaker.id}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                  {speaker.id}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="flex items-center">
+                                    {speaker.photo_url ? (
+                                      <Image
+                                        src={speaker.photo_url}
+                                        alt={speaker.name}
+                                        width={40}
+                                        height={40}
+                                        className="h-10 w-10 rounded-full mr-3"
+                                      />
+                                    ) : (
+                                      <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <span className="text-green-600 font-medium">
+                                          {speaker.name.charAt(0)}
+                                        </span>
+                                      </div>
+                                    )}
+                                    <div className="text-sm font-medium text-gray-900">
+                                      {speaker.name}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {speaker.expertise || "-"}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <span
+                                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                      speaker.status === "approved"
+                                        ? "bg-green-100 text-green-800"
+                                        : speaker.status === "rejected"
+                                        ? "bg-red-100 text-red-800"
+                                        : "bg-yellow-100 text-yellow-800"
+                                    }`}>
+                                    {speaker.status}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {new Date(
+                                    speaker.created_at
+                                  ).toLocaleDateString()}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                  <div className="flex gap-2">
+                                    {speaker.status === "pending" && (
+                                      <button
+                                        onClick={() =>
+                                          handleUpdateSpeakerStatus(
+                                            speaker.id,
+                                            "approved"
+                                          )
+                                        }
+                                        className="text-green-600 hover:text-green-900">
+                                        Approve
+                                      </button>
+                                    )}
+                                    {speaker.status === "pending" && (
+                                      <button
+                                        onClick={() =>
+                                          handleUpdateSpeakerStatus(
+                                            speaker.id,
+                                            "rejected"
+                                          )
+                                        }
+                                        className="text-red-600 hover:text-red-900">
+                                        Reject
+                                      </button>
+                                    )}
+                                    <button
+                                      onClick={(e) =>
+                                        handleDeleteClick(
+                                          "speakers",
+                                          speaker.id,
+                                          speaker.name,
+                                          e
+                                        )
+                                      }
+                                      className="text-red-600 hover:text-red-900">
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {(filteredSpeakers?.length || 0) > 0 && (
+                      <Pagination
+                        currentPage={currentSpeakerPage}
+                        totalPages={Math.ceil(
+                          (filteredSpeakers?.length || 0) / itemsPerPage
+                        )}
+                        paginate={paginate}
+                        type="speakers"
                       />
                     )}
                   </>

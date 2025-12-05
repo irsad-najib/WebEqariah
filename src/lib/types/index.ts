@@ -32,6 +32,20 @@ export interface Mosque {
   adminId: string;
 }
 
+// ========== SPEAKER TYPES ==========
+export interface Speaker {
+  id: number;
+  name: string;
+  bio?: string;
+  photo_url?: string;
+  expertise?: string;
+  status: "pending" | "approved" | "rejected";
+  created_at: string;
+  updated_at: string;
+  approved_by?: number;
+  approved_at?: string;
+}
+
 // ========== ANNOUNCEMENT TYPES ==========
 export interface Announcement {
   id: number;
