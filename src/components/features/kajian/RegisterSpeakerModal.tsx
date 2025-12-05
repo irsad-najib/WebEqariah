@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { X, Upload } from "lucide-react";
 import { axiosInstance } from "@/lib/utils/api";
+import Image from "next/image";
 
 interface RegisterSpeakerModalProps {
   isOpen: boolean;
@@ -28,8 +29,12 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
     photo_url: "",
   });
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -38,6 +43,56 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const formDataImage = new FormData();
+    formDataImage.append("image", file);
+    setUploading(true);
+
+    try {
+      const response = await axiosInstance.post(
+        "/api/speaker/upload-photo",
+        formDataImage,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setFormData((prev) => ({
+          ...prev,
+          photo_url: response.data.url,
+        }));
+        setIsUploadModalOpen(false);
+        setPreview(null);
+        setFile(null);
+      } else {
+        throw new Error(response.data.message || "Upload failed");
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Error uploading image";
+      setError(errorMessage);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -167,20 +222,36 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
 
           {/* Photo URL Field */}
           <div>
-            <label
-              htmlFor="photo_url"
-              className="block text-sm font-medium text-gray-700 mb-1">
-              URL Foto
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Foto Ustadz
             </label>
-            <input
-              type="url"
-              id="photo_url"
-              name="photo_url"
-              value={formData.photo_url}
-              onChange={handleChange}
-              placeholder="https://example.com/photo.jpg"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={formData.photo_url}
+                readOnly
+                placeholder="Upload foto atau masukkan URL"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+              />
+              <button
+                type="button"
+                onClick={() => setIsUploadModalOpen(true)}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
+                <Upload size={18} />
+                Upload
+              </button>
+            </div>
+            {formData.photo_url && (
+              <div className="mt-2">
+                <Image
+                  src={formData.photo_url}
+                  alt="Preview"
+                  width={100}
+                  height={100}
+                  className="rounded-lg object-cover"
+                />
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -201,6 +272,85 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
           </div>
         </form>
       </div>
+
+      {/* Upload Photo Modal */}
+      {isUploadModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-800">Upload Foto</h3>
+              <button
+                onClick={() => {
+                  setIsUploadModalOpen(false);
+                  setPreview(null);
+                  setFile(null);
+                }}
+                className="text-gray-500 hover:text-gray-700">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                {preview ? (
+                  <div className="space-y-3">
+                    <Image
+                      src={preview}
+                      alt="Preview"
+                      width={200}
+                      height={200}
+                      className="mx-auto rounded-lg object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreview(null);
+                        setFile(null);
+                      }}
+                      className="text-sm text-red-600 hover:text-red-700">
+                      Hapus
+                    </button>
+                  </div>
+                ) : (
+                  <label className="cursor-pointer">
+                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                    <p className="mt-2 text-sm text-gray-600">
+                      Klik untuk pilih foto
+                    </p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsUploadModalOpen(false);
+                    setPreview(null);
+                    setFile(null);
+                  }}
+                  disabled={uploading}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50">
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleUpload}
+                  disabled={!file || uploading}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                  {uploading ? "Uploading..." : "Upload"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
