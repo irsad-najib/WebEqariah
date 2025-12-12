@@ -44,6 +44,7 @@ export interface Speaker {
   updated_at: string;
   approved_by?: number;
   approved_at?: string;
+  announcements?: Announcement[];
 }
 
 // ========== ANNOUNCEMENT TYPES ==========
