@@ -58,6 +58,7 @@ export interface Announcement {
   createdAt: string;
   created_at?: string; // Backend format, akan dihapus setelah standardisasi
   authorId?: string;
+  author_id?: number; // Backend format
   author_name?: string; // Backend format, akan dihapus setelah standardisasi
   mosqueId: number;
   mosque_id?: number; // Backend format, akan dihapus setelah standardisasi
@@ -71,6 +72,11 @@ export interface Announcement {
     name: string;
     image: string | null;
   };
+  userInfo?: {
+    id: number;
+    username: string;
+    email: string;
+  } | null;
   type?: "announcement" | "kajian" | "marketplace" | string;
   speaker_name?: string | null;
   speakerName?: string | null;

@@ -164,7 +164,12 @@ const DashboardPage = () => {
             url: ann.media_url || null,
             type: ann.type || "announcement",
             mosqueId: ann.mosque_id,
-            author_name: ann.author_name || ann.mosqueInfo?.name || "Unknown",
+            author_id: ann.author_id || ann.authorId,
+            author_name:
+              ann.author_name ||
+              ann.userInfo?.username ||
+              ann.mosqueInfo?.name ||
+              "Unknown",
             like_count: ann.like_count || 0,
             comment_count: ann.comment_count || 0,
             mosqueInfo: {
@@ -172,6 +177,13 @@ const DashboardPage = () => {
               name: ann.mosqueInfo?.name,
               image: ann.mosqueInfo?.image || null,
             },
+            userInfo: ann.userInfo
+              ? {
+                  id: ann.userInfo.id,
+                  username: ann.userInfo.username,
+                  email: ann.userInfo.email,
+                }
+              : null,
             createdAt: ann.createdAt,
           })) || [];
         setAnnouncements(sortAnnouncementsByLatestId(transformedAnnouncements));
