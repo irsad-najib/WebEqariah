@@ -15,9 +15,21 @@ export default function UstadzPage() {
     const fetchSpeakers = async () => {
       try {
         const response = await axiosInstance.get("/api/speaker/approved");
-        setSpeakers(response.data);
+        const payload = response?.data;
+        const list = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+          ? payload.data
+          : [];
+
+        if (!Array.isArray(list)) {
+          throw new Error("Invalid speaker payload");
+        }
+
+        setSpeakers(list);
       } catch (err) {
         console.error("Error fetching speakers:", err);
+        setSpeakers([]);
         setError("Failed to load speakers");
       } finally {
         setLoading(false);

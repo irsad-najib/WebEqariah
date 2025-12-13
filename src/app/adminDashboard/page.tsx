@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Search, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { axiosInstance } from "@/lib/utils/api";
 import { useRouter } from "next/navigation";
@@ -101,6 +101,8 @@ const AdminDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcementTypeFilter, setAnnouncementTypeFilter] =
+    useState<string>("all");
   const [mosques, setMosques] = useState<Mosque[]>([]);
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -126,6 +128,41 @@ const AdminDashboard: React.FC = () => {
   const [currentMosquePage, setCurrentMosquePage] = useState<number>(1);
   const [currentSpeakerPage, setCurrentSpeakerPage] = useState<number>(1);
   const itemsPerPage: number = 10;
+  const normalizeAnnouncementType = (value?: string | null) =>
+    value?.toLowerCase().trim() || "announcement";
+
+  const formatAnnouncementTypeLabel = (value: string) =>
+    value
+      .split(/[_-]/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ") || "Announcement";
+
+  const announcementTypeOptions = useMemo(() => {
+    const typeSet = new Set<string>();
+    (announcements || []).forEach((announcement) => {
+      typeSet.add(normalizeAnnouncementType(announcement?.type));
+    });
+    return (typeSet.size ? Array.from(typeSet) : ["announcement"]).sort();
+  }, [announcements]);
+
+  const totalAnnouncementLikes = useMemo(
+    () =>
+      (announcements || []).reduce(
+        (sum, announcement) => sum + (announcement?.like_count ?? 0),
+        0
+      ),
+    [announcements]
+  );
+
+  const totalAnnouncementComments = useMemo(
+    () =>
+      (announcements || []).reduce(
+        (sum, announcement) => sum + (announcement?.comment_count ?? 0),
+        0
+      ),
+    [announcements]
+  );
 
   useEffect(() => {
     const authsession = async () => {
@@ -268,23 +305,34 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const normalizedSearchTerm = searchTerm.toLowerCase();
   const filteredUsers = (users || []).filter(
     (user) =>
-      user?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      (user?.username || "").toLowerCase().includes(normalizedSearchTerm) ||
+      (user?.email || "").toLowerCase().includes(normalizedSearchTerm)
   );
-  const filteredAnnouncements = (announcements || []).filter(
-    (announcement) =>
-      announcement?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      announcement?.content?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredAnnouncements = (announcements || []).filter((announcement) => {
+    const matchesSearch =
+      (announcement?.title || "")
+        .toLowerCase()
+        .includes(normalizedSearchTerm) ||
+      (announcement?.content || "")
+        .toLowerCase()
+        .includes(normalizedSearchTerm);
+
+    const matchesType =
+      announcementTypeFilter === "all" ||
+      normalizeAnnouncementType(announcement?.type) === announcementTypeFilter;
+
+    return matchesSearch && matchesType;
+  });
   const filteredMosque = (mosques || []).filter((mosque) =>
-    mosque?.mosqueName?.toLowerCase().includes(searchTerm.toLowerCase())
+    (mosque?.mosqueName || "").toLowerCase().includes(normalizedSearchTerm)
   );
   const filteredSpeakers = (speakers || []).filter(
     (speaker) =>
-      speaker?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      speaker?.expertise?.toLowerCase().includes(searchTerm.toLowerCase())
+      (speaker?.name || "").toLowerCase().includes(normalizedSearchTerm) ||
+      (speaker?.expertise || "").toLowerCase().includes(normalizedSearchTerm)
   );
 
   const paginate = (pageNumber: number, type: string): void => {
@@ -300,6 +348,10 @@ const AdminDashboard: React.FC = () => {
     setCurrentMosquePage(1);
     setCurrentSpeakerPage(1);
   }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentAnnouncementPage(1);
+  }, [announcementTypeFilter]);
 
   const openImagePreview = (imageUrl: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -433,6 +485,10 @@ const AdminDashboard: React.FC = () => {
             />
           </div>
         );
+      }
+
+      if (col === "type" && typeof value === "string") {
+        return formatAnnouncementTypeLabel(normalizeAnnouncementType(value));
       }
 
       if (value === null || typeof value === "undefined") {
@@ -637,6 +693,25 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
+            <div className="bg-white rounded-lg shadow p-5">
+              <p className="text-sm text-gray-500 mb-1">
+                Total Likes di Semua Pengumuman
+              </p>
+              <p className="text-3xl font-bold text-gray-800">
+                {totalAnnouncementLikes.toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-white rounded-lg shadow p-5">
+              <p className="text-sm text-gray-500 mb-1">
+                Total Komentar di Semua Pengumuman
+              </p>
+              <p className="text-3xl font-bold text-gray-800">
+                {totalAnnouncementComments.toLocaleString()}
+              </p>
+            </div>
+          </div>
+
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
               <p>{error}</p>
@@ -721,15 +796,32 @@ const AdminDashboard: React.FC = () => {
 
             {activeTab === "announcements" && (
               <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4">
                   <h2 className="text-lg font-medium">
                     Announcements (Showing {filteredAnnouncements?.length || 0}{" "}
                     of {announcements?.length || 0})
                   </h2>
-                  {/* <button className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
-                  <PlusCircle size={16} className="mr-2" />
-                  Add Announcement
-                </button> */}
+                  <div className="flex flex-col gap-2 text-sm text-gray-600 md:flex-row md:items-center">
+                    <label
+                      htmlFor="announcement-type-filter"
+                      className="font-medium">
+                      Filter tipe pengumuman
+                    </label>
+                    <select
+                      id="announcement-type-filter"
+                      value={announcementTypeFilter}
+                      onChange={(e) =>
+                        setAnnouncementTypeFilter(e.target.value)
+                      }
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option value="all">Semua tipe</option>
+                      {announcementTypeOptions.map((typeOption) => (
+                        <option key={typeOption} value={typeOption}>
+                          {formatAnnouncementTypeLabel(typeOption)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 {loading ? (
                   <div className="flex justify-center items-center py-8">
@@ -742,6 +834,9 @@ const AdminDashboard: React.FC = () => {
                       [
                         "title",
                         "content",
+                        "type",
+                        "like_count",
+                        "comment_count",
                         "createdAt",
                         "authorId",
                         "imageUrl",
