@@ -61,6 +61,10 @@ const DashboardPage = () => {
   const [announcementTypeFilter, setAnnouncementTypeFilter] =
     useState<string>("all");
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const normalizeAnnouncementType = (value?: string | null) =>
     value?.toLowerCase().trim() || "announcement";
 
@@ -74,16 +78,26 @@ const DashboardPage = () => {
   const announcementTypeOptions = useMemo(() => {
     const typeSet = new Set<string>();
     (announcements || []).forEach((announcement) => {
-      typeSet.add(normalizeAnnouncementType(announcement?.type));
+      const type = normalizeAnnouncementType(announcement?.type);
+      // Exclude marketplace from options (it has its own page)
+      if (type !== "marketplace") {
+        typeSet.add(type);
+      }
     });
     return (typeSet.size ? Array.from(typeSet) : ["announcement"]).sort();
   }, [announcements]);
 
   const filteredAnnouncements = useMemo(() => {
+    // Filter out marketplace type by default (marketplace has its own page)
+    const nonMarketplace = announcements.filter(
+      (announcement) =>
+        normalizeAnnouncementType(announcement?.type) !== "marketplace"
+    );
+
     if (announcementTypeFilter === "all") {
-      return announcements;
+      return nonMarketplace;
     }
-    return announcements.filter(
+    return nonMarketplace.filter(
       (announcement) =>
         normalizeAnnouncementType(announcement?.type) === announcementTypeFilter
     );
@@ -168,6 +182,11 @@ const DashboardPage = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Reset pagination when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [announcementTypeFilter]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -386,7 +405,7 @@ const DashboardPage = () => {
 
       <Navbar />
 
-      <div className="flex relative">
+      <div className="flex relative text-black">
         {/* Main Content */}
         <div className="flex-1 container mx-auto px-4 lg:pr-80 pb-24">
           {/* WebSocket Status Indicator */}
@@ -678,73 +697,80 @@ const DashboardPage = () => {
           {/* Announcements List */}
           <div className="space-y-6 text-black mt-6">
             {filteredAnnouncements && filteredAnnouncements.length > 0 ? (
-              filteredAnnouncements.map((announcement) => (
-                <div
-                  key={announcement.id}
-                  className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.01]">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-4">
-                      <div className="relative w-12 h-12">
+              filteredAnnouncements
+                .slice(
+                  (currentPage - 1) * itemsPerPage,
+                  currentPage * itemsPerPage
+                )
+                .map((announcement) => (
+                  <div
+                    key={announcement.id}
+                    className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.01]">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center space-x-4">
+                        <div className="relative w-12 h-12">
+                          <Image
+                            src={
+                              announcement.mosqueInfo?.image || "/mosque.png"
+                            }
+                            alt={announcement.mosqueInfo?.name || "Mosque"}
+                            className="rounded-full"
+                            fill
+                          />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold">
+                            {announcement.mosqueInfo?.name || "Mosque"}
+                          </h3>
+                          <p className="text-gray-500 mt-2 whitespace-pre-wrap">
+                            {new Date(
+                              announcement.createdAt
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                        {formatAnnouncementTypeLabel(
+                          normalizeAnnouncementType(announcement.type)
+                        )}
+                      </span>
+                    </div>
+                    <h2 className="text-2xl font-bold mt-4">
+                      {announcement.title}
+                    </h2>
+                    <RichTextRenderer
+                      content={truncateHtmlContent(announcement.content, 100)}
+                    />
+                    <div className="flex items-center gap-6 mt-4 text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <Heart className="w-5 h-5 text-red-500" />
+                        <span className="text-sm font-medium">
+                          {announcement.like_count || 0} Likes
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="w-5 h-5 text-blue-500" />
+                        <span className="text-sm font-medium">
+                          {announcement.comment_count || 0} Komentar
+                        </span>
+                      </div>
+                    </div>
+                    {announcement.url && (
+                      <div className="mt-4 inline-block">
                         <Image
-                          src={announcement.mosqueInfo?.image || "/mosque.png"}
-                          alt={announcement.mosqueInfo?.name || "Mosque"}
-                          className="rounded-full"
-                          fill
+                          src={announcement.url}
+                          alt={announcement.title}
+                          className="rounded-lg object-contain"
+                          width={400}
+                          height={384}
+                          style={{ maxHeight: "24rem", width: "auto" }}
                         />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold">
-                          {announcement.mosqueInfo?.name || "Mosque"}
-                        </h3>
-                        <p className="text-gray-500 mt-2 whitespace-pre-wrap">
-                          {new Date(
-                            announcement.createdAt
-                          ).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                      {formatAnnouncementTypeLabel(
-                        normalizeAnnouncementType(announcement.type)
-                      )}
-                    </span>
-                  </div>
-                  <h2 className="text-2xl font-bold mt-4">
-                    {announcement.title}
-                  </h2>
-                  <RichTextRenderer
-                    content={truncateHtmlContent(announcement.content, 100)}
-                  />
-                  <div className="flex items-center gap-6 mt-4 text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Heart className="w-5 h-5 text-red-500" />
-                      <span className="text-sm font-medium">
-                        {announcement.like_count || 0} Likes
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MessageCircle className="w-5 h-5 text-blue-500" />
-                      <span className="text-sm font-medium">
-                        {announcement.comment_count || 0} Komentar
-                      </span>
-                    </div>
-                  </div>
-                  {announcement.url && (
-                    <div className="mt-4 inline-block">
-                      <Image
-                        src={announcement.url}
-                        alt={announcement.title}
-                        className="rounded-lg object-contain"
-                        width={400}
-                        height={384}
-                        style={{ maxHeight: "24rem", width: "auto" }}
-                      />
-                    </div>
-                  )}
-                </div>
-              ))
+                ))
             ) : (
               <div className="bg-white p-8 rounded-2xl text-center shadow-xl border border-gray-100">
                 <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -770,6 +796,54 @@ const DashboardPage = () => {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {filteredAnnouncements.length > 0 && (
+            <div className="flex justify-center items-center gap-4 mt-8 mb-6">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  currentPage === 1
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-green-600 text-white hover:bg-green-700"
+                }`}>
+                Previous
+              </button>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">
+                  Page {currentPage} of{" "}
+                  {Math.ceil(filteredAnnouncements.length / itemsPerPage)}
+                </span>
+                <span className="text-xs text-gray-500">
+                  ({filteredAnnouncements.length} items)
+                </span>
+              </div>
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) =>
+                    Math.min(
+                      prev + 1,
+                      Math.ceil(filteredAnnouncements.length / itemsPerPage)
+                    )
+                  )
+                }
+                disabled={
+                  currentPage ===
+                  Math.ceil(filteredAnnouncements.length / itemsPerPage)
+                }
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  currentPage ===
+                  Math.ceil(filteredAnnouncements.length / itemsPerPage)
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-green-600 text-white hover:bg-green-700"
+                }`}>
+                Next
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Desktop Chat Sidebar - Fixed positioning */}
