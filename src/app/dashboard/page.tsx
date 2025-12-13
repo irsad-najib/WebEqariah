@@ -27,7 +27,7 @@ interface NewAnnouncementForm {
   content: string;
   url: string;
   imageUrl?: string;
-  type: "announcement" | "kajian";
+  type: "announcement" | "kajian" | "marketplace" | string;
   speaker_name?: string;
   event_date?: string;
   speaker_id?: number | null;
@@ -75,29 +75,35 @@ const DashboardPage = () => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ") || "Announcement";
 
+  const getTypeBadgeColors = (type: string) => {
+    const normalized = normalizeAnnouncementType(type);
+    switch (normalized) {
+      case "announcement":
+        return "bg-blue-100 text-blue-800";
+      case "kajian":
+        return "bg-purple-100 text-purple-800";
+      case "marketplace":
+        return "bg-amber-100 text-amber-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   const announcementTypeOptions = useMemo(() => {
     const typeSet = new Set<string>();
     (announcements || []).forEach((announcement) => {
       const type = normalizeAnnouncementType(announcement?.type);
-      // Exclude marketplace from options (it has its own page)
-      if (type !== "marketplace") {
-        typeSet.add(type);
-      }
+      typeSet.add(type);
     });
-    return (typeSet.size ? Array.from(typeSet) : ["announcement"]).sort();
+    // Ensure all 3 main types are present
+    return Array.from(typeSet).sort();
   }, [announcements]);
 
   const filteredAnnouncements = useMemo(() => {
-    // Filter out marketplace type by default (marketplace has its own page)
-    const nonMarketplace = announcements.filter(
-      (announcement) =>
-        normalizeAnnouncementType(announcement?.type) !== "marketplace"
-    );
-
     if (announcementTypeFilter === "all") {
-      return nonMarketplace;
+      return announcements;
     }
-    return nonMarketplace.filter(
+    return announcements.filter(
       (announcement) =>
         normalizeAnnouncementType(announcement?.type) === announcementTypeFilter
     );
@@ -156,7 +162,11 @@ const DashboardPage = () => {
             title: ann.title,
             content: ann.content,
             url: ann.media_url || null,
+            type: ann.type || "announcement",
             mosqueId: ann.mosque_id,
+            author_name: ann.author_name || ann.mosqueInfo?.name || "Unknown",
+            like_count: ann.like_count || 0,
+            comment_count: ann.comment_count || 0,
             mosqueInfo: {
               id: ann.mosque_id,
               name: ann.mosqueInfo?.name,
@@ -213,10 +223,16 @@ const DashboardPage = () => {
           title: announcementData.title,
           content: announcementData.content,
           url: announcementData.media_url || null,
+          type: announcementData.type || "announcement",
           mosqueId: Number(announcementData.mosque_id),
           author_name: announcementData.author_name || "Anonymous",
           like_count: Number(announcementData.like_count || 0),
           comment_count: Number(announcementData.comment_count || 0),
+          mosqueInfo: {
+            id: Number(announcementData.mosque_id),
+            name: announcementData.author_name || "Mosque",
+            image: null,
+          },
           mosque: {
             id: Number(announcementData.mosque_id),
             mosqueName: announcementData.author_name || "Mosque",
@@ -731,7 +747,10 @@ const DashboardPage = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getTypeBadgeColors(
+                          announcement.type
+                        )}`}>
                         {formatAnnouncementTypeLabel(
                           normalizeAnnouncementType(announcement.type)
                         )}
