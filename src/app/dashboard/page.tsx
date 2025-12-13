@@ -749,7 +749,7 @@ const DashboardPage = () => {
                     <div className="flex items-center gap-2 mt-2">
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getTypeBadgeColors(
-                          announcement.type
+                          announcement.type ?? "announcement"
                         )}`}>
                         {formatAnnouncementTypeLabel(
                           normalizeAnnouncementType(announcement.type)
