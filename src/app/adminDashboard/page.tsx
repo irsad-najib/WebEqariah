@@ -392,7 +392,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const renderTable = <T extends Record<string, unknown>>(
+  const renderTable = <T extends object>(
     data: T[],
     columns: string[],
     type: string
@@ -401,22 +401,25 @@ const AdminDashboard: React.FC = () => {
     const safeData = data || [];
 
     const getCellValue = (item: T, col: string): React.ReactNode => {
+      const record = item as Record<string, unknown>;
       if (col.includes(".")) {
         const [parent, child] = col.split(".");
-        const parentValue = item[parent as keyof T];
+        const parentValue = record[parent];
         if (
           parentValue &&
           typeof parentValue === "object" &&
           parentValue !== null
         ) {
           const nested = parentValue as Record<string, unknown>;
-          return nested[child] ?? "";
+          return nested[child] !== undefined && nested[child] !== null
+            ? String(nested[child])
+            : "";
         }
         return "";
       }
 
       // Check if the column is imageUrl and display as an image
-      const value = item[col as keyof T];
+      const value = record[col];
       if (col === "imageUrl" && typeof value === "string" && value) {
         return (
           <div className="relative h-16 w-16">
@@ -471,12 +474,22 @@ const AdminDashboard: React.FC = () => {
           <tbody className="divide-y divide-gray-200">
             {safeData.length > 0 ? (
               safeData.map((item) => (
-                <React.Fragment key={item?.id || Math.random()}>
+                <React.Fragment
+                  key={String(
+                    (item as Record<string, unknown>)?.id ?? Math.random()
+                  )}>
                   <tr
-                    key={item?.id || Math.random()}
+                    key={String(
+                      (item as Record<string, unknown>)?.id ?? Math.random()
+                    )}
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() =>
-                      setExpandedRow(expandedRow === item?.id ? null : item?.id)
+                      setExpandedRow(
+                        expandedRow ===
+                          String((item as Record<string, unknown>)?.id ?? "")
+                          ? null
+                          : String((item as Record<string, unknown>)?.id ?? "")
+                      )
                     }>
                     {columns.map((col) => {
                       const value = getCellValue(item, col);
@@ -497,15 +510,21 @@ const AdminDashboard: React.FC = () => {
                         {type === "mosque" && (
                           <button
                             className={`${
-                              item?.status === "APPROVED"
+                              (item as Record<string, unknown>)?.status ===
+                              "APPROVED"
                                 ? "text-yellow-600 hover:text-yellow-900"
                                 : "text-green-600 hover:text-green-900"
                             }`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleApproveMosque(String(item?.id));
+                              handleApproveMosque(
+                                String(
+                                  (item as Record<string, unknown>)?.id ?? ""
+                                )
+                              );
                             }}>
-                            {item?.status === "APPROVED"
+                            {(item as Record<string, unknown>)?.status ===
+                            "APPROVED"
                               ? "Unapprove"
                               : "Approve"}
                           </button>
@@ -520,12 +539,21 @@ const AdminDashboard: React.FC = () => {
                           onClick={(e) =>
                             handleDeleteClick(
                               type as "users" | "announcements" | "mosque",
-                              item?.id,
+                              ((item as Record<string, unknown>)?.id as
+                                | string
+                                | number) ?? "",
                               type === "users"
-                                ? item?.username
+                                ? String(
+                                    (item as Record<string, unknown>)?.username
+                                  )
                                 : type === "announcements"
-                                ? item?.title
-                                : item?.mosqueName,
+                                ? String(
+                                    (item as Record<string, unknown>)?.title
+                                  )
+                                : String(
+                                    (item as Record<string, unknown>)
+                                      ?.mosqueName
+                                  ),
                               e
                             )
                           }>
@@ -534,7 +562,8 @@ const AdminDashboard: React.FC = () => {
                       </div>
                     </td>
                   </tr>
-                  {expandedRow === item?.id && (
+                  {expandedRow ===
+                    String((item as Record<string, unknown>)?.id ?? "") && (
                     <tr>
                       <td
                         colSpan={columns.length + 1}
