@@ -57,6 +57,10 @@ function MessagePageContent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
   // Get query parameters
   const searchParams = useSearchParams();
   const selectedUserFromQuery = searchParams.get("selectedUser");
@@ -119,7 +123,7 @@ function MessagePageContent() {
         setMessages([]);
       }
     },
-    [currentUser]
+    [currentUser, scrollToBottom]
   );
 
   // Load users function dengan useCallback
@@ -227,11 +231,7 @@ function MessagePageContent() {
         });
       }
     }
-  }, [lastMessage, selectedUserId, currentUser]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, [lastMessage, selectedUserId, currentUser, scrollToBottom]);
 
   // Handle user selection with sessionStorage
   const handleUserSelect = (userId: string) => {

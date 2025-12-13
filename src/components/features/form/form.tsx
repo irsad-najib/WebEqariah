@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Quill from "quill";
-import "quill/dist/quill.snow.css";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import { Node as TiptapNode, mergeAttributes } from "@tiptap/core";
 import {
   Send,
   Image as ImageIcon,
-  Video,
+  Video as VideoIcon,
   Paperclip,
   Bold,
   Italic,
@@ -17,50 +21,75 @@ import {
 import axios from "axios";
 import { axiosInstance } from "@/lib/utils/api";
 
-// Custom Video Blot for Quill
-const BlockEmbed = Quill.import("blots/block/embed");
+// Custom video node for Tiptap so we can embed uploaded mp4 files easily
+const Video = TiptapNode.create({
+  name: "video",
+  group: "block",
+  atom: true,
+  draggable: true,
+  selectable: true,
+  addAttributes() {
+    return {
+      src: {
+        default: null,
+        parseHTML: (element: HTMLElement) => {
+          const directSrc = element.getAttribute("src");
+          const sourceChild = element.querySelector("source");
+          return directSrc || sourceChild?.getAttribute("src") || null;
+        },
+      },
+      controls: {
+        default: true,
+      },
+      playsinline: {
+        default: true,
+      },
+    };
+  },
+  parseHTML() {
+    return [{ tag: "video" }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return [
+      "video",
+      mergeAttributes(
+        {
+          controls: true,
+          playsinline: "",
+          class: "editor-video",
+        },
+        HTMLAttributes
+      ),
+    ];
+  },
+  addCommands() {
+    return {
+      setVideo:
+        (options: { src: string }) =>
+        ({ commands }) =>
+          commands.insertContent({
+            type: this.name,
+            attrs: options,
+          }),
+    };
+  },
+});
 
-class VideoBlot extends BlockEmbed {
-  static blotName = "video";
-  static tagName = "video";
-  static className = "ql-video";
-
-  static create(value: string) {
-    const node = super.create() as HTMLVideoElement;
-    node.setAttribute("controls", "");
-    node.setAttribute(
-      "style",
-      "max-width: 100%; border-radius: 8px; margin: 8px 0;"
-    );
-    node.setAttribute("playsinline", "");
-
-    const source = document.createElement("source");
-    source.setAttribute("src", value);
-    source.setAttribute("type", "video/mp4");
-    node.appendChild(source);
-
-    return node;
-  }
-
-  static value(node: HTMLVideoElement) {
-    const source = node.querySelector("source");
-    return source?.getAttribute("src") || "";
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    video: {
+      setVideo: (options: { src: string }) => ReturnType;
+    };
   }
 }
 
-// Register custom video blot
-if (typeof window !== "undefined") {
-  Quill.register(VideoBlot, true);
-}
-
-// Define types for props
 interface MyEditorProps {
   value?: string;
   onEditorChange: (content: string) => void;
   onSend?: () => void;
-  onMediaUpload?: (mediaUrl: string) => void; // New prop for handling uploaded media URLs
-  uploadEndpoint?: string; // Custom upload endpoint
-  showSendButton?: boolean; // Option to hide send button
+  onMediaUpload?: (mediaUrl: string) => void;
+  uploadEndpoint?: string;
+  showSendButton?: boolean;
 }
 
 export default function MyEditor({
@@ -68,10 +97,9 @@ export default function MyEditor({
   onEditorChange,
   onSend,
   onMediaUpload,
-  uploadEndpoint = "/api/upload-media", // Default endpoint
+  uploadEndpoint = "/api/upload-media",
   showSendButton = true,
 }: MyEditorProps) {
-  const [editorLoaded, setEditorLoaded] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -82,14 +110,21 @@ export default function MyEditor({
     file: File;
   } | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const editorRef = useRef<HTMLDivElement>(null);
-  const quillRef = useRef<Quill | null>(null);
+  const [editorReady, setEditorReady] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const onEditorChangeRef = useRef(onEditorChange);
+  const onMediaUploadRef = useRef(onMediaUpload);
 
-  // Ensure we're on the client side
+  useEffect(() => {
+    onEditorChangeRef.current = onEditorChange;
+  }, [onEditorChange]);
+
+  useEffect(() => {
+    onMediaUploadRef.current = onMediaUpload;
+  }, [onMediaUpload]);
+
   useEffect(() => {
     setIsClient(true);
-    setEditorLoaded(true);
 
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -97,39 +132,80 @@ export default function MyEditor({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  const processFile = useCallback((file: File) => {
+    const isImage = file.type.startsWith("image/");
+    const isVideo = file.type.startsWith("video/");
+
+    if (!isImage && !isVideo) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const src = reader.result as string;
+      setMediaPreview({
+        type: isImage ? "image" : "video",
+        src,
+        file,
+      });
+    };
+    reader.readAsDataURL(file);
+  }, []);
+
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit.configure({
+          heading: false,
+        }),
+        Placeholder.configure({
+          placeholder: "Type a message...",
+        }),
+        Image.configure({
+          HTMLAttributes: {
+            class: "editor-image",
+          },
+        }),
+        Link.configure({
+          autolink: true,
+          openOnClick: false,
+          linkOnPaste: true,
+        }),
+        Video,
+      ],
+      content: value || "",
+      onUpdate: ({ editor }) => {
+        onEditorChangeRef.current(editor.getHTML());
+      },
+    },
+    []
+  );
+
   useEffect(() => {
-    if (isClient && editorLoaded && editorRef.current && !quillRef.current) {
-      const quillInstance = new Quill(editorRef.current, {
-        theme: "snow",
-        placeholder: "Type a message...",
-        modules: {
-          toolbar: false, // We'll use custom toolbar
-        },
-      });
+    if (!editor) return;
+    setEditorReady(true);
 
-      quillRef.current = quillInstance;
+    const handleFocus = () => setShowToolbar(true);
+    const handleBlur = () => setShowToolbar(false);
 
-      // Handle text changes
-      quillInstance.on("text-change", () => {
-        const content = quillInstance.root.innerHTML || "";
-        onEditorChange(content);
-      });
+    editor.on("focus", handleFocus);
+    editor.on("blur", handleBlur);
 
-      // Set initial value if provided
-      if (value) {
-        quillInstance.root.innerHTML = value;
-      }
+    return () => {
+      editor.off("focus", handleFocus);
+      editor.off("blur", handleBlur);
+    };
+  }, [editor]);
 
-      // Focus handler
-      quillInstance.on("selection-change", (range) => {
-        if (range) {
-          setShowToolbar(true);
-        }
-      });
+  useEffect(() => {
+    if (!editor) return;
+    if (value === undefined) return;
+
+    const currentHTML = editor.getHTML();
+    if (value !== currentHTML) {
+      editor.commands.setContent(value, { emitUpdate: false });
     }
-  }, [isClient, editorLoaded, onEditorChange, value]);
+  }, [editor, value]);
 
-  // Drag & Drop handlers
+  // Drag & drop overlay handling matches previous behaviour
   useEffect(() => {
     if (!isClient || isMobile || !containerRef.current) return;
 
@@ -144,8 +220,6 @@ export default function MyEditor({
     const handleDragLeave = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-
-      // Only set dragOver to false if we're leaving the container entirely
       if (!container.contains(e.relatedTarget as Node)) {
         setIsDragOver(false);
       }
@@ -183,169 +257,117 @@ export default function MyEditor({
       container.removeEventListener("dragover", handleDragOver);
       container.removeEventListener("drop", handleDrop);
     };
-  }, [isClient, isMobile]);
+  }, [isClient, isMobile, processFile]);
 
-  // Sync external value changes to editor
-  useEffect(() => {
-    if (
-      quillRef.current &&
-      value !== undefined &&
-      value !== quillRef.current.root.innerHTML
-    ) {
-      const currentSelection = quillRef.current.getSelection();
-      quillRef.current.root.innerHTML = value || "";
+  const uploadFileToAPI = useCallback(
+    async (file: File): Promise<string | null> => {
+      try {
+        setIsUploading(true);
 
-      if (currentSelection) {
-        quillRef.current.setSelection(currentSelection);
-      }
-    }
-  }, [value]);
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("source", "marketplace");
 
-  // API Upload function
-  const uploadFileToAPI = async (file: File): Promise<string | null> => {
-    try {
-      setIsUploading(true);
+        const response = await axiosInstance.post(uploadEndpoint, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("source", "marketplace"); // or make this dynamic
-
-      console.log("📤 Uploading file:", {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        endpoint: uploadEndpoint,
-      });
-
-      const response = await axiosInstance.post(uploadEndpoint, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / (progressEvent.total || 1)
-          );
-          console.log(`📊 Upload Progress: ${percentCompleted}%`);
-        },
-      });
-
-      console.log("✅ Upload success:", response.data);
-
-      // Axios automatically throws for non-2xx responses
-      // and parses JSON response data
-      return response.data.data?.url || response.data.url || null; // Handle different response formats
-    } catch (error) {
-      console.error("❌ Upload error:", error);
-
-      // Better error messages
-      if (axios.isAxiosError(error)) {
-        if (error.code === "ECONNABORTED") {
-          alert("Upload timeout. Video terlalu besar atau koneksi lambat.");
-        } else if (error.response?.status === 413) {
-          alert("File terlalu besar. Maksimal 100MB.");
-        } else if (error.response?.status === 401) {
-          alert("Anda harus login terlebih dahulu.");
+        return response.data?.data?.url || response.data?.url || null;
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.code === "ECONNABORTED") {
+            alert("Upload timeout. Video terlalu besar atau koneksi lambat.");
+          } else if (error.response?.status === 413) {
+            alert("File terlalu besar. Maksimal 100MB.");
+          } else if (error.response?.status === 401) {
+            alert("Anda harus login terlebih dahulu.");
+          } else {
+            alert(
+              `Upload gagal: ${error.response?.data?.message || error.message}`
+            );
+          }
         } else {
-          alert(
-            `Upload gagal: ${error.response?.data?.message || error.message}`
-          );
+          alert("Upload gagal. Silakan coba lagi.");
         }
-      } else {
-        alert("Upload gagal. Silakan coba lagi.");
+
+        return null;
+      } finally {
+        setIsUploading(false);
       }
+    },
+    [uploadEndpoint]
+  );
 
-      return null;
-    } finally {
-      setIsUploading(false);
-    }
-  };
+  const insertMedia = useCallback(async () => {
+    if (!editor || !mediaPreview) return;
 
-  const processFile = (file: File) => {
-    const isImage = file.type.startsWith("image/");
-    const isVideo = file.type.startsWith("video/");
-
-    if (!isImage && !isVideo) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const src = reader.result as string;
-      setMediaPreview({
-        type: isImage ? "image" : "video",
-        src,
-        file,
-      });
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleMediaUpload = (mediaType: "image" | "video") => {
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", mediaType === "image" ? "image/*" : "video/*");
-    input.click();
-
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (file) {
-        processFile(file);
-      }
-    };
-  };
-
-  const insertMedia = async () => {
-    if (!mediaPreview || !quillRef.current) return;
-
-    // Upload to API first
     const uploadedUrl = await uploadFileToAPI(mediaPreview.file);
-
     if (!uploadedUrl) {
-      return; // Upload failed, don't insert
+      return;
     }
 
-    // Call the onMediaUpload callback if provided
-    if (onMediaUpload) {
-      onMediaUpload(uploadedUrl);
+    if (onMediaUploadRef.current) {
+      onMediaUploadRef.current(uploadedUrl);
     }
-
-    const range = quillRef.current.getSelection() || {
-      index: quillRef.current.getLength(),
-    };
 
     if (mediaPreview.type === "image") {
-      // Insert image with uploaded URL
-      quillRef.current.insertEmbed(range.index, "image", uploadedUrl);
-      quillRef.current.setSelection({ index: range.index + 1, length: 0 });
-    } else if (mediaPreview.type === "video") {
-      // Insert video using custom VideoBlot
-      quillRef.current.insertEmbed(range.index, "video", uploadedUrl);
-      quillRef.current.setSelection({ index: range.index + 1, length: 0 });
-
-      console.log("✅ Video inserted:", uploadedUrl);
+      editor.chain().focus().setImage({ src: uploadedUrl }).run();
+    } else {
+      editor.chain().focus().setVideo({ src: uploadedUrl }).run();
     }
 
     setMediaPreview(null);
-  };
+  }, [editor, mediaPreview, uploadFileToAPI]);
 
-  const cancelMediaPreview = () => {
+  const cancelMediaPreview = useCallback(() => {
     setMediaPreview(null);
-  };
+  }, []);
 
-  const formatText = (format: string) => {
-    if (quillRef.current) {
-      const range = quillRef.current.getSelection();
-      if (range) {
-        quillRef.current.format(format, !quillRef.current.getFormat()[format]);
+  const handleMediaUpload = useCallback(
+    (mediaType: "image" | "video") => {
+      const input = document.createElement("input");
+      input.setAttribute("type", "file");
+      input.setAttribute(
+        "accept",
+        mediaType === "image" ? "image/*" : "video/*"
+      );
+      input.click();
+
+      input.onchange = () => {
+        const file = input.files?.[0];
+        if (file) {
+          processFile(file);
+        }
+      };
+    },
+    [processFile]
+  );
+
+  const formatText = useCallback(
+    (format: "bold" | "italic") => {
+      if (!editor) return;
+
+      if (format === "bold") {
+        editor.chain().focus().toggleBold().run();
+      } else {
+        editor.chain().focus().toggleItalic().run();
       }
-    }
-  };
+    },
+    [editor]
+  );
 
-  const handleSend = () => {
+  const handleSend = useCallback(() => {
     if (onSend) {
       onSend();
     }
-  };
+  }, [onSend]);
 
-  // Don't render anything until we're on the client
+  const isBoldActive = editor?.isActive("bold") ?? false;
+  const isItalicActive = editor?.isActive("italic") ?? false;
+  const isEditorEmpty = editor?.isEmpty ?? true;
+
   if (!isClient) {
     return (
       <div className="whatsapp-editor-skeleton">
@@ -359,9 +381,8 @@ export default function MyEditor({
       <div
         ref={containerRef}
         className={`whatsapp-editor-wrapper ${isDragOver ? "drag-over" : ""}`}>
-        {editorLoaded ? (
+        {editorReady && editor ? (
           <div className="whatsapp-chat-container">
-            {/* Upload Loading Overlay */}
             {isUploading && (
               <div className="upload-overlay">
                 <div className="upload-content">
@@ -371,7 +392,6 @@ export default function MyEditor({
               </div>
             )}
 
-            {/* Drag & Drop Overlay */}
             {isDragOver && !isMobile && !isUploading && (
               <div className="drag-overlay">
                 <div className="drag-content">
@@ -381,12 +401,11 @@ export default function MyEditor({
               </div>
             )}
 
-            {/* Media Preview */}
             {mediaPreview && !isUploading && (
               <div className="media-preview-container">
                 <div className="media-preview">
                   <button
-                    type="button" // Add this
+                    type="button"
                     onClick={cancelMediaPreview}
                     className="preview-close-btn">
                     <X size={16} />
@@ -414,7 +433,7 @@ export default function MyEditor({
 
                   <div className="preview-actions">
                     <button
-                      type="button" // Add this
+                      type="button"
                       onClick={insertMedia}
                       className="preview-insert-btn"
                       disabled={isUploading}>
@@ -425,25 +444,24 @@ export default function MyEditor({
               </div>
             )}
 
-            {/* Mini Toolbar (appears when typing) */}
             {showToolbar && !mediaPreview && !isDragOver && !isUploading && (
               <div className="mini-toolbar">
                 <button
-                  type="button" // Add this
+                  type="button"
                   onClick={() => formatText("bold")}
-                  className="toolbar-btn"
+                  className={`toolbar-btn ${isBoldActive ? "active" : ""}`}
                   title="Bold">
                   <Bold size={16} />
                 </button>
                 <button
-                  type="button" // Add this
+                  type="button"
                   onClick={() => formatText("italic")}
-                  className="toolbar-btn"
+                  className={`toolbar-btn ${isItalicActive ? "active" : ""}`}
                   title="Italic">
                   <Italic size={16} />
                 </button>
                 <button
-                  type="button" // Add this
+                  type="button"
                   onClick={() => setShowToolbar(false)}
                   className="toolbar-btn-close">
                   ×
@@ -451,9 +469,7 @@ export default function MyEditor({
               </div>
             )}
 
-            {/* Main Input Container */}
             <div className="chat-input-container">
-              {/* Left Actions */}
               <div className="input-actions-left">
                 <button
                   type="button"
@@ -466,16 +482,16 @@ export default function MyEditor({
                 </button>
 
                 <button
-                  type="button" // Add this
+                  type="button"
                   onClick={() => handleMediaUpload("video")}
                   className="action-btn"
                   title="Add Video"
                   disabled={isUploading}>
-                  <Video size={20} />
+                  <VideoIcon size={20} />
                 </button>
 
                 <button
-                  type="button" // Add this
+                  type="button"
                   className="action-btn"
                   title="Attach File"
                   disabled={isUploading}>
@@ -483,20 +499,19 @@ export default function MyEditor({
                 </button>
               </div>
 
-              {/* Editor */}
               <div className="editor-container">
-                <div ref={editorRef} className="whatsapp-editor" />
+                <div className="whatsapp-editor">
+                  <EditorContent editor={editor} className="tiptap-editor" />
+                </div>
 
-                {/* Drag hint for desktop */}
-                {!isMobile && !value && !isUploading && (
+                {!isMobile && isEditorEmpty && !isUploading && (
                   <div className="drag-hint">or drag & drop media files</div>
                 )}
               </div>
 
-              {/* Send Button */}
               {showSendButton && (
                 <button
-                  type="button" // Add this
+                  type="button"
                   onClick={handleSend}
                   className="send-btn"
                   title="Send"
@@ -513,9 +528,7 @@ export default function MyEditor({
         )}
       </div>
 
-      {/* WhatsApp-like styling */}
       <style jsx global>{`
-        /* Main Container */
         .whatsapp-editor-wrapper {
           max-width: 100%;
           margin: 0 auto;
@@ -534,7 +547,6 @@ export default function MyEditor({
           position: relative;
         }
 
-        /* Upload Loading Overlay */
         .upload-overlay {
           position: absolute;
           top: 0;
@@ -590,7 +602,6 @@ export default function MyEditor({
           }
         }
 
-        /* Drag & Drop Overlay */
         .drag-overlay {
           position: absolute;
           top: 0;
@@ -627,7 +638,6 @@ export default function MyEditor({
           font-weight: 500;
         }
 
-        /* Drag Hint */
         .drag-hint {
           position: absolute;
           bottom: 8px;
@@ -638,7 +648,6 @@ export default function MyEditor({
           opacity: 0.7;
         }
 
-        /* Media Preview */
         .media-preview-container {
           position: absolute;
           top: -280px;
@@ -747,7 +756,6 @@ export default function MyEditor({
           cursor: not-allowed;
         }
 
-        /* Mini Toolbar */
         .mini-toolbar {
           position: absolute;
           top: -50px;
@@ -785,6 +793,11 @@ export default function MyEditor({
           cursor: pointer;
         }
 
+        .toolbar-btn.active {
+          background: #e2f3ef;
+          color: #00a884;
+        }
+
         .toolbar-btn:hover {
           background: #f0f2f5;
           color: #00a884;
@@ -800,7 +813,6 @@ export default function MyEditor({
           margin-left: 4px;
         }
 
-        /* Chat Input Container */
         .chat-input-container {
           display: flex;
           align-items: flex-end;
@@ -812,7 +824,6 @@ export default function MyEditor({
           position: relative;
         }
 
-        /* Left Actions */
         .input-actions-left {
           display: flex;
           gap: 4px;
@@ -842,7 +853,6 @@ export default function MyEditor({
           cursor: not-allowed;
         }
 
-        /* Editor Container */
         .editor-container {
           flex: 1;
           min-height: 20px;
@@ -850,14 +860,18 @@ export default function MyEditor({
           position: relative;
         }
 
-        .whatsapp-editor .ql-container {
-          border: none !important;
+        .whatsapp-editor {
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
             sans-serif;
         }
 
-        .whatsapp-editor .ql-editor {
+        .whatsapp-editor .tiptap-editor {
           border: none;
+        }
+
+        .whatsapp-editor .tiptap-editor .ProseMirror {
+          border: none;
+          outline: none;
           padding: 8px 12px;
           font-size: 15px;
           line-height: 1.4;
@@ -868,19 +882,18 @@ export default function MyEditor({
           word-wrap: break-word;
         }
 
-        .whatsapp-editor .ql-editor.ql-blank::before {
+        .whatsapp-editor .tiptap-editor .ProseMirror p {
+          margin: 0;
+          padding: 0;
+        }
+
+        .whatsapp-editor .tiptap-editor .ProseMirror.is-editor-empty::before {
           color: #8696a0;
           font-style: normal;
           left: 12px;
           font-size: 15px;
         }
 
-        .whatsapp-editor .ql-editor p {
-          margin: 0;
-          padding: 0;
-        }
-
-        /* Send Button */
         .send-btn {
           padding: 10px;
           border: none;
@@ -911,8 +924,7 @@ export default function MyEditor({
           transform: none;
         }
 
-        /* Media Styling in Editor */
-        .whatsapp-editor .ql-editor img {
+        .whatsapp-editor .tiptap-editor .ProseMirror img {
           max-width: 250px;
           height: auto;
           border-radius: 12px;
@@ -922,12 +934,12 @@ export default function MyEditor({
           transition: transform 0.2s ease;
         }
 
-        .whatsapp-editor .ql-editor img:hover {
+        .whatsapp-editor .tiptap-editor .ProseMirror img:hover {
           transform: scale(1.02);
         }
 
-        /* Video Blot Styling */
-        .whatsapp-editor .ql-editor video.ql-video {
+        .whatsapp-editor .tiptap-editor .ProseMirror video,
+        .whatsapp-editor .tiptap-editor .ProseMirror .editor-video {
           max-width: 100%;
           width: 100%;
           max-width: 300px;
@@ -939,21 +951,6 @@ export default function MyEditor({
           background: #000;
         }
 
-        .whatsapp-editor .ql-editor .video-container {
-          margin: 8px 0;
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .whatsapp-editor .ql-editor video {
-          width: 100%;
-          max-width: 300px;
-          height: auto;
-          display: block;
-        }
-
-        /* Skeleton Loading */
         .whatsapp-editor-skeleton {
           background: #f0f2f5;
           border-radius: 20px;
@@ -982,7 +979,6 @@ export default function MyEditor({
           }
         }
 
-        /* Mobile Responsive */
         @media (max-width: 768px) {
           .whatsapp-chat-container {
             border-radius: 16px;
@@ -994,12 +990,12 @@ export default function MyEditor({
             padding: 6px 10px;
           }
 
-          .whatsapp-editor .ql-editor {
-            font-size: 16px; /* Prevent zoom on iOS */
+          .whatsapp-editor .tiptap-editor .ProseMirror {
+            font-size: 16px;
             padding: 6px 8px;
           }
 
-          .whatsapp-editor .ql-editor.ql-blank::before {
+          .whatsapp-editor .tiptap-editor .ProseMirror.is-editor-empty::before {
             left: 8px;
             font-size: 16px;
           }
@@ -1019,11 +1015,11 @@ export default function MyEditor({
             padding: 8px;
           }
 
-          .whatsapp-editor .ql-editor img {
+          .whatsapp-editor .tiptap-editor .ProseMirror img {
             max-width: 200px;
           }
 
-          .whatsapp-editor .ql-editor video {
+          .whatsapp-editor .tiptap-editor .ProseMirror video {
             max-width: 250px;
           }
 
@@ -1046,21 +1042,22 @@ export default function MyEditor({
           }
         }
 
-        /* Scrollbar untuk editor */
-        .whatsapp-editor .ql-editor::-webkit-scrollbar {
+        .whatsapp-editor .tiptap-editor .ProseMirror::-webkit-scrollbar {
           width: 4px;
         }
 
-        .whatsapp-editor .ql-editor::-webkit-scrollbar-track {
+        .whatsapp-editor .tiptap-editor .ProseMirror::-webkit-scrollbar-track {
           background: transparent;
         }
 
-        .whatsapp-editor .ql-editor::-webkit-scrollbar-thumb {
+        .whatsapp-editor .tiptap-editor .ProseMirror::-webkit-scrollbar-thumb {
           background: #8696a0;
           border-radius: 2px;
         }
 
-        .whatsapp-editor .ql-editor::-webkit-scrollbar-thumb:hover {
+        .whatsapp-editor
+          .tiptap-editor
+          .ProseMirror::-webkit-scrollbar-thumb:hover {
           background: #54656f;
         }
       `}</style>

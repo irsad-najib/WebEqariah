@@ -16,8 +16,8 @@ import { SpeakerSelect } from "@/components/features/kajian/SpeakerSelect";
 const MyEditor = dynamic(() => import("@/components/features/form/form"), {
   ssr: false,
 });
-const QuillContentRenderer = dynamic(
-  () => import("@/components/features/form/QuillContentRenderer"),
+const RichTextRenderer = dynamic(
+  () => import("@/components/features/form/RichTextRenderer"),
   { ssr: false }
 );
 
@@ -604,7 +604,7 @@ const DashboardPage = () => {
                   <h2 className="text-2xl font-bold mt-4">
                     {announcement.title}
                   </h2>
-                  <QuillContentRenderer
+                  <RichTextRenderer
                     content={truncateHtmlContent(announcement.content, 100)}
                   />
                   {announcement.url && (

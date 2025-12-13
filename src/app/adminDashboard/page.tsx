@@ -4,9 +4,34 @@ import { Search, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { axiosInstance } from "@/lib/utils/api";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { isAxiosError } from "axios";
 
 // Define interfaces for our data types
 import type { User, Announcement, Mosque, Speaker } from "@/lib/types";
+
+type ApiErrorResponse = {
+  message?: Record<string, string> | string;
+  error?: string;
+};
+
+function getErrorMessage(
+  error: unknown,
+  fallback = "An unexpected error occurred"
+): string {
+  if (isAxiosError(error) && error.response) {
+    const data = error.response.data as ApiErrorResponse | undefined;
+    if (data?.message) {
+      if (typeof data.message === "string") {
+        return data.message;
+      }
+      return Object.values(data.message).join(", ");
+    }
+    if (data?.error) {
+      return data.error;
+    }
+  }
+  return fallback;
+}
 // Define props for the Pagination component
 interface PaginationProps {
   currentPage: number;
@@ -15,30 +40,22 @@ interface PaginationProps {
   type: string;
 }
 
-const fetchData = async (
+const fetchData = async <T,>(
   url: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setData: React.Dispatch<React.SetStateAction<any[]>>,
+  setData: React.Dispatch<React.SetStateAction<T[]>>,
   setError: React.Dispatch<React.SetStateAction<string | null>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   try {
     setLoading(true);
-    const response = await axiosInstance.get(url, { withCredentials: true });
-    setData(response.data);
+    const response = await axiosInstance.get<T[]>(url, {
+      withCredentials: true,
+    });
+    const payload = Array.isArray(response.data) ? response.data : [];
+    setData(payload);
     setError(null);
-  } catch (er) {
-    if (er && typeof er === "object" && "response" in er) {
-      const errorResponse = er.response as {
-        data?: { message?: Record<string, string> };
-      };
-      const errorMessage = errorResponse?.data?.message
-        ? Object.values(errorResponse.data.message).join(", ")
-        : "An unexpected error occurred";
-      setError(errorMessage);
-    } else {
-      setError("An unexpected error occurred");
-    }
+  } catch (error) {
+    setError(getErrorMessage(error));
   } finally {
     setLoading(false);
   }
@@ -186,19 +203,8 @@ const AdminDashboard: React.FC = () => {
           : [];
         setSpeakers(list);
         setError(null);
-      } catch (er) {
-        if (er && typeof er === "object" && "response" in er) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const errorResponse = (er as any).response as {
-            data?: { message?: Record<string, string> };
-          };
-          const errorMessage = errorResponse?.data?.message
-            ? Object.values(errorResponse.data.message).join(", ")
-            : "An unexpected error occurred";
-          setError(errorMessage);
-        } else {
-          setError("An unexpected error occurred");
-        }
+      } catch (error) {
+        setError(getErrorMessage(error));
       } finally {
         setLoading(false);
       }
@@ -244,15 +250,9 @@ const AdminDashboard: React.FC = () => {
 
       // Optional: refresh data to stay synced with backend
       await fetchData("/api/admin/mosques", setMosques, setError, setLoading);
-    } catch (err) {
-      const errorResponse = err as {
-        response?: { data?: { message?: string } };
-      };
-      setError(
-        errorResponse?.response?.data?.message ||
-          "Failed to update mosque status."
-      );
-      console.error("Error updating mosque status:", err);
+    } catch (error) {
+      setError(getErrorMessage(error, "Failed to update mosque status."));
+      console.error("Error updating mosque status:", error);
     }
   };
 
@@ -355,17 +355,8 @@ const AdminDashboard: React.FC = () => {
 
       setDeleteConfirmation({ show: false, type: null, id: null, name: "" });
       setError(null);
-    } catch (err) {
-      if (err && typeof err === "object" && "response" in err) {
-        const errorResponse = err.response as {
-          data?: { error?: string };
-        };
-        setError(
-          errorResponse?.data?.error || "Failed to delete. Please try again."
-        );
-      } else {
-        setError("An unexpected error occurred");
-      }
+    } catch (error) {
+      setError(getErrorMessage(error, "Failed to delete. Please try again."));
     } finally {
       setDeleting(false);
     }
@@ -395,20 +386,13 @@ const AdminDashboard: React.FC = () => {
         );
         setError(null);
       }
-    } catch (err) {
-      const errorResponse = err as {
-        response?: { data?: { message?: string } };
-      };
-      setError(
-        errorResponse?.response?.data?.message ||
-          "Failed to update speaker status."
-      );
-      console.error("Error updating speaker status:", err);
+    } catch (error) {
+      setError(getErrorMessage(error, "Failed to update speaker status."));
+      console.error("Error updating speaker status:", error);
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const renderTable = <T extends Record<string, any>>(
+  const renderTable = <T extends Record<string, unknown>>(
     data: T[],
     columns: string[],
     type: string
@@ -416,29 +400,55 @@ const AdminDashboard: React.FC = () => {
     // Safety check untuk data
     const safeData = data || [];
 
-    const getCellValue = (item: T, col: string) => {
+    const getCellValue = (item: T, col: string): React.ReactNode => {
       if (col.includes(".")) {
         const [parent, child] = col.split(".");
-        return item?.[parent] ? item[parent][child] : "";
+        const parentValue = item[parent as keyof T];
+        if (
+          parentValue &&
+          typeof parentValue === "object" &&
+          parentValue !== null
+        ) {
+          const nested = parentValue as Record<string, unknown>;
+          return nested[child] ?? "";
+        }
+        return "";
       }
 
       // Check if the column is imageUrl and display as an image
-      if (col === "imageUrl" && item?.[col]) {
+      const value = item[col as keyof T];
+      if (col === "imageUrl" && typeof value === "string" && value) {
         return (
           <div className="relative h-16 w-16">
             <Image
-              src={item[col]}
+              src={value}
               alt="Preview"
               fill
               sizes="64px"
               className="object-cover rounded cursor-pointer"
-              onClick={(e) => openImagePreview(item[col], e)}
+              onClick={(e) => openImagePreview(value, e)}
             />
           </div>
         );
       }
 
-      return item?.[col] || "";
+      if (value === null || typeof value === "undefined") {
+        return "";
+      }
+
+      if (Array.isArray(value)) {
+        return value.join(", ");
+      }
+
+      if (typeof value === "object") {
+        return JSON.stringify(value);
+      }
+
+      if (typeof value === "boolean") {
+        return value ? "Yes" : "No";
+      }
+
+      return value as React.ReactNode;
     };
 
     return (
