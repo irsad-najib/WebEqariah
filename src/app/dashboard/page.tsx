@@ -5,7 +5,7 @@ import { axiosInstance } from "@/lib/utils/api";
 import { Navbar } from "@/components/layout/Navbar";
 import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 import Image from "next/image";
-import { Upload, Heart, MessageCircle } from "lucide-react";
+import { Upload, Heart, MessageCircle, User } from "lucide-react";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { Announcement } from "@/lib/types";
 import dynamic from "next/dynamic";
@@ -718,78 +718,97 @@ const DashboardPage = () => {
                   (currentPage - 1) * itemsPerPage,
                   currentPage * itemsPerPage
                 )
-                .map((announcement) => (
-                  <div
-                    key={announcement.id}
-                    className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.01]">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center space-x-4">
-                        <div className="relative w-12 h-12">
+                .map((announcement) => {
+                  const isMarketplace =
+                    normalizeAnnouncementType(announcement.type) ===
+                    "marketplace";
+                  return (
+                    <div
+                      key={announcement.id}
+                      className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.01]">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-4">
+                          <div className="relative w-12 h-12">
+                            {isMarketplace ? (
+                              <div className="w-12 h-12 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center">
+                                <User className="w-6 h-6 text-amber-600" />
+                              </div>
+                            ) : (
+                              <Image
+                                src={
+                                  announcement.mosqueInfo?.image ||
+                                  "/mosque.png"
+                                }
+                                alt={announcement.mosqueInfo?.name || "Mosque"}
+                                className="rounded-full"
+                                fill
+                              />
+                            )}
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold">
+                              {isMarketplace
+                                ? announcement.author_name || "User"
+                                : announcement.mosqueInfo?.name || "Mosque"}
+                            </h3>
+                            <p className="text-gray-500 mt-2 whitespace-pre-wrap">
+                              {new Date(
+                                announcement.createdAt
+                              ).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getTypeBadgeColors(
+                            announcement.type ?? "announcement"
+                          )}`}>
+                          {formatAnnouncementTypeLabel(
+                            normalizeAnnouncementType(announcement.type)
+                          )}
+                        </span>
+                        {isMarketplace && (
+                          <span className="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded">
+                            Your Item
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="text-2xl font-bold mt-4">
+                        {announcement.title}
+                      </h2>
+                      <RichTextRenderer
+                        content={truncateHtmlContent(announcement.content, 100)}
+                      />
+                      <div className="flex items-center gap-6 mt-4 text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <Heart className="w-5 h-5 text-red-500" />
+                          <span className="text-sm font-medium">
+                            {announcement.like_count || 0} Likes
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MessageCircle className="w-5 h-5 text-blue-500" />
+                          <span className="text-sm font-medium">
+                            {announcement.comment_count || 0} Komentar
+                          </span>
+                        </div>
+                      </div>
+                      {announcement.url && (
+                        <div className="mt-4 inline-block">
                           <Image
-                            src={
-                              announcement.mosqueInfo?.image || "/mosque.png"
-                            }
-                            alt={announcement.mosqueInfo?.name || "Mosque"}
-                            className="rounded-full"
-                            fill
+                            src={announcement.url}
+                            alt={announcement.title}
+                            className="rounded-lg object-contain"
+                            width={400}
+                            height={384}
+                            style={{ maxHeight: "24rem", width: "auto" }}
                           />
                         </div>
-                        <div>
-                          <h3 className="text-lg font-semibold">
-                            {announcement.mosqueInfo?.name || "Mosque"}
-                          </h3>
-                          <p className="text-gray-500 mt-2 whitespace-pre-wrap">
-                            {new Date(
-                              announcement.createdAt
-                            ).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getTypeBadgeColors(
-                          announcement.type ?? "announcement"
-                        )}`}>
-                        {formatAnnouncementTypeLabel(
-                          normalizeAnnouncementType(announcement.type)
-                        )}
-                      </span>
-                    </div>
-                    <h2 className="text-2xl font-bold mt-4">
-                      {announcement.title}
-                    </h2>
-                    <RichTextRenderer
-                      content={truncateHtmlContent(announcement.content, 100)}
-                    />
-                    <div className="flex items-center gap-6 mt-4 text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <Heart className="w-5 h-5 text-red-500" />
-                        <span className="text-sm font-medium">
-                          {announcement.like_count || 0} Likes
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MessageCircle className="w-5 h-5 text-blue-500" />
-                        <span className="text-sm font-medium">
-                          {announcement.comment_count || 0} Komentar
-                        </span>
-                      </div>
-                    </div>
-                    {announcement.url && (
-                      <div className="mt-4 inline-block">
-                        <Image
-                          src={announcement.url}
-                          alt={announcement.title}
-                          className="rounded-lg object-contain"
-                          width={400}
-                          height={384}
-                          style={{ maxHeight: "24rem", width: "auto" }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))
+                  );
+                })
             ) : (
               <div className="bg-white p-8 rounded-2xl text-center shadow-xl border border-gray-100">
                 <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
