@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect, useState, ChangeEvent } from "react";
+import React, { useEffect, useState, ChangeEvent, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { axiosInstance } from "@/lib/utils/api";
 import { Navbar } from "@/components/layout/Navbar";
 import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 import Image from "next/image";
-import { Upload } from "lucide-react";
+import { Upload, Heart, MessageCircle } from "lucide-react";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { Announcement } from "@/lib/types";
 import dynamic from "next/dynamic";
@@ -58,6 +58,54 @@ const DashboardPage = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isRegisterSpeakerModalOpen, setIsRegisterSpeakerModalOpen] =
     useState(false);
+  const [announcementTypeFilter, setAnnouncementTypeFilter] =
+    useState<string>("all");
+
+  const normalizeAnnouncementType = (value?: string | null) =>
+    value?.toLowerCase().trim() || "announcement";
+
+  const formatAnnouncementTypeLabel = (value: string) =>
+    value
+      .split(/[_-]/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ") || "Announcement";
+
+  const announcementTypeOptions = useMemo(() => {
+    const typeSet = new Set<string>();
+    (announcements || []).forEach((announcement) => {
+      typeSet.add(normalizeAnnouncementType(announcement?.type));
+    });
+    return (typeSet.size ? Array.from(typeSet) : ["announcement"]).sort();
+  }, [announcements]);
+
+  const filteredAnnouncements = useMemo(() => {
+    if (announcementTypeFilter === "all") {
+      return announcements;
+    }
+    return announcements.filter(
+      (announcement) =>
+        normalizeAnnouncementType(announcement?.type) === announcementTypeFilter
+    );
+  }, [announcements, announcementTypeFilter]);
+
+  const totalLikes = useMemo(
+    () =>
+      announcements.reduce(
+        (sum, announcement) => sum + (announcement?.like_count ?? 0),
+        0
+      ),
+    [announcements]
+  );
+
+  const totalComments = useMemo(
+    () =>
+      announcements.reduce(
+        (sum, announcement) => sum + (announcement?.comment_count ?? 0),
+        0
+      ),
+    [announcements]
+  );
 
   useEffect(() => {
     const authsession = async () => {
@@ -572,10 +620,65 @@ const DashboardPage = () => {
             </div>
           )}
 
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-white rounded-xl shadow-lg p-5 border border-gray-100">
+              <p className="text-sm text-gray-500 mb-1">Total Pengumuman</p>
+              <p className="text-3xl font-bold text-gray-800">
+                {announcements.length}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-5 border border-gray-100">
+              <div className="flex items-center gap-2 mb-1">
+                <Heart className="w-4 h-4 text-red-500" />
+                <p className="text-sm text-gray-500">Total Likes</p>
+              </div>
+              <p className="text-3xl font-bold text-gray-800">
+                {totalLikes.toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-5 border border-gray-100">
+              <div className="flex items-center gap-2 mb-1">
+                <MessageCircle className="w-4 h-4 text-blue-500" />
+                <p className="text-sm text-gray-500">Total Komentar</p>
+              </div>
+              <p className="text-3xl font-bold text-gray-800">
+                {totalComments.toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          {/* Filter Section */}
+          <div className="bg-white rounded-xl shadow-lg p-5 mb-6 border border-gray-100">
+            <div className="flex flex-col md:flex-row md:items-center gap-4">
+              <label
+                htmlFor="announcement-type-filter"
+                className="text-sm font-medium text-gray-700">
+                Filter Tipe Pengumuman:
+              </label>
+              <select
+                id="announcement-type-filter"
+                value={announcementTypeFilter}
+                onChange={(e) => setAnnouncementTypeFilter(e.target.value)}
+                className="flex-1 md:max-w-xs border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="all">Semua Tipe</option>
+                {announcementTypeOptions.map((typeOption) => (
+                  <option key={typeOption} value={typeOption}>
+                    {formatAnnouncementTypeLabel(typeOption)}
+                  </option>
+                ))}
+              </select>
+              <span className="text-sm text-gray-600">
+                Menampilkan {filteredAnnouncements.length} dari{" "}
+                {announcements.length} pengumuman
+              </span>
+            </div>
+          </div>
+
           {/* Announcements List */}
           <div className="space-y-6 text-black mt-6">
-            {announcements && announcements.length > 0 ? (
-              announcements.map((announcement) => (
+            {filteredAnnouncements && filteredAnnouncements.length > 0 ? (
+              filteredAnnouncements.map((announcement) => (
                 <div
                   key={announcement.id}
                   className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.01]">
@@ -601,12 +704,33 @@ const DashboardPage = () => {
                       </div>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                      {formatAnnouncementTypeLabel(
+                        normalizeAnnouncementType(announcement.type)
+                      )}
+                    </span>
+                  </div>
                   <h2 className="text-2xl font-bold mt-4">
                     {announcement.title}
                   </h2>
                   <RichTextRenderer
                     content={truncateHtmlContent(announcement.content, 100)}
                   />
+                  <div className="flex items-center gap-6 mt-4 text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-red-500" />
+                      <span className="text-sm font-medium">
+                        {announcement.like_count || 0} Likes
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MessageCircle className="w-5 h-5 text-blue-500" />
+                      <span className="text-sm font-medium">
+                        {announcement.comment_count || 0} Komentar
+                      </span>
+                    </div>
+                  </div>
                   {announcement.url && (
                     <div className="mt-4 inline-block">
                       <Image
