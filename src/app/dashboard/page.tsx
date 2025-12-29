@@ -688,7 +688,10 @@ const DashboardPage = () => {
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={
+                    loading ||
+                    (newAnnouncement.type === "kuliah" && !newAnnouncement.bidang_ilmu)
+                  }
                   className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline md:ml-10">
                   {loading ? "Loading..." : "Create Announcement"}
                 </button>
