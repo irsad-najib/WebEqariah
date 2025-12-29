@@ -19,15 +19,15 @@ export default function Home() {
       {/* <UnderConstruction /> */}
       {/* Uncomment the following lines to use the Mosque component */}
 
-      <main className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-16">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-16">
-          <div className="container mx-auto px-4">
+      <main>
+        {/* Hero Section (full viewport minus navbar) */}
+        <div className="min-h-[calc(100vh-64px)] bg-gradient-to-r from-green-600 to-emerald-700 text-white flex items-center">
+          <div className="max-w-screen-2xl mx-auto w-full px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
                 Selamat Datang di Eqariah
               </h1>
-              <p className="text-xl md:text-2xl mb-8 text-green-100">
+              <p className="text-xl md:text-2xl mb-8 text-green-100 drop-shadow-lg">
                 Platform Modern untuk Menghubungkan Masjid dan Jemaah
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

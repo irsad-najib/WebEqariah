@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
+import Link from "next/link";
 import { axiosInstance } from "@/lib/utils/api";
 import Image from "next/image";
 import { Speaker } from "@/lib/types";
@@ -64,9 +65,10 @@ export default function UstadzPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {speakers.map((speaker) => (
-              <div
+              <Link
                 key={speaker.id}
-                className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                href={`/ustadz/${speaker.id}`}
+                className="block bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                 <div className="p-6">
                   <div className="flex items-center space-x-4 mb-4">
                     <div className="relative h-16 w-16 flex-shrink-0">
@@ -124,7 +126,7 @@ export default function UstadzPage() {
                     )}
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
