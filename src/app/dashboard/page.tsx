@@ -11,6 +11,8 @@ import { Announcement } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { RegisterSpeakerModal } from "@/components/features/kajian/RegisterSpeakerModal";
 import { SpeakerSelect } from "@/components/features/kajian/SpeakerSelect";
+import { RegisterKitabModal } from "@/components/features/kajian/RegisterKitabModal";
+import { KitabSelect } from "@/components/features/kajian/KitabSelect";
 
 // Import MyEditor with no SSR
 const MyEditor = dynamic(() => import("@/components/features/form/form"), {
@@ -31,6 +33,8 @@ interface NewAnnouncementForm {
   speaker_name?: string;
   event_date?: string;
   speaker_id?: number | null;
+  kitab_id?: number | null;
+  kitab_title?: string;
 }
 
 const DashboardPage = () => {
@@ -48,6 +52,7 @@ const DashboardPage = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [isRegisterKitabModalOpen, setIsRegisterKitabModalOpen] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -528,6 +533,30 @@ const DashboardPage = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Pilih Kitab
+                      </label>
+                      <KitabSelect
+                        value={newAnnouncement.kitab_id}
+                        onChange={(kitabId, kitabTitle) => {
+                          setNewAnnouncement((prev) => ({
+                            ...prev,
+                            kitab_id: kitabId,
+                            kitab_title: kitabTitle,
+                          }));
+                        }}
+                        placeholder="Pilih kitab untuk kuliah..."
+                      />
+                      <div className="mt-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsRegisterKitabModalOpen(true)}
+                          className="text-sm text-green-600 hover:text-green-700 underline">
+                          Kitab tidak ada? Daftar kitab baru
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Waktu Kuliah
                       </label>
                       <input
@@ -963,6 +992,16 @@ const DashboardPage = () => {
         onSuccess={() => {
           // Optionally refresh or show success message
           setSuccess("Ustadz berhasil didaftarkan!");
+        }}
+      />
+
+      {/* Register Kitab Modal */}
+      <RegisterKitabModal
+        isOpen={isRegisterKitabModalOpen}
+        onClose={() => setIsRegisterKitabModalOpen(false)}
+        onSuccess={() => {
+          // Optionally refresh or show success message
+          setSuccess("Kitab berhasil didaftarkan!");
         }}
       />
     </div>
