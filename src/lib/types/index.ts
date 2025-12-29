@@ -47,6 +47,18 @@ export interface Speaker {
   announcements?: Announcement[];
 }
 
+// ========== KITAB TYPES ==========
+export interface Kitab {
+  id: number;
+  judul: string;
+  pengarang?: string;
+  bidang_ilmu?: string;
+  mazhab?: string;
+  status?: "pending" | "approved" | "rejected";
+  created_at?: string;
+  updated_at?: string;
+}
+
 // ========== ANNOUNCEMENT TYPES ==========
 export interface Announcement {
   id: number;
