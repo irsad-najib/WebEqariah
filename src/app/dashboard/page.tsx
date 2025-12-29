@@ -490,17 +490,17 @@ const DashboardPage = () => {
                     <input
                       type="radio"
                       name="type"
-                      value="kajian"
-                      checked={newAnnouncement.type === "kajian"}
+                      value="kuliah"
+                      checked={newAnnouncement.type === "kuliah"}
                       onChange={handleAnnouncementChange}
                       className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300"
                     />
-                    <span className="font-medium text-gray-700">Kajian</span>
+                    <span className="font-medium text-gray-700">Kuliah</span>
                   </label>
                 </div>
 
-                {/* Kajian Specific Fields */}
-                {newAnnouncement.type === "kajian" && (
+                {/* Kuliah Specific Fields */}
+                {newAnnouncement.type === "kuliah" && (
                   <div className="grid grid-cols-1 gap-4 p-4 bg-green-50 rounded-lg border border-green-100 mb-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -515,7 +515,7 @@ const DashboardPage = () => {
                             speaker_name: speakerName,
                           }));
                         }}
-                        placeholder="Pilih ustadz untuk kajian..."
+                        placeholder="Pilih pembicara untuk kuliah..."
                       />
                       <div className="mt-2">
                         <button
@@ -528,7 +528,7 @@ const DashboardPage = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Waktu Kajian
+                        Waktu Kuliah
                       </label>
                       <input
                         type="datetime-local"

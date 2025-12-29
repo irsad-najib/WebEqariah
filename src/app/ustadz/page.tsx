@@ -5,48 +5,120 @@ import Link from "next/link";
 import { axiosInstance } from "@/lib/utils/api";
 import Image from "next/image";
 import { Speaker } from "@/lib/types";
-import { MapPin, User as UserIcon } from "lucide-react";
+import { MapPin, User as UserIcon, Calendar, Clock } from "lucide-react";
+import { KajianSidebar } from "@/components/features/kajian/KajianSidebar";
+
+interface Announcement {
+  id: number;
+  title: string;
+  content?: string;
+  speaker_name?: string;
+  speaker_id?: number;
+  event_date?: string;
+  scheduled_date?: string;
+  scheduled_time?: string;
+  type?: string;
+  mosqueId?: number;
+  mosque?: {
+    mosqueName: string;
+  };
+  mosqueInfo?: {
+    name: string;
+    image: string;
+  };
+}
 
 export default function UstadzPage() {
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSpeakers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axiosInstance.get("/api/speaker/approved");
-        const payload = response?.data;
-        const list = Array.isArray(payload)
-          ? payload
-          : Array.isArray(payload?.data)
-          ? payload.data
+        // Fetch speakers
+        const speakersResponse = await axiosInstance.get("/api/speaker/approved");
+        const speakersPayload = speakersResponse?.data;
+        const speakersList = Array.isArray(speakersPayload)
+          ? speakersPayload
+          : Array.isArray(speakersPayload?.data)
+          ? speakersPayload.data
           : [];
 
-        if (!Array.isArray(list)) {
+        if (!Array.isArray(speakersList)) {
           throw new Error("Invalid speaker payload");
         }
 
-        setSpeakers(list);
+        // Fetch announcements
+        let announcementsList: Announcement[] = [];
+        try {
+          const announcementsResponse = await axiosInstance.get(
+            "/api/announcement"
+          );
+          announcementsList = Array.isArray(announcementsResponse?.data)
+            ? announcementsResponse.data
+            : [];
+        } catch (err) {
+          console.warn("Error fetching announcements:", err);
+          announcementsList = [];
+        }
+
+        setSpeakers(speakersList);
+        setAnnouncements(announcementsList);
       } catch (err) {
-        console.error("Error fetching speakers:", err);
+        console.error("Error fetching data:", err);
         setSpeakers([]);
-        setError("Failed to load speakers");
+        setAnnouncements([]);
+        setError("Failed to load data");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSpeakers();
+    fetchData();
   }, []);
+
+  // Function to get announcements for a specific speaker by name
+  const getSpeakerAnnouncements = (speakerName: string) => {
+    return announcements.filter(
+      (ann) =>
+        (ann.speaker_name?.toLowerCase() === speakerName.toLowerCase() ||
+          ann.speaker_id) &&
+        (ann.type === "kajian" || !ann.type)
+    );
+  };
+
+  // Helper function to parse event_date into formatted date and time
+  const parseEventDate = (eventDate: string | undefined) => {
+    if (!eventDate) return { date: "", time: "" };
+
+    try {
+      const date = new Date(eventDate);
+      return {
+        date: date.toLocaleDateString("id-ID", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        }),
+        time: date.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+    } catch {
+      return { date: eventDate, time: "" };
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Daftar Ustadz & Jadwal Kajian
+          Daftar Ustadz & Jadwal Kuliah
         </h1>
+        
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -99,31 +171,55 @@ export default function UstadzPage() {
                     <h3 className="text-sm font-medium text-gray-900 mb-3">
                       Jadwal Kajian:
                     </h3>
-                    {speaker.announcements &&
-                    speaker.announcements.length > 0 ? (
-                      <div className="space-y-3">
-                        {speaker.announcements.map((announcement) => (
-                          <div
-                            key={announcement.id}
-                            className="bg-gray-50 p-3 rounded-lg text-sm">
-                            <p className="font-medium text-gray-800 mb-1">
-                              {announcement.title}
-                            </p>
-                            {announcement.mosque && (
-                              <div className="flex items-center text-gray-600 mt-1">
-                                <MapPin size={14} className="mr-1" />
-                                <span>{announcement.mosque.mosqueName}</span>
+                    {(() => {
+                      const speakerAnnouncements = getSpeakerAnnouncements(
+                        speaker.name
+                      );
+                      return speakerAnnouncements.length > 0 ? (
+                        <div className="space-y-3">
+                          {speakerAnnouncements.map((announcement) => {
+                            const { date, time } = parseEventDate(
+                              announcement.event_date
+                            );
+                            return (
+                              <div
+                                key={announcement.id}
+                                className="bg-gray-50 p-3 rounded-lg text-sm">
+                                <p className="font-medium text-gray-800 mb-2">
+                                  {announcement.title}
+                                </p>
+                                {date && (
+                                  <div className="flex items-center text-gray-600 text-xs mb-1">
+                                    <Calendar size={12} className="mr-1" />
+                                    <span>{date}</span>
+                                  </div>
+                                )}
+                                {time && (
+                                  <div className="flex items-center text-gray-600 text-xs mb-1">
+                                    <Clock size={12} className="mr-1" />
+                                    <span>{time}</span>
+                                  </div>
+                                )}
+                                {(announcement.mosque ||
+                                  announcement.mosqueInfo) && (
+                                  <div className="flex items-center text-gray-600 text-xs mt-1">
+                                    <MapPin size={12} className="mr-1" />
+                                    <span>
+                                      {announcement.mosque?.mosqueName ||
+                                        announcement.mosqueInfo?.name}
+                                    </span>
+                                  </div>
+                                )}
                               </div>
-                            )}
-                            {/* Assuming announcement might have a date field, if not we skip it for now or use created_at */}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 italic">
-                        Belum ada jadwal kajian.
-                      </p>
-                    )}
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">
+                          Belum ada jadwal kajian.
+                        </p>
+                      );
+                    })()}
                   </div>
                 </div>
               </Link>
