@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import axios from "axios";
 import { axiosInstance } from "@/lib/utils/api";
 
 interface RegisterKitabModalProps {
@@ -87,13 +88,28 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
         }, 1500);
       }
     } catch (err) {
-      const errorResponse = err as {
-        response?: { data?: { message?: string } };
-      };
-      setError(
-        errorResponse?.response?.data?.message ||
-          "Gagal mendaftarkan kitab. Silakan coba lagi."
-      );
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        const respData = err.response?.data;
+        console.error("RegisterKitab API error:", status, respData);
+
+        const serverMessage =
+          respData?.message || respData?.error ||
+          (typeof respData === "string" ? respData : null);
+
+        if (serverMessage) {
+          setError(String(serverMessage));
+        } else {
+          setError(
+            `Server responded with status ${status}${
+              status === 404 ? " (Not Found - check backend endpoint)" : ""
+            }`
+          );
+        }
+      } else {
+        console.error("Unknown error registering kitab:", err);
+        setError("Gagal mendaftarkan kitab. Silakan coba lagi.");
+      }
     } finally {
       setLoading(false);
     }
