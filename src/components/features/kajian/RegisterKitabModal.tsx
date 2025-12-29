@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import axios from "axios";
 import { axiosInstance } from "@/lib/utils/api";
 
 interface RegisterKitabModalProps {
@@ -88,13 +89,43 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
         }, 1500);
       }
     } catch (err) {
-      const errorResponse = err as {
-        response?: { data?: { message?: string } };
-      };
-      setError(
-        errorResponse?.response?.data?.message ||
-          "Gagal mendaftarkan kitab. Silakan coba lagi."
-      );
+      // Provide more detailed error feedback for debugging and try a fallback endpoint
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        const respData = err.response?.data;
+        console.error("RegisterKitab API error:", status, respData);
+
+        // If endpoint not found, try a common fallback path once
+        if (status === 404) {
+          try {
+            const fallback = await axiosInstance.post("/api/kitab", formData, {
+              withCredentials: true,
+            });
+
+            if (fallback.data?.success) {
+              setSuccess(fallback.data.message || "Kitab berhasil didaftarkan!");
+              setFormData({ judul: "", pengarang: "", bidang_ilmu: "", mazhab: "" });
+              setTimeout(() => {
+                if (onSuccess) onSuccess();
+                onClose();
+              }, 1500);
+              return;
+            }
+
+            setError(fallback.data?.message || "Gagal mendaftarkan kitab. Silakan coba lagi.");
+          } catch (err2) {
+            console.error("Fallback kitab register error:", err2);
+            setError(
+              respData?.message || `Server responded with status ${status}`
+            );
+          }
+        } else {
+          setError(respData?.message || `Request failed with status ${status}`);
+        }
+      } else {
+        console.error("Unknown error registering kitab:", err);
+        setError("Gagal mendaftarkan kitab. Silakan coba lagi.");
+      }
     } finally {
       setLoading(false);
     }
