@@ -1,0 +1,239 @@
+"use client";
+import React, { useState } from "react";
+import { X } from "lucide-react";
+import { axiosInstance } from "@/lib/utils/api";
+
+interface RegisterKitabModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+}
+
+interface KitabFormData {
+  judul: string;
+  pengarang: string;
+  bidang_ilmu: string;
+  mazhab: string;
+}
+
+const BIDANG_ILMU_OPTIONS = [
+  "Aqidah",
+  "Fiqih",
+  "Akhlak",
+  "Hadis",
+  "Tafsir",
+  "Tasawuf",
+];
+
+const MAZHAB_OPTIONS = [
+  "Syafi'i",
+  "Hanafi",
+  "Maliki",
+  "Hanbali",
+  "Tidak Spesifik Mazhab",
+];
+
+export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+}) => {
+  const [formData, setFormData] = useState<KitabFormData>({
+    judul: "",
+    pengarang: "",
+    bidang_ilmu: "",
+    mazhab: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  if (!isOpen) return null;
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await axiosInstance.post(
+        "/api/kitab/register",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.success) {
+        setSuccess(response.data.message || "Kitab berhasil didaftarkan!");
+        setFormData({
+          judul: "",
+          pengarang: "",
+          bidang_ilmu: "",
+          mazhab: "",
+        });
+
+        // Call onSuccess callback after 1.5 seconds
+        setTimeout(() => {
+          if (onSuccess) onSuccess();
+          onClose();
+        }, 1500);
+      }
+    } catch (err) {
+      const errorResponse = err as {
+        response?: { data?: { message?: string } };
+      };
+      setError(
+        errorResponse?.response?.data?.message ||
+          "Gagal mendaftarkan kitab. Silakan coba lagi."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 text-black">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b">
+          <h2 className="text-2xl font-bold text-gray-800">
+            Daftar Kitab Baru
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 transition-colors"
+            disabled={loading}>
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Error Message */}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Success Message */}
+          {success && (
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-600 text-sm">{success}</p>
+            </div>
+          )}
+
+          {/* Judul Kitab Field */}
+          <div>
+            <label
+              htmlFor="judul"
+              className="block text-sm font-medium text-gray-700 mb-1">
+              Judul Kitab <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="judul"
+              name="judul"
+              value={formData.judul}
+              onChange={handleChange}
+              required
+              placeholder="Contoh: Fiqhus Sunnah"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Pengarang Field */}
+          <div>
+            <label
+              htmlFor="pengarang"
+              className="block text-sm font-medium text-gray-700 mb-1">
+              Pengarang <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="pengarang"
+              name="pengarang"
+              value={formData.pengarang}
+              onChange={handleChange}
+              required
+              placeholder="Contoh: As-Sayyid Sabiq"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Bidang Ilmu Field */}
+          <div>
+            <label
+              htmlFor="bidang_ilmu"
+              className="block text-sm font-medium text-gray-700 mb-1">
+              Bidang Ilmu <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="bidang_ilmu"
+              name="bidang_ilmu"
+              value={formData.bidang_ilmu}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              <option value="">Pilih Bidang Ilmu...</option>
+              {BIDANG_ILMU_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Mazhab Field */}
+          <div>
+            <label
+              htmlFor="mazhab"
+              className="block text-sm font-medium text-gray-700 mb-1">
+              Mazhab <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="mazhab"
+              name="mazhab"
+              value={formData.mazhab}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              <option value="">Pilih Mazhab...</option>
+              {MAZHAB_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="flex-1 px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              Batal
+            </button>
+            <button
+              type="submit"
+              disabled={loading || !formData.judul || !formData.pengarang || !formData.bidang_ilmu || !formData.mazhab}
+              className="flex-1 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading ? "Mendaftar..." : "Daftar Kitab"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
