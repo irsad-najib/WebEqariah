@@ -2,7 +2,7 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Suspense, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Announcement, Kitab, Speaker } from "@/lib/types";
 import { buildMonthGrid, toDateKey } from "@/lib/utils/calendarGrid";
 import { useCalendarFilters } from "@/lib/hooks/useCalendarFilters";
@@ -12,15 +12,7 @@ import { FilterGroup } from "@/components/features/calendar/FilterGroup";
 import { CheckboxList } from "@/components/features/calendar/CheckboxList";
 import { useCalendarData } from "@/lib/hooks/useCalendarData";
 
-export default function CalendarPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
-      <CalendarPageInner />
-    </Suspense>
-  );
-}
-
-function CalendarPageInner() {
+export function CalendarClient() {
   const {
     state,
     monthDate,
@@ -420,6 +412,7 @@ function CalendarPageInner() {
                                               minute: "2-digit",
                                             })
                                           : "";
+
                                       return (
                                         <div
                                           key={ev.id}

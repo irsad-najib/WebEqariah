@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { BIDANG_ILMU_OPTIONS } from "@/lib/constants/bidangIlmu";
 
 const BIDANG_ILMU_STORAGE_KEY = "eqariah_bidang_ilmu";
@@ -131,6 +131,14 @@ const mainNavLinks = [
 ];
 
 export const Navbar = () => {
+  return (
+    <Suspense fallback={<div className="h-14 bg-[#4caf4f]" />}>
+      <NavbarInner />
+    </Suspense>
+  );
+};
+
+const NavbarInner = () => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
