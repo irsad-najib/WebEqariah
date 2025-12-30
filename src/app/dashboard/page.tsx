@@ -500,7 +500,7 @@ const DashboardPage = () => {
                       onChange={handleAnnouncementChange}
                       className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300"
                     />
-                    <span className="font-medium text-gray-700">Kajian</span>
+                    <span className="font-medium text-gray-700">Kuliah</span>
                   </label>
                 </div>
 
@@ -520,7 +520,7 @@ const DashboardPage = () => {
                             speaker_name: speakerName,
                           }));
                         }}
-                        placeholder="Pilih pembicara untuk kajian..."
+                        placeholder="Pilih pembicara untuk kuliah..."
                       />
                       <div className="mt-2">
                         <button
@@ -544,7 +544,7 @@ const DashboardPage = () => {
                             kitab_title: kitabTitle,
                           }));
                         }}
-                        placeholder="Pilih kitab untuk kajian..."
+                        placeholder="Pilih kitab untuk kuliah..."
                       />
                       <div className="mt-2">
                         <button
@@ -557,7 +557,7 @@ const DashboardPage = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Waktu Kajian
+                        Waktu Kuliah
                       </label>
                       <input
                         type="datetime-local"
