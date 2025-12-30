@@ -1,34 +1,15 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "@/lib/utils/api";
-import { Speaker } from "@/lib/types";
-import { MapPin, User as UserIcon, Calendar, Clock } from "lucide-react";
+import type { Announcement, Kitab } from "@/lib/types";
 import { DirectoryGridPage } from "@/components/features/directory/DirectoryGridPage";
 import { DirectoryCardLink } from "@/components/features/directory/DirectoryCardLink";
+import { BookOpen, Calendar, Clock, MapPin } from "lucide-react";
 import { parseEventDate } from "@/lib/utils/eventDate";
 
-interface Announcement {
-  id: number;
-  title: string;
-  content?: string;
-  speaker_name?: string;
-  speaker_id?: number;
-  event_date?: string;
-  scheduled_date?: string;
-  scheduled_time?: string;
-  type?: string;
-  mosqueId?: number;
-  mosque?: {
-    mosqueName: string;
-  };
-  mosqueInfo?: {
-    name: string;
-    image: string;
-  };
-}
-
-export default function UstadzPage() {
-  const [speakers, setSpeakers] = useState<Speaker[]>([]);
+export default function KitabPage() {
+  const [kitabs, setKitabs] = useState<Kitab[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,40 +17,37 @@ export default function UstadzPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch speakers
-        const speakersResponse = await axiosInstance.get(
-          "/api/speaker/approved"
-        );
-        const speakersPayload = speakersResponse?.data;
-        const speakersList = Array.isArray(speakersPayload)
-          ? speakersPayload
-          : Array.isArray(speakersPayload?.data)
-          ? speakersPayload.data
+        const kitabsResponse = await axiosInstance.get("/api/kitab/approved", {
+          withCredentials: true,
+        });
+        const kitabsPayload = kitabsResponse?.data;
+        const kitabsList = Array.isArray(kitabsPayload)
+          ? kitabsPayload
+          : Array.isArray(kitabsPayload?.data)
+          ? kitabsPayload.data
           : [];
 
-        if (!Array.isArray(speakersList)) {
-          throw new Error("Invalid speaker payload");
-        }
-
-        // Fetch announcements
         let announcementsList: Announcement[] = [];
         try {
           const announcementsResponse = await axiosInstance.get(
             "/api/announcement"
           );
-          announcementsList = Array.isArray(announcementsResponse?.data)
-            ? announcementsResponse.data
+          const announcementsPayload = announcementsResponse?.data;
+          announcementsList = Array.isArray(announcementsPayload)
+            ? announcementsPayload
+            : Array.isArray(announcementsPayload?.data)
+            ? announcementsPayload.data
             : [];
         } catch (err) {
           console.warn("Error fetching announcements:", err);
           announcementsList = [];
         }
 
-        setSpeakers(speakersList);
+        setKitabs(kitabsList);
         setAnnouncements(announcementsList);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setSpeakers([]);
+        setKitabs([]);
         setAnnouncements([]);
         setError("Failed to load data");
       } finally {
@@ -80,42 +58,42 @@ export default function UstadzPage() {
     fetchData();
   }, []);
 
-  const getSpeakerAnnouncements = (speaker: Speaker) => {
-    const name = (speaker.name || "").toLowerCase();
+  const getKitabAnnouncements = (kitab: Kitab) => {
     return announcements.filter((ann) => {
       if (!(ann.type === "kajian" || !ann.type)) return false;
-      if (ann.speaker_id != null) return ann.speaker_id === speaker.id;
-      if (ann.speaker_name) return ann.speaker_name.toLowerCase() === name;
-      return false;
+      if (ann.kitab_id == null) return false;
+      return ann.kitab_id === kitab.id;
     });
   };
 
   return (
     <DirectoryGridPage
-      title="Daftar Ustadz & Jadwal Kuliah"
+      title="Daftar Kitab & Jadwal Kuliah"
       loading={loading}
       error={error}
-      emptyTitle="Belum ada data ustadz."
+      emptyTitle="Belum ada data kitab."
       emptySubtitle="Silakan cek kembali nanti.">
-      {speakers.length === 0 ? null : (
+      {kitabs.length === 0 ? null : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {speakers.map((speaker) => (
+          {kitabs.map((kitab) => (
             <DirectoryCardLink
-              key={speaker.id}
-              href={`/calendar?speaker_id=${speaker.id}`}
-              title={speaker.name}
-              subtitle={speaker.expertise}
-              imageUrl={speaker.photo_url}
-              fallback={<UserIcon size={32} />}>
+              key={kitab.id}
+              href={`/calendar?kitab_id=${kitab.id}`}
+              title={kitab.judul}
+              subtitle={[kitab.pengarang, kitab.bidang_ilmu]
+                .filter(Boolean)
+                .join(" • ")}
+              imageUrl={null}
+              fallback={<BookOpen size={32} />}>
               <div className="border-t pt-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
                   Jadwal Kajian:
                 </h3>
                 {(() => {
-                  const speakerAnnouncements = getSpeakerAnnouncements(speaker);
-                  return speakerAnnouncements.length > 0 ? (
+                  const kitabAnnouncements = getKitabAnnouncements(kitab);
+                  return kitabAnnouncements.length > 0 ? (
                     <div className="space-y-3">
-                      {speakerAnnouncements.map((announcement) => {
+                      {kitabAnnouncements.map((announcement) => {
                         const { date, time } = parseEventDate(
                           announcement.event_date
                         );
@@ -138,16 +116,16 @@ export default function UstadzPage() {
                                 <span>{time}</span>
                               </div>
                             )}
-                            {(announcement.mosque ||
-                              announcement.mosqueInfo) && (
+                            {(announcement as any).mosque ||
+                            announcement.mosqueInfo ? (
                               <div className="flex items-center text-gray-600 text-xs mt-1">
                                 <MapPin size={12} className="mr-1" />
                                 <span>
-                                  {announcement.mosque?.mosqueName ||
+                                  {(announcement as any).mosque?.mosqueName ||
                                     announcement.mosqueInfo?.name}
                                 </span>
                               </div>
-                            )}
+                            ) : null}
                           </div>
                         );
                       })}

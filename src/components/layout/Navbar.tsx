@@ -1,8 +1,11 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { BIDANG_ILMU_OPTIONS } from "@/lib/constants/bidangIlmu";
+
+const BIDANG_ILMU_STORAGE_KEY = "eqariah_bidang_ilmu";
 
 interface NavLinkProps {
   href: string;
@@ -30,7 +33,6 @@ const NavLink = ({
 
 // Main navigation links - simplified
 const mainNavLinks = [
-
   {
     href: "/masjid",
     children: "Masjid/Surau",
@@ -89,25 +91,6 @@ const mainNavLinks = [
     ),
   },
   {
-    href: "/bidang-ilmu",
-    children: "Bidang Ilmu",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 14l-7 7m0 0l-7-7m7 7V3"
-        />
-      </svg>
-    ),
-  },
-  {
     href: "/instructions",
     children: "How to Use",
     icon: (
@@ -147,13 +130,52 @@ const mainNavLinks = [
   },
 ];
 
-
-
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const hideBidangIlmuDropdown = (pathname ?? "").startsWith("/calendar");
+
+  const bidangIlmuFromUrl = searchParams.get("bidang_ilmu") ?? "";
+  const [selectedBidangIlmu, setSelectedBidangIlmu] = useState<string>("");
+
+  useEffect(() => {
+    // Prefer URL param when present; otherwise fallback to sessionStorage.
+    if (bidangIlmuFromUrl) {
+      setSelectedBidangIlmu(bidangIlmuFromUrl);
+      try {
+        sessionStorage.setItem(BIDANG_ILMU_STORAGE_KEY, bidangIlmuFromUrl);
+      } catch {
+        // ignore storage failures
+      }
+      return;
+    }
+
+    try {
+      const stored = sessionStorage.getItem(BIDANG_ILMU_STORAGE_KEY) ?? "";
+      if (stored) setSelectedBidangIlmu(stored);
+    } catch {
+      // ignore storage failures
+    }
+  }, [bidangIlmuFromUrl]);
 
   const closeMenu = () => setIsOpen(false);
+
+  const handleBidangIlmuChange = (value: string) => {
+    setSelectedBidangIlmu(value);
+
+    try {
+      if (value) sessionStorage.setItem(BIDANG_ILMU_STORAGE_KEY, value);
+      else sessionStorage.removeItem(BIDANG_ILMU_STORAGE_KEY);
+    } catch {
+      // ignore storage failures
+    }
+
+    const qs = value ? `?bidang_ilmu=${encodeURIComponent(value)}` : "";
+    router.push(`/calendar${qs}`);
+    closeMenu();
+  };
 
   return (
     <>
@@ -191,6 +213,26 @@ export const Navbar = () => {
                   {children}
                 </NavLink>
               ))}
+
+              {/* Bidang Ilmu Dropdown */}
+              {!hideBidangIlmuDropdown && (
+                <div className="flex items-center">
+                  <select
+                    aria-label="Pilih Bidang Ilmu"
+                    value={selectedBidangIlmu}
+                    onChange={(e) => handleBidangIlmuChange(e.target.value)}
+                    className="text-white text-lg bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-all border border-white/20">
+                    <option value="" className="text-gray-900">
+                      Bidang Ilmu...
+                    </option>
+                    {BIDANG_ILMU_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt} className="text-gray-900">
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Sign In Button */}
@@ -297,6 +339,29 @@ export const Navbar = () => {
                 {children}
               </NavLink>
             ))}
+
+            {/* Bidang Ilmu Dropdown */}
+            {!hideBidangIlmuDropdown && (
+              <div className="mt-3">
+                <label
+                  htmlFor="navbar_bidang_ilmu"
+                  className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  Bidang Ilmu
+                </label>
+                <select
+                  id="navbar_bidang_ilmu"
+                  value={selectedBidangIlmu}
+                  onChange={(e) => handleBidangIlmuChange(e.target.value)}
+                  className="w-full p-3 text-gray-700 bg-white border border-gray-200 rounded-lg">
+                  <option value="">Pilih Bidang Ilmu...</option>
+                  {BIDANG_ILMU_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Auth Section */}

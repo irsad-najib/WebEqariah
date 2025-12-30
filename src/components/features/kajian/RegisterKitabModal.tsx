@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { X, Upload } from "lucide-react";
 import axios from "axios";
 import { axiosInstance } from "@/lib/utils/api";
-
+import { BIDANG_ILMU_OPTIONS } from "@/lib/constants/bidangIlmu";
 
 interface RegisterKitabModalProps {
   isOpen: boolean;
@@ -17,15 +17,6 @@ interface KitabFormData {
   bidang_ilmu: string;
   mazhab: string;
 }
-
-const BIDANG_ILMU_OPTIONS = [
-  "Aqidah",
-  "Fiqih",
-  "Akhlak",
-  "Hadis",
-  "Tafsir",
-  "Tasawuf",
-];
 
 const MAZHAB_OPTIONS = [
   "Syafi'i",
@@ -95,7 +86,8 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
         console.error("RegisterKitab API error:", status, respData);
 
         const serverMessage =
-          respData?.message || respData?.error ||
+          respData?.message ||
+          respData?.error ||
           (typeof respData === "string" ? respData : null);
 
         if (serverMessage) {
@@ -243,7 +235,13 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={loading || !formData.judul || !formData.pengarang || !formData.bidang_ilmu || !formData.mazhab}
+              disabled={
+                loading ||
+                !formData.judul ||
+                !formData.pengarang ||
+                !formData.bidang_ilmu ||
+                !formData.mazhab
+              }
               className="flex-1 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {loading ? "Mendaftar..." : "Daftar Kitab"}
             </button>

@@ -95,6 +95,9 @@ export interface Announcement {
   type?: "announcement" | "kajian" | "marketplace" | string;
   speaker_name?: string | null;
   speakerName?: string | null;
+  speaker_id?: number | null;
+  kitab_id?: number | null;
+  kitab_title?: string | null;
   event_date?: string | null;
   eventDate?: string | null;
 }

@@ -99,11 +99,13 @@ export const useAuth = () => {
   const logout = useCallback(async () => {
     try {
       // Call API logout (optional)
-      await fetch("/api/auth/logout", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authState.token}`,
-        },
+      await axiosInstance.get("/api/auth/logout", {
+        withCredentials: true,
+        headers: authState.token
+          ? {
+              Authorization: `Bearer ${authState.token}`,
+            }
+          : undefined,
       });
     } catch (error) {
       console.error("Logout API call failed:", error);

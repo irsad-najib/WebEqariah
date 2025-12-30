@@ -7,7 +7,12 @@ import Image from "next/image";
 import { isAxiosError } from "axios";
 
 // Define interfaces for our data types
-import type { User, Announcement, Mosque, Speaker } from "@/lib/types";
+import type { User, Announcement, Mosque, Speaker, Kitab } from "@/lib/types";
+import {
+  deleteKitab,
+  fetchAllKitabs,
+  updateKitabStatus,
+} from "@/lib/api/adminKitab";
 
 type ApiErrorResponse = {
   message?: Record<string, string> | string;
@@ -96,7 +101,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
-    "users" | "announcements" | "mosque" | "speakers"
+    "users" | "announcements" | "mosque" | "speakers" | "kitab"
   >("users");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
@@ -105,6 +110,7 @@ const AdminDashboard: React.FC = () => {
     useState<string>("all");
   const [mosques, setMosques] = useState<Mosque[]>([]);
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
+  const [kitabs, setKitabs] = useState<Kitab[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -115,7 +121,7 @@ const AdminDashboard: React.FC = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     show: boolean;
-    type: "users" | "announcements" | "mosque" | "speakers" | null;
+    type: "users" | "announcements" | "mosque" | "speakers" | "kitab" | null;
     id: number | null;
     name: string;
   }>({ show: false, type: null, id: null, name: "" });
@@ -127,6 +133,7 @@ const AdminDashboard: React.FC = () => {
     useState<number>(1);
   const [currentMosquePage, setCurrentMosquePage] = useState<number>(1);
   const [currentSpeakerPage, setCurrentSpeakerPage] = useState<number>(1);
+  const [currentKitabPage, setCurrentKitabPage] = useState<number>(1);
   const itemsPerPage: number = 10;
   const normalizeAnnouncementType = (value?: string | null) =>
     value?.toLowerCase().trim() || "announcement";
@@ -252,6 +259,26 @@ const AdminDashboard: React.FC = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  useEffect(() => {
+    const fetchKitabs = async () => {
+      try {
+        setLoading(true);
+        const list = await fetchAllKitabs();
+        setKitabs(list);
+        setError(null);
+      } catch (err) {
+        setError(getErrorMessage(err, "Failed to load kitabs."));
+        setKitabs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchKitabs();
+    const intervalId = setInterval(fetchKitabs, 300000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   const handleApproveMosque = async (mosqueId: string) => {
     try {
       const response = await axiosInstance.post(
@@ -334,12 +361,23 @@ const AdminDashboard: React.FC = () => {
       (speaker?.name || "").toLowerCase().includes(normalizedSearchTerm) ||
       (speaker?.expertise || "").toLowerCase().includes(normalizedSearchTerm)
   );
+  const filteredKitabs = (kitabs || []).filter((kitab) => {
+    const judul = (kitab?.judul || "").toLowerCase();
+    const pengarang = (kitab?.pengarang || "").toLowerCase();
+    const bidang = (kitab?.bidang_ilmu || "").toLowerCase();
+    return (
+      judul.includes(normalizedSearchTerm) ||
+      pengarang.includes(normalizedSearchTerm) ||
+      bidang.includes(normalizedSearchTerm)
+    );
+  });
 
   const paginate = (pageNumber: number, type: string): void => {
     if (type === "users") setCurrentUserPage(pageNumber);
     if (type === "announcements") setCurrentAnnouncementPage(pageNumber);
     if (type === "mosque") setCurrentMosquePage(pageNumber);
     if (type === "speakers") setCurrentSpeakerPage(pageNumber);
+    if (type === "kitab") setCurrentKitabPage(pageNumber);
   };
 
   useEffect(() => {
@@ -347,6 +385,7 @@ const AdminDashboard: React.FC = () => {
     setCurrentAnnouncementPage(1);
     setCurrentMosquePage(1);
     setCurrentSpeakerPage(1);
+    setCurrentKitabPage(1);
   }, [searchTerm]);
 
   useEffect(() => {
@@ -359,7 +398,7 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleDeleteClick = (
-    type: "users" | "announcements" | "mosque" | "speakers",
+    type: "users" | "announcements" | "mosque" | "speakers" | "kitab",
     id: number | string,
     name: string,
     e: React.MouseEvent
@@ -373,16 +412,20 @@ const AdminDashboard: React.FC = () => {
 
     setDeleting(true);
     try {
-      const endpoint =
-        deleteConfirmation.type === "users"
-          ? `api/admin/users/${deleteConfirmation.id}`
-          : deleteConfirmation.type === "announcements"
-          ? `api/admin/announcements/${deleteConfirmation.id}`
-          : deleteConfirmation.type === "speakers"
-          ? `api/speaker/${deleteConfirmation.id}`
-          : `api/admin/mosques/${deleteConfirmation.id}`;
+      if (deleteConfirmation.type === "kitab") {
+        await deleteKitab(deleteConfirmation.id);
+      } else {
+        const endpoint =
+          deleteConfirmation.type === "users"
+            ? `api/admin/users/${deleteConfirmation.id}`
+            : deleteConfirmation.type === "announcements"
+            ? `api/admin/announcements/${deleteConfirmation.id}`
+            : deleteConfirmation.type === "speakers"
+            ? `api/speaker/${deleteConfirmation.id}`
+            : `api/admin/mosques/${deleteConfirmation.id}`;
 
-      await axiosInstance.delete(endpoint, { withCredentials: true });
+        await axiosInstance.delete(endpoint, { withCredentials: true });
+      }
 
       // Update local state to remove deleted item
       if (deleteConfirmation.type === "users") {
@@ -403,6 +446,8 @@ const AdminDashboard: React.FC = () => {
         setSpeakers(
           speakers.filter((speaker) => speaker.id !== deleteConfirmation.id)
         );
+      } else if (deleteConfirmation.type === "kitab") {
+        setKitabs(kitabs.filter((kitab) => kitab.id !== deleteConfirmation.id));
       }
 
       setDeleteConfirmation({ show: false, type: null, id: null, name: "" });
@@ -441,6 +486,22 @@ const AdminDashboard: React.FC = () => {
     } catch (error) {
       setError(getErrorMessage(error, "Failed to update speaker status."));
       console.error("Error updating speaker status:", error);
+    }
+  };
+
+  const handleUpdateKitabStatus = async (
+    kitabId: number,
+    status: "approved" | "rejected"
+  ) => {
+    try {
+      await updateKitabStatus(kitabId, status);
+      setKitabs((prev) =>
+        prev.map((k) => (k.id === kitabId ? { ...k, status } : k))
+      );
+      setError(null);
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to update kitab status."));
+      console.error("Error updating kitab status:", err);
     }
   };
 
@@ -757,6 +818,15 @@ const AdminDashboard: React.FC = () => {
                   onClick={() => setActiveTab("speakers")}>
                   Speakers
                 </button>
+                <button
+                  className={`px-6 py-3 text-sm font-medium ${
+                    activeTab === "kitab"
+                      ? "text-blue-600 border-b-2 border-blue-600"
+                      : "text-gray-500 hover:text-blue-500"
+                  }`}
+                  onClick={() => setActiveTab("kitab")}>
+                  Kitab
+                </button>
               </div>
             </div>
 
@@ -1051,6 +1121,146 @@ const AdminDashboard: React.FC = () => {
                         )}
                         paginate={paginate}
                         type="speakers"
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {activeTab === "kitab" && (
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-medium">
+                    Kitab (Showing {filteredKitabs?.length || 0} of{" "}
+                    {kitabs?.length || 0})
+                  </h2>
+                </div>
+                {loading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              ID
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Nama Kitab
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Kategori / Bidang Ilmu
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Created At
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {filteredKitabs
+                            .slice(
+                              (currentKitabPage - 1) * itemsPerPage,
+                              currentKitabPage * itemsPerPage
+                            )
+                            .map((kitab) => (
+                              <tr key={kitab.id}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                  {kitab.id}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {kitab.judul}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {kitab.pengarang || "-"}
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {kitab.bidang_ilmu || "-"}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <span
+                                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                      kitab.status === "approved"
+                                        ? "bg-green-100 text-green-800"
+                                        : kitab.status === "rejected"
+                                        ? "bg-red-100 text-red-800"
+                                        : "bg-yellow-100 text-yellow-800"
+                                    }`}>
+                                    {kitab.status || "pending"}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {kitab.created_at
+                                    ? new Date(
+                                        kitab.created_at
+                                      ).toLocaleDateString()
+                                    : "-"}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                  <div className="flex gap-2">
+                                    {kitab.status === "pending" && (
+                                      <button
+                                        onClick={() =>
+                                          handleUpdateKitabStatus(
+                                            kitab.id,
+                                            "approved"
+                                          )
+                                        }
+                                        className="text-green-600 hover:text-green-900">
+                                        Approve
+                                      </button>
+                                    )}
+                                    {kitab.status === "pending" && (
+                                      <button
+                                        onClick={() =>
+                                          handleUpdateKitabStatus(
+                                            kitab.id,
+                                            "rejected"
+                                          )
+                                        }
+                                        className="text-red-600 hover:text-red-900">
+                                        Reject
+                                      </button>
+                                    )}
+                                    <button
+                                      onClick={(e) =>
+                                        handleDeleteClick(
+                                          "kitab",
+                                          kitab.id,
+                                          kitab.judul,
+                                          e
+                                        )
+                                      }
+                                      className="text-red-600 hover:text-red-900"
+                                      title="Delete">
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {(filteredKitabs?.length || 0) > 0 && (
+                      <Pagination
+                        currentPage={currentKitabPage}
+                        totalPages={Math.ceil(
+                          (filteredKitabs?.length || 0) / itemsPerPage
+                        )}
+                        paginate={paginate}
+                        type="kitab"
                       />
                     )}
                   </>
