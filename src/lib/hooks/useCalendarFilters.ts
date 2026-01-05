@@ -8,6 +8,7 @@ export type CalendarFilterState = {
   bidangIlmu: string[];
   speakerIds: number[];
   kitabIds: number[];
+  masjidIds: number[];
   ym: string; // YYYY-MM
 };
 
@@ -30,25 +31,25 @@ export function useCalendarFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const readStringArray = (key: string): string[] => {
-    const all = searchParams
-      .getAll(key)
-      .map((v) => v.trim())
-      .filter(Boolean);
-    return uniq(all);
-  };
-
-  const readIntArray = (key: string): number[] => {
-    const all = searchParams
-      .getAll(key)
-      .map((v) => v.trim())
-      .filter(Boolean)
-      .map((v) => toInt(v))
-      .filter((v): v is number => v != null);
-    return uniq(all);
-  };
-
   const state: CalendarFilterState = useMemo(() => {
+    const readStringArray = (key: string): string[] => {
+      const all = searchParams
+        .getAll(key)
+        .map((v) => v.trim())
+        .filter(Boolean);
+      return uniq(all);
+    };
+
+    const readIntArray = (key: string): number[] => {
+      const all = searchParams
+        .getAll(key)
+        .map((v) => v.trim())
+        .filter(Boolean)
+        .map((v) => toInt(v))
+        .filter((v): v is number => v != null);
+      return uniq(all);
+    };
+
     const now = new Date();
     const ymFromUrl = searchParams.get("ym");
     const ym =
@@ -59,6 +60,7 @@ export function useCalendarFilters() {
       bidangIlmu: readStringArray("bidang_ilmu"),
       speakerIds: readIntArray("speaker_id"),
       kitabIds: readIntArray("kitab_id"),
+      masjidIds: readIntArray("masjid_id"),
       ym,
     };
   }, [searchParams]);
@@ -132,6 +134,21 @@ export function useCalendarFilters() {
     setKitabIds(Array.from(next));
   };
 
+  const setMasjidIds = (values: number[]) =>
+    setParams((p) => {
+      p.delete("masjid_id");
+      for (const v of uniq(values).filter((x) => Number.isFinite(x))) {
+        p.append("masjid_id", String(v));
+      }
+    });
+
+  const toggleMasjidId = (value: number) => {
+    const next = new Set(state.masjidIds);
+    if (next.has(value)) next.delete(value);
+    else next.add(value);
+    setMasjidIds(Array.from(next));
+  };
+
   const setMonth = (date: Date) =>
     setParams((p) => {
       p.set("ym", formatYm(date));
@@ -153,6 +170,8 @@ export function useCalendarFilters() {
     toggleSpeakerId,
     setKitabIds,
     toggleKitabId,
+    setMasjidIds,
+    toggleMasjidId,
     setMonth,
     shiftMonth,
   };

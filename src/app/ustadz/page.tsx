@@ -1,8 +1,14 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { axiosInstance } from "@/lib/utils/api";
 import { Speaker } from "@/lib/types";
-import { MapPin, User as UserIcon, Calendar, Clock } from "lucide-react";
+import {
+  MapPin,
+  User as UserIcon,
+  Calendar,
+  Clock,
+  Search,
+} from "lucide-react";
 import { DirectoryGridPage } from "@/components/features/directory/DirectoryGridPage";
 import { DirectoryCardLink } from "@/components/features/directory/DirectoryCardLink";
 import { parseEventDate } from "@/lib/utils/eventDate";
@@ -32,6 +38,7 @@ export default function UstadzPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,6 +97,20 @@ export default function UstadzPage() {
     });
   };
 
+  // Filter speakers based on search term
+  const filteredSpeakers = useMemo(() => {
+    if (searchTerm.trim() === "") {
+      return speakers;
+    }
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    return speakers.filter(
+      (speaker) =>
+        speaker.name.toLowerCase().includes(searchLower) ||
+        speaker.expertise?.toLowerCase().includes(searchLower)
+    );
+  }, [searchTerm, speakers]);
+
   return (
     <DirectoryGridPage
       title="Daftar Ustadz & Jadwal Kuliah"
@@ -97,9 +118,50 @@ export default function UstadzPage() {
       error={error}
       emptyTitle="Belum ada data ustadz."
       emptySubtitle="Silakan cek kembali nanti.">
-      {speakers.length === 0 ? null : (
+      {/* Search Input */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={20}
+          />
+          <input
+            type="text"
+            placeholder="Cari ustadz berdasarkan nama atau bidang keahlian..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:outline-none text-black"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <Search size={16} />
+            </button>
+          )}
+        </div>
+        {searchTerm && (
+          <p className="mt-2 text-sm text-gray-600">
+            Menampilkan {filteredSpeakers.length} dari {speakers.length} ustadz
+          </p>
+        )}
+      </div>
+
+      {filteredSpeakers.length === 0 ? (
+        <div className="text-center py-12">
+          <UserIcon className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            {searchTerm ? "Tidak ada hasil" : "Belum ada data ustadz."}
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {searchTerm
+              ? "Coba gunakan kata kunci lain."
+              : "Silakan cek kembali nanti."}
+          </p>
+        </div>
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {speakers.map((speaker) => (
+          {filteredSpeakers.map((speaker) => (
             <DirectoryCardLink
               key={speaker.id}
               href={`/calendar?speaker_id=${speaker.id}`}

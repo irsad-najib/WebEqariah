@@ -8,10 +8,12 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useToast, ToastContainer } from "@/components/ui/toast";
 import { handleError } from "@/lib/utils/errorHandler";
+import { useAuth } from "@/lib/hooks/useAuth";
 // import { User, FormState } from "../lib/types";
 
 const Login = () => {
   const router = useRouter();
+  const { refresh } = useAuth();
   const [formData, setFormData] = useState({
     identifier: "",
     password: "",
@@ -49,6 +51,9 @@ const Login = () => {
       });
 
       if (response.data.success) {
+        // Refresh auth state immediately to update Navbar
+        await refresh();
+
         success(
           "Login Successful!",
           "Welcome back! Redirecting to dashboard..."

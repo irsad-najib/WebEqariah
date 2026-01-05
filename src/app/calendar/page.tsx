@@ -31,6 +31,8 @@ function CalendarPageInner() {
     toggleSpeakerId,
     setKitabIds,
     toggleKitabId,
+    setMasjidIds,
+    toggleMasjidId,
     shiftMonth,
   } = useCalendarFilters();
 
@@ -41,6 +43,7 @@ function CalendarPageInner() {
   const [bidangIlmuSearch, setBidangIlmuSearch] = useState("");
   const [speakerSearch, setSpeakerSearch] = useState("");
   const [kitabSearch, setKitabSearch] = useState("");
+  const [masjidSearch, setMasjidSearch] = useState("");
 
   const kitabById = useMemo(() => {
     const map = new Map<number, Kitab>();
@@ -60,6 +63,7 @@ function CalendarPageInner() {
     const selectedSpeakerIds = new Set(state.speakerIds);
     const selectedKitabIds = new Set(state.kitabIds);
     const selectedBidangIlmu = new Set(state.bidangIlmu);
+    const selectedMasjidIds = new Set(state.masjidIds);
 
     const selectedSpeakerNames = new Set(
       state.speakerIds
@@ -101,6 +105,12 @@ function CalendarPageInner() {
         return selectedKitabIds.has(a.kitab_id);
       })
       .filter((a) => {
+        if (selectedMasjidIds.size === 0) return true;
+        const masjidId = a.mosque_id || a.mosqueId || a.mosqueInfo?.id;
+        if (!masjidId) return false;
+        return selectedMasjidIds.has(masjidId);
+      })
+      .filter((a) => {
         if (selectedBidangIlmu.size === 0) return true;
         const kitabId = a.kitab_id;
         if (!kitabId) return false;
@@ -113,6 +123,7 @@ function CalendarPageInner() {
     speakerById,
     state.bidangIlmu,
     state.kitabIds,
+    state.masjidIds,
     state.q,
     state.speakerIds,
   ]);
@@ -177,6 +188,24 @@ function CalendarPageInner() {
       .map((k) => ({ value: String(k.id), label: k.judul }));
   }, [kitabs, kitabSearch]);
 
+  const masjidItems = useMemo(() => {
+    const s = masjidSearch.trim().toLowerCase();
+    const masjidMap = new Map<number, { id: number; name: string }>();
+
+    for (const a of announcements || []) {
+      const id = a.mosque_id || a.mosqueId || a.mosqueInfo?.id;
+      const name = a.mosqueInfo?.name || (a as any)?.mosque?.mosqueName;
+      if (id && name && !masjidMap.has(id)) {
+        masjidMap.set(id, { id, name });
+      }
+    }
+
+    return Array.from(masjidMap.values())
+      .filter((m) => (s ? m.name.toLowerCase().includes(s) : true))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((m) => ({ value: String(m.id), label: m.name }));
+  }, [announcements, masjidSearch]);
+
   const selectedBidangIlmu = useMemo(
     () => new Set(state.bidangIlmu),
     [state.bidangIlmu]
@@ -188,6 +217,10 @@ function CalendarPageInner() {
   const selectedKitabIds = useMemo(
     () => new Set(state.kitabIds.map(String)),
     [state.kitabIds]
+  );
+  const selectedMasjidIds = useMemo(
+    () => new Set(state.masjidIds.map(String)),
+    [state.masjidIds]
   );
 
   const filteredMonthEvents = useMemo(() => {
@@ -325,6 +358,33 @@ function CalendarPageInner() {
                         onClick={() => setKitabIds([])}
                         className="mt-2 text-xs font-medium text-gray-600 hover:text-gray-900">
                         Clear kitab
+                      </button>
+                    ) : null}
+                  </FilterGroup>
+
+                  <FilterGroup
+                    title="Masjid"
+                    selectedCount={state.masjidIds.length}
+                    searchValue={masjidSearch}
+                    onSearchChange={setMasjidSearch}
+                    searchPlaceholder="Cari masjid...">
+                    <CheckboxList
+                      items={masjidItems}
+                      selectedValues={selectedMasjidIds}
+                      onToggle={(value) => {
+                        const id = Number.parseInt(value, 10);
+                        if (Number.isFinite(id)) toggleMasjidId(id);
+                      }}
+                      emptyLabel={
+                        loading ? "Loading masjid..." : "Tidak ada masjid."
+                      }
+                    />
+                    {state.masjidIds.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setMasjidIds([])}
+                        className="mt-2 text-xs font-medium text-gray-600 hover:text-gray-900">
+                        Clear masjid
                       </button>
                     ) : null}
                   </FilterGroup>
@@ -729,6 +789,33 @@ function CalendarPageInner() {
                         onClick={() => setKitabIds([])}
                         className="mt-2 text-xs font-medium text-gray-600 hover:text-gray-900">
                         Clear kitab
+                      </button>
+                    ) : null}
+                  </FilterGroup>
+
+                  <FilterGroup
+                    title="Masjid"
+                    selectedCount={state.masjidIds.length}
+                    searchValue={masjidSearch}
+                    onSearchChange={setMasjidSearch}
+                    searchPlaceholder="Cari masjid...">
+                    <CheckboxList
+                      items={masjidItems}
+                      selectedValues={selectedMasjidIds}
+                      onToggle={(value) => {
+                        const id = Number.parseInt(value, 10);
+                        if (Number.isFinite(id)) toggleMasjidId(id);
+                      }}
+                      emptyLabel={
+                        loading ? "Loading masjid..." : "Tidak ada masjid."
+                      }
+                    />
+                    {state.masjidIds.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setMasjidIds([])}
+                        className="mt-2 text-xs font-medium text-gray-600 hover:text-gray-900">
+                        Clear masjid
                       </button>
                     ) : null}
                   </FilterGroup>

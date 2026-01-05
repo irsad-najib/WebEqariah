@@ -121,7 +121,7 @@ const AdminDashboard: React.FC = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     show: boolean;
-    type: "users" | "announcements" | "mosque" | "speakers" | "kitab" | null;
+    type: "users" | "mosque" | "speakers" | "kitab" | "announcements" | null;
     id: number | null;
     name: string;
   }>({ show: false, type: null, id: null, name: "" });
@@ -398,7 +398,7 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleDeleteClick = (
-    type: "users" | "announcements" | "mosque" | "speakers" | "kitab",
+    type: "users" | "mosque" | "speakers" | "kitab" | "announcements",
     id: number | string,
     name: string,
     e: React.MouseEvent
@@ -414,42 +414,38 @@ const AdminDashboard: React.FC = () => {
     try {
       if (deleteConfirmation.type === "kitab") {
         await deleteKitab(deleteConfirmation.id);
-      } else {
-        const endpoint =
-          deleteConfirmation.type === "users"
-            ? `api/admin/users/${deleteConfirmation.id}`
-            : deleteConfirmation.type === "announcements"
-            ? `api/admin/announcements/${deleteConfirmation.id}`
-            : deleteConfirmation.type === "speakers"
-            ? `api/speaker/${deleteConfirmation.id}`
-            : `api/admin/mosques/${deleteConfirmation.id}`;
-
-        await axiosInstance.delete(endpoint, { withCredentials: true });
-      }
-
-      // Update local state to remove deleted item
-      if (deleteConfirmation.type === "users") {
+        setKitabs(kitabs.filter((kitab) => kitab.id !== deleteConfirmation.id));
+      } else if (deleteConfirmation.type === "users") {
+        await axiosInstance.delete(`api/admin/users/${deleteConfirmation.id}`, {
+          withCredentials: true,
+        });
         setUsers(
           users.filter((user) => Number(user.id) !== deleteConfirmation.id)
         );
-      } else if (deleteConfirmation.type === "announcements") {
-        setAnnouncements(
-          announcements.filter(
-            (announcement) => announcement.id !== deleteConfirmation.id
-          )
-        );
       } else if (deleteConfirmation.type === "mosque") {
+        await axiosInstance.delete(
+          `api/admin/mosques/${deleteConfirmation.id}`,
+          { withCredentials: true }
+        );
         setMosques(
           mosques.filter((mosque) => mosque.id !== deleteConfirmation.id)
         );
       } else if (deleteConfirmation.type === "speakers") {
+        await axiosInstance.delete(`api/speaker/${deleteConfirmation.id}`, {
+          withCredentials: true,
+        });
         setSpeakers(
           speakers.filter((speaker) => speaker.id !== deleteConfirmation.id)
         );
-      } else if (deleteConfirmation.type === "kitab") {
-        setKitabs(kitabs.filter((kitab) => kitab.id !== deleteConfirmation.id));
+      } else if (deleteConfirmation.type === "announcements") {
+        await axiosInstance.delete(
+          `/api/announcement/${deleteConfirmation.id}`,
+          { withCredentials: true }
+        );
+        setAnnouncements(
+          announcements.filter((ann) => ann.id !== deleteConfirmation.id)
+        );
       }
-
       setDeleteConfirmation({ show: false, type: null, id: null, name: "" });
       setError(null);
     } catch (error) {
@@ -626,7 +622,7 @@ const AdminDashboard: React.FC = () => {
                       <div className="flex space-x-2">
                         {type === "mosque" && (
                           <button
-                            className={`${
+                            className={`$${
                               (item as Record<string, unknown>)?.status ===
                               "APPROVED"
                                 ? "text-yellow-600 hover:text-yellow-900"
@@ -655,7 +651,7 @@ const AdminDashboard: React.FC = () => {
                           className="text-red-600 hover:text-red-900 transition-colors"
                           onClick={(e) =>
                             handleDeleteClick(
-                              type as "users" | "announcements" | "mosque",
+                              type as "users" | "mosque" | "announcements",
                               ((item as Record<string, unknown>)?.id as
                                 | string
                                 | number) ?? "",
