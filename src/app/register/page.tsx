@@ -70,7 +70,7 @@ const Register = () => {
     if (response.data.success) {
       router.replace("/registration-success");
     } else {
-      throw new Error(response.data.message || "Registration failed");
+      throw new Error(response.data.message || "Pendaftaran gagal");
     }
   };
 
@@ -106,9 +106,9 @@ const Register = () => {
                   </svg>
                 </div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
-                  Create Account
+                  Cipta Akaun
                 </h1>
-                <p className="text-gray-600">Join our community today</p>
+                <p className="text-gray-600">Sertai komuniti hari ini</p>
               </div>
 
               {formState.error && (
@@ -141,7 +141,7 @@ const Register = () => {
                   value={values.email}
                   onChange={(e) => setValue("email", e.target.value)}
                   error={errors.email}
-                  placeholder="Enter your email"
+                  placeholder="Masukkan email anda"
                 />
 
                 <div className="relative mb-4">
@@ -151,7 +151,7 @@ const Register = () => {
                     value={values.password}
                     onChange={(e) => setValue("password", e.target.value)}
                     error={errors.password}
-                    placeholder="Enter your password"
+                    placeholder="Masukkan password anda"
                   />
                   <button
                     type="button"
@@ -170,7 +170,7 @@ const Register = () => {
                       setValue("confirmPassword", e.target.value)
                     }
                     error={errors.confirmPassword}
-                    placeholder="Confirm your password"
+                    placeholder="Sahkan password anda"
                   />
                   <button
                     type="button"
@@ -190,17 +190,17 @@ const Register = () => {
                   size="lg"
                   loading={formState.loading}
                   className="w-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
-                  Create Account
+                  Cipta Akaun
                 </Button>
               </form>
 
               <div className="text-center mt-6">
                 <p className="text-gray-600">
-                  Already have an account?{" "}
+                  Sudah ada akaun?{" "}
                   <Link
                     href="/login"
                     className="text-green-600 hover:text-green-700 font-semibold hover:underline transition-all">
-                    Sign in here
+                    Masuk di sini
                   </Link>
                 </p>
               </div>
@@ -236,14 +236,14 @@ const Register = () => {
                   </div>
                 </div>
                 <h2 className="text-5xl font-bold mb-6 drop-shadow-lg">
-                  Welcome
+                  Selamat Datang
                 </h2>
                 <p className="text-2xl mb-4 text-green-50">
-                  Start your journey with us
+                  Mulakan perjalanan anda bersama kami
                 </p>
                 <p className="text-lg text-green-100">
-                  Connect with your mosque community and stay updated with the
-                  latest announcements and events
+                  Sambung dengan komuniti masjid anda dan tetap dikemaskini dengan
+                  pengumuman dan acara terkini
                 </p>
               </div>
             </div>
