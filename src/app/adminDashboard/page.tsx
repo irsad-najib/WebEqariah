@@ -899,17 +899,17 @@ const AdminDashboard: React.FC = () => {
                       filteredAnnouncements || [],
                       [
                         "Tajuk",
-                        "content",
-                        "type",
-                        "like_count",
-                        "comment_count",
-                        "createdAt",
-                        "authorId",
-                        "imageUrl",
-                        "mosque.contactPerson",
-                        "mosque.contactPhone",
+                        "Kandungan",
+                        "Jenis",
+                        "Like",
+                        "Comment",
+                        "Tercipta Pada",
+                        "ID Pembuat",
+                        "Link Gambar",
+                        "Contact Person",
+                        "Contact Phone",
                       ],
-                      "announcements"
+                      "Pengumuman"
                     )}
                     {(filteredAnnouncements?.length || 0) > 0 && (
                       <Pagination
