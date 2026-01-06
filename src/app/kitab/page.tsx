@@ -87,8 +87,8 @@ export default function KitabPage() {
       title="Daftar Kitab & Jadwal Kuliah"
       loading={loading}
       error={error}
-      emptyTitle="Belum ada data kitab."
-      emptySubtitle="Silakan cek kembali nanti.">
+      emptyTitle="Tiada data kitab lagi."
+      emptySubtitle="Sila semak semula kemudian.">
       {/* Search Input */}
       <div className="mb-6">
         <div className="relative max-w-md">
@@ -144,7 +144,7 @@ export default function KitabPage() {
               fallback={<BookOpen size={32} />}>
               <div className="border-t pt-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
-                  Jadwal Kajian:
+                  Jadwal Kuliah:
                 </h3>
                 {(() => {
                   const kitabAnnouncements = getKitabAnnouncements(kitab);
@@ -189,7 +189,7 @@ export default function KitabPage() {
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500 italic">
-                      Belum ada jadwal kajian.
+                      Tiada jadwal kuliah lagi.
                     </p>
                   );
                 })()}

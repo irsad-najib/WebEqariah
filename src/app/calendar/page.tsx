@@ -267,16 +267,16 @@ function CalendarPageInner() {
             <aside className="hidden w-[320px] shrink-0 xl:block">
               <div className="rounded-xl border border-gray-200 bg-white p-4">
                 <h1 className="text-xl font-semibold text-gray-900">
-                  Calendar
+                  Kalendar
                 </h1>
                 <p className="mt-1 text-sm text-gray-600">
-                  Filter kajian berdasarkan bidang ilmu, ustadz, dan kitab.
+                  Tapis kajian berdasarkan bidang ilmu, ustadz, dan kitab.
                 </p>
 
                 <div className="mt-5 space-y-5">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Search
+                      Carian
                     </label>
                     <input
                       value={state.q}
@@ -400,7 +400,7 @@ function CalendarPageInner() {
                       {monthLabel}
                     </div>
                     <div className="mt-0.5 text-sm text-gray-600">
-                      Menampilkan {filteredMonthEvents.length} event (bulan ini)
+                      Menampilkan {filteredMonthEvents.length} acara (bulan ini)
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -408,20 +408,20 @@ function CalendarPageInner() {
                       type="button"
                       onClick={() => setFiltersOpen(true)}
                       className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 xl:hidden">
-                      Filter
+                      Tapis
                     </button>
                     <button
                       type="button"
                       onClick={() => shiftMonth(-1)}
                       className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       <ChevronLeft size={16} />
-                      Prev
+                      Sebelumnya
                     </button>
                     <button
                       type="button"
                       onClick={() => shiftMonth(1)}
                       className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      Next
+                      Selanjutnya
                       <ChevronRight size={16} />
                     </button>
                   </div>
@@ -437,7 +437,7 @@ function CalendarPageInner() {
                     <div className="md:hidden">
                       {filteredMonthEvents.length === 0 ? (
                         <div className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-600">
-                          Tidak ada event untuk bulan ini.
+                          Tidak ada acara untuk bulan ini.
                         </div>
                       ) : (
                         <div className="space-y-3">
@@ -535,8 +535,8 @@ function CalendarPageInner() {
                         {/* Weekday header row (fixed height) */}
                         <div className="grid grid-cols-7 gap-px bg-gray-200">
                           {[
-                            "Min",
-                            "Sen",
+                            "Ahd",
+                            "Isn",
                             "Sel",
                             "Rab",
                             "Kam",
@@ -665,7 +665,7 @@ function CalendarPageInner() {
                       </div>
 
                       <div className="mt-4 text-sm text-gray-600">
-                        Menampilkan {filteredEvents.length} event (semua hasil
+                        Menampilkan {filteredEvents.length} acara (semua hasil
                         filter).
                       </div>
                     </div>
@@ -689,24 +689,24 @@ function CalendarPageInner() {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <div className="text-sm font-semibold text-gray-900">
-                    Filters
+                    Tapis
                   </div>
                   <div className="text-xs text-gray-600">
-                    Atur bidang ilmu, ustadz, dan kitab
+                    Susun bidang ilmu, ustadz, dan kitab
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setFiltersOpen(false)}
                   className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  Close
+                  Tutup
                 </button>
               </div>
 
               <div className="mt-4 rounded-xl border border-gray-200 bg-white p-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Search
+                    Pencarian
                   </label>
                   <input
                     value={state.q}

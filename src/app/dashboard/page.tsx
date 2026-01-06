@@ -457,7 +457,7 @@ const DashboardPage = () => {
             <div className="bg-white text-black shadow-xl rounded-2xl mb-6 p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-gray-800 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                  Create New Announcement
+                  Cipta Pengumuman Baharu
                 </h2>
               </div>
 
@@ -488,7 +488,7 @@ const DashboardPage = () => {
                       className="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300"
                     />
                     <span className="font-medium text-gray-700">
-                      Announcement
+                      Pengumuman
                     </span>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
@@ -527,7 +527,7 @@ const DashboardPage = () => {
                           type="button"
                           onClick={() => setIsRegisterSpeakerModalOpen(true)}
                           className="text-sm text-green-600 hover:text-green-700 underline">
-                          Ustadz tidak ada? Daftar ustadz baru
+                          Ustadz tidak ada? Daftarkan ustadz baru
                         </button>
                       </div>
                     </div>
@@ -551,7 +551,7 @@ const DashboardPage = () => {
                           type="button"
                           onClick={() => setIsRegisterKitabModalOpen(true)}
                           className="text-sm text-green-600 hover:text-green-700 underline">
-                          Kitab tidak ada? Daftar kitab baru
+                          Kitab tidak ada? Daftarkan kitab baru
                         </button>
                       </div>
                     </div>
@@ -608,7 +608,7 @@ const DashboardPage = () => {
                     <div className="relative bg-white rounded-lg p-6 max-w-md w-full mx-4">
                       <div className="flex justify-between items-center mb-4">
                         <h3 className="text-lg font-semibold text-gray-700">
-                          Upload image for announcement(Optional)
+                          Muat naik imej untuk pengumuman (pilihan)
                         </h3>
                         <button
                           onClick={() => setIsOpen(false)}
@@ -618,10 +618,10 @@ const DashboardPage = () => {
                       </div>
 
                       <p className="text-sm text-gray-500">
-                        Select and preview your image before uploading
+                        Pilih dan pratonton imej anda sebelum memuat naik
                       </p>
                       <p className="text-sm text-gray-500">
-                        Maks size image 5 mb
+                        Saiz maks imej 5 mb
                       </p>
                       <p className="text-sm text-gray-500 mb-4">
                         format file: png, jpg, jpeg, heic, and heif
@@ -640,7 +640,7 @@ const DashboardPage = () => {
                             htmlFor="mosque-image-modal"
                             className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer">
                             <Upload className="h-6 w-6 mb-2" />
-                            Choose Image
+                            Pilih Imej
                           </label>
                         </div>
 
@@ -669,7 +669,7 @@ const DashboardPage = () => {
                                   setFile(null);
                                 }}
                                 className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                Cancel
+                                Batal
                               </button>
                               <button
                                 type="button"
@@ -730,14 +730,14 @@ const DashboardPage = () => {
               <label
                 htmlFor="announcement-type-filter"
                 className="text-sm font-medium text-gray-700">
-                Filter Tipe Pengumuman:
+                Penapis Jenis Pengumuman:
               </label>
               <select
                 id="announcement-type-filter"
                 value={announcementTypeFilter}
                 onChange={(e) => setAnnouncementTypeFilter(e.target.value)}
                 className="flex-1 md:max-w-xs border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                <option value="all">Semua Tipe</option>
+                <option value="all">Semua Jenis</option>
                 {announcementTypeOptions.map((typeOption) => (
                   <option key={typeOption} value={typeOption}>
                     {formatAnnouncementTypeLabel(typeOption)}
@@ -811,7 +811,7 @@ const DashboardPage = () => {
                         </span>
                         {isMarketplace && (
                           <span className="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded">
-                            Your Item
+                            Barangan Anda
                           </span>
                         )}
                       </div>
@@ -867,10 +867,10 @@ const DashboardPage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3">
-                  No Announcements Yet
+                  Tiada Pengumuman Lagi
                 </h3>
                 <p className="text-gray-600">
-                  When announcements are posted, they&apos;ll appear here.
+                  Apabila pengumuman disiarkan, ia akan dipaparkan di sini.
                 </p>
               </div>
             )}
