@@ -898,18 +898,18 @@ const AdminDashboard: React.FC = () => {
                     {renderTable(
                       filteredAnnouncements || [],
                       [
-                        "Tajuk",
-                        "Kandungan",
-                        "Jenis",
-                        "Like",
-                        "Comment",
-                        "Tercipta Pada",
-                        "ID Pembuat",
-                        "Link Gambar",
-                        "Contact Person",
-                        "Contact Phone",
+                        "title",
+                        "content",
+                        "type",
+                        "like_count",
+                        "comment_count",
+                        "createdAt",
+                        "authorId",
+                        "imageUrl",
+                        "mosque.contactPerson",
+                        "mosque.contactPhone",
                       ],
-                      "Pengumuman"
+                      "announcements"
                     )}
                     {(filteredAnnouncements?.length || 0) > 0 && (
                       <Pagination
