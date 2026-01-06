@@ -93,14 +93,14 @@ export const KajianSidebar = () => {
       <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4">
         <h3 className="text-lg font-bold text-white flex items-center justify-center gap-2 text-center">
           <Calendar className="w-5 h-5" />
-          Jadwal Kajian Terdekat
+          Jadwal Kuliah Terdekat
         </h3>
       </div>
 
       <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
         {kajianList.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
-            <p>Belum ada kajian terdekat</p>
+            <p>Belum ada kuliah terdekat</p>
           </div>
         ) : (
           kajianList.map((kajian) => {

@@ -726,7 +726,7 @@ const AdminDashboard: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-800">
                 Admin Dashboard
               </h1>
-              <p className="text-gray-500">Manage users and announcements</p>
+              <p className="text-gray-500">Urus pengguna dan pengumuman</p>
             </div>
             <button
               onClick={handleLogout}
@@ -898,7 +898,7 @@ const AdminDashboard: React.FC = () => {
                     {renderTable(
                       filteredAnnouncements || [],
                       [
-                        "title",
+                        "Tajuk",
                         "content",
                         "type",
                         "like_count",
