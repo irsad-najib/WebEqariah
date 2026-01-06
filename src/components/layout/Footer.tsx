@@ -26,7 +26,6 @@ export const Footer = () => {
         <a className="text-gray-300">Blog</a>
         <a className="text-gray-300">Contact us</a>
         <a className="text-gray-300">Pricing</a>
-        <a className="text-gray-300">Testimonials</a>
       </div>
 
       <div className="flex flex-col justify-center">

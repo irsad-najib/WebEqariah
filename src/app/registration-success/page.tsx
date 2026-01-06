@@ -8,7 +8,7 @@ const WaitingPage = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 text-black">
       <div className="bg-white text-2xl shadow-md rounded-lg p-8 ">
         <h1 className="text-4xl font-bold text-center mb-4 text-green-500">
-          Waiting for Confirmation
+          Pendaftaran Berjaya!
         </h1>
         <Image
           src="/registration-success.png"
@@ -18,14 +18,10 @@ const WaitingPage = () => {
           height={800}
         />
         <p className="text-gray-700 text-center mb-4">
-          Thank you for registering to add a mosque. Your application is
-          currently awaiting confirmation from the admin.
-        </p>
-        <p className="text-gray-700 text-center mb-4">
-          You will be notified via email once your application is approved.
+          Terima kasih kerana mendaftar.
         </p>
         <p className="text-gray-700 text-center">
-          If you have any further questions, please feel free to contact us.
+          Jika anda mempunyai sebarang pertanyaan lanjut, sila hubungi kami.
         </p>
         <div className="flex flex-col md:flex-row gap-4 justify-center pt-4">
           <Link
@@ -33,7 +29,7 @@ const WaitingPage = () => {
             className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors"
           >
             <Home size={20} />
-            Back to Home
+            Kembali
           </Link>
         </div>
       </div>

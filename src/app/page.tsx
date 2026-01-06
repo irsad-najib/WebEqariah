@@ -25,7 +25,7 @@ export default function Home() {
           <div className="max-w-screen-2xl mx-auto w-full px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
-                Selamat Datang di Eqariah
+                Selamat Datang ke Eqariah
               </h1>
               <p className="text-xl md:text-2xl mb-8 text-green-100 drop-shadow-lg">
                 Platform Modern untuk Menghubungkan Masjid dan Jemaah
@@ -47,7 +47,7 @@ export default function Home() {
                       d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  Lihat Overview
+                  Lihat Gambaran Keseluruhan
                 </button>
                 <button
                   onClick={() => router.push("/instructions")}
@@ -65,7 +65,7 @@ export default function Home() {
                       d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                     />
                   </svg>
-                  Cara Menggunakan
+                  Cara Penggunaan
                 </button>
               </div>
             </div>

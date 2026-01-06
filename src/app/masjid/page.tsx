@@ -28,7 +28,7 @@ export default function Masjid() {
             {/* Mosque List (Main Content) */}
             <div className="flex-1">
               <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
-                Temukan Masjid di Sekitar Anda
+                Cari Masjid Berhampiran Anda
               </h2>
               <Mosque onClick={handleMosqueClick} />
             </div>

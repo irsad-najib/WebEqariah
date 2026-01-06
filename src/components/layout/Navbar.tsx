@@ -88,7 +88,7 @@ const mainNavLinks = [
   },
   {
     href: "/instructions",
-    children: "How to Use",
+    children: "Cara Penggunaan",
     icon: (
       <svg
         width="20"
@@ -107,7 +107,7 @@ const mainNavLinks = [
   },
   {
     href: "/register-mosque",
-    children: "Register Mosque",
+    children: "Register Masjid",
     icon: (
       <svg
         width="20"
