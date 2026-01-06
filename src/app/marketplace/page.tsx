@@ -15,7 +15,7 @@ const MyEditor = dynamic(() => import("@/components/features/form/form"), {
   loading: () => (
     <div className="flex items-center justify-center p-4 border border-gray-300 rounded-lg bg-gray-50">
       <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
-      <span className="ml-2 text-gray-600">Loading editor...</span>
+      <span className="ml-2 text-gray-600">Memuatkan editor...</span>
     </div>
   ),
 });
@@ -212,7 +212,7 @@ export default function MarketplacePage() {
 
     if (!currentUser) {
       setError({
-        general: "You must be logged in to post items",
+        general: "Anda mesti login masuk untuk memuatkan item",
       });
       setLoading(false);
       return;
@@ -232,7 +232,7 @@ export default function MarketplacePage() {
         }
       );
 
-      setSuccess("Marketplace item created successfully");
+      setSuccess("Item pasaran berjaya dicipta!");
 
       // Immediate UX update: add returned item to state if not present
       const created = createMarketplaceItem.data;
@@ -270,9 +270,9 @@ export default function MarketplacePage() {
         mediaUrl: "",
       });
     } catch (err) {
-      console.error("Error creating marketplace item:", err);
+      console.error("Error semasa mencipta item pasaran:", err);
       setError({
-        general: "Failed to create marketplace item: " + (err as Error).message,
+        general: "Gagal mencipta item pasaran:" + (err as Error).message,
       });
     } finally {
       setLoading(false);
@@ -319,11 +319,11 @@ export default function MarketplacePage() {
         setPreview(null);
         setFile(null);
       } else {
-        throw new Error(response.data.message || "Upload failed");
+        throw new Error(response.data.message || "Muat naik gagal");
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Error uploading image";
+        error instanceof Error ? error.message : "Error muat naik imej";
       setError((prev) => ({
         ...prev,
         imageUrl: errorMessage,
@@ -336,7 +336,7 @@ export default function MarketplacePage() {
   // Handle liking an item
   const handleLike = async (itemId: number) => {
     if (!isAuthenticated) {
-      setError({ general: "You must be logged in to like items" });
+      setError({ general: "Anda mesti login masuk untuk menyukai item" });
       return;
     }
 
@@ -363,9 +363,9 @@ export default function MarketplacePage() {
         })
       );
     } catch (error) {
-      console.error("Error liking item:", error);
+      console.error("Error menyukai item:", error);
       setError({
-        general: "Failed to like item: " + (error as Error).message,
+        general: "Gagal menyukai item: " + (error as Error).message,
       });
     } finally {
       setLoadingLike((prev) => ({ ...prev, [itemId]: false }));
@@ -391,7 +391,7 @@ export default function MarketplacePage() {
         );
         setComments((prev) => ({ ...prev, [itemId]: response.data }));
       } catch (error) {
-        console.error("Error fetching comments:", error);
+        console.error("Error semasa mengambil komen:", error);
       } finally {
         setLoadingComments(false);
       }
@@ -401,7 +401,7 @@ export default function MarketplacePage() {
   // Add comment to an item
   const handleAddComment = async (itemId: number) => {
     if (!isAuthenticated) {
-      setError({ general: "You must be logged in to comment" });
+      setError({ general: "Anda mesti login masuk untuk komen" });
       return;
     }
 
@@ -440,9 +440,9 @@ export default function MarketplacePage() {
       // Reset the new comment field
       setNewComment("");
     } catch (error) {
-      console.error("Error adding comment:", error);
+      console.error("Error menambah komen:", error);
       setError({
-        general: "Failed to add comment: " + (error as Error).message,
+        general: "Gagal menambah komen: " + (error as Error).message,
       });
     } finally {
       setLoadingComments(false);
@@ -506,10 +506,10 @@ export default function MarketplacePage() {
         return sortMarketplaceItemsByLatest([newItem, ...prev]);
       });
 
-      setSuccess("New marketplace item received");
+      setSuccess("Item pasaran baru diterima");
       setTimeout(() => setSuccess(""), 2500);
     } catch (err) {
-      console.error("Failed to process WS message:", err);
+      console.error("Gagal memproses mesej WS:", err);
     }
   }, [lastMessage]);
 
@@ -583,14 +583,14 @@ export default function MarketplacePage() {
                     </span>
                   </p>
                   <p className="text-sm text-blue-600">
-                    Your items will display your username
+                    Item anda akan memaparkan nama pengguna anda
                   </p>
                 </div>
               </div>
             ) : (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-yellow-800">
-                  Sign in to post your own marketplace items.
+                  Login untuk menyiarkan item pasaran anda sendiri.
                 </p>
               </div>
             )}
@@ -617,7 +617,7 @@ export default function MarketplacePage() {
             <div className="bg-white text-black shadow-md rounded-lg mb-6 p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold">
-                  Create New Marketplace Item
+                  Cipta Item Pasaran Baru
                 </h2>
               </div>
 
@@ -667,7 +667,7 @@ export default function MarketplacePage() {
               <div className="relative bg-white rounded-lg p-6 max-w-md w-full mx-4">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold text-gray-700">
-                    Upload image for your item (Optional)
+                    Muat naik gambar untuk item anda (Optional)
                   </h3>
                   <button
                     onClick={() => setIsOpen(false)}
@@ -677,7 +677,7 @@ export default function MarketplacePage() {
                 </div>
 
                 <p className="text-sm text-gray-500">
-                  Select and preview your image before uploading
+                  Pilih dan pratonton gambar anda sebelum memuat naik
                 </p>
                 <p className="text-sm text-gray-500">Max size image 5 MB</p>
                 <p className="text-sm text-gray-500 mb-4">
@@ -697,7 +697,7 @@ export default function MarketplacePage() {
                       htmlFor="item-image-modal"
                       className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer">
                       <Upload className="h-6 w-6 mb-2" />
-                      Choose Image
+                      Pilih Gambar
                     </label>
                   </div>
 
@@ -726,7 +726,7 @@ export default function MarketplacePage() {
                             setFile(null);
                           }}
                           className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                          Cancel
+                          Batal
                         </button>
                         <button
                           type="button"
@@ -810,7 +810,7 @@ export default function MarketplacePage() {
                       {currentUser &&
                         parseInt(currentUser.id) === item.authorId && (
                           <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full whitespace-nowrap">
-                            Your Item
+                            Barangan Anda
                           </span>
                         )}
                     </div>
@@ -848,14 +848,14 @@ export default function MarketplacePage() {
                     {/* Comments Section - Outside the fixed height container */}
                     {commentOpen === item.id && (
                       <div className="mt-4 border-t border-gray-100 pt-4 -mx-6 -mb-6 px-6 pb-6 bg-gray-50">
-                        <h4 className="text-sm font-semibold mb-3">Comments</h4>
+                        <h4 className="text-sm font-semibold mb-3">Komen</h4>
 
                         {/* Comments List */}
                         {loadingComments ? (
                           <div className="text-center py-4">
                             <div className="spinner w-6 h-6 border-2 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full animate-spin mx-auto"></div>
                             <p className="text-sm text-gray-500 mt-2">
-                              Loading comments...
+                              Memuat komen...
                             </p>
                           </div>
                         ) : (
@@ -888,7 +888,7 @@ export default function MarketplacePage() {
                               ))
                             ) : (
                               <p className="text-sm text-gray-500 text-center py-2">
-                                No comments yet
+                                Tiada komen lagi
                               </p>
                             )}
                           </div>
@@ -913,7 +913,7 @@ export default function MarketplacePage() {
                               onClick={() => handleAddComment(item.id)}
                               disabled={!newComment.trim() || loadingComments}
                               className="bg-blue-500 text-white px-3 rounded-r-md hover:bg-blue-600 disabled:bg-blue-300 text-sm">
-                              Post
+                              Pos
                             </button>
                           </div>
                         )}
@@ -939,10 +939,10 @@ export default function MarketplacePage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                  No Marketplace Items Yet
+                  Tiada Item Pasaran Lagi
                 </h3>
                 <p className="text-gray-500">
-                  Be the first to post an item for sale!
+                  Jadilah yang pertama untuk menyiarkan barang untuk dijual!
                 </p>
               </div>
             )}
@@ -981,7 +981,7 @@ export default function MarketplacePage() {
               <button
                 onClick={closeFullContentModal}
                 className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-                Close
+                Tutup
               </button>
             </div>
           </div>

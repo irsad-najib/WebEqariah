@@ -55,13 +55,13 @@ export default function SpeakerPage() {
           <button
             onClick={() => router.back()}
             className="mb-6 text-sm text-green-600 hover:underline">
-            ← Back
+            ← Kembali
           </button>
 
-          {loading && <div>Loading speaker...</div>}
+          {loading && <div>Memuat Ustadz...</div>}
 
           {error && (
-            <div className="text-red-600">Error loading speaker: {error}</div>
+            <div className="text-red-600">Error memuat ustadz: {error}</div>
           )}
 
           {speaker && (
@@ -98,7 +98,7 @@ export default function SpeakerPage() {
           )}
 
           {!loading && !speaker && !error && (
-            <div className="text-gray-600">No speaker found.</div>
+            <div className="text-gray-600">Tiada ustadz ditemui.</div>
           )}
         </div>
       </main>

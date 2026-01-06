@@ -49,7 +49,7 @@ const Settings = ({
       <div className="bg-gray-200 text-black">
         <div className="flex flex-col items-center justify-center h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
-          <p className="text-lg text-green-700 mt-4">Loading...</p>
+          <p className="text-lg text-green-700 mt-4">Memuat...</p>
         </div>
       </div>
     );
@@ -58,12 +58,12 @@ const Settings = ({
   return (
     <div className="bg-gray-200 text-black p-8 h-full">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Profile Settings</h1>
+        <h1 className="text-3xl font-bold">Tetapan Profil</h1>
         <Button
           onClick={onEdit}
           className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 shadow-md">
           <Edit size={18} />
-          Edit Profile
+          Edit Profil
         </Button>
       </div>
 
@@ -131,12 +131,12 @@ const MosqueSettings = ({
   return (
     <div className="bg-gray-200 text-black p-8 h-full">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Mosque Settings</h1>
+        <h1 className="text-3xl font-bold">Tetapan Masjid</h1>
         <Button
           onClick={onEdit}
           className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 shadow-md">
           <Edit size={18} />
-          Edit Mosque
+          Tetapan Masjid
         </Button>
       </div>
 
@@ -154,7 +154,7 @@ const MosqueSettings = ({
         )}
         <div>
           <label className="block text-sm font-semibold text-gray-600 mb-1">
-            Mosque Name
+            Nama Masjid
           </label>
           <p className="text-lg text-gray-900">{mosqueData.mosque_name}</p>
         </div>
@@ -172,7 +172,7 @@ const MosqueSettings = ({
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-600 mb-1">
-            Address
+            Alamat
           </label>
           <p className="text-lg text-gray-900">
             {mosqueData.address_line1}
@@ -364,7 +364,7 @@ const Profile = () => {
                     : ""
                 }`}
                 onClick={() => setActivePage("Mosque")}>
-                Mosque
+                Masjid
               </li>
             )}
           </ul>
