@@ -7,6 +7,7 @@ export const BIDANG_ILMU_OPTIONS = [
   "Tasawuf",
   "Tahlil",
   "Ceramah Perdana",
+  "Bacaan Yasin",
 ] as const;
 
 export type BidangIlmuOption = (typeof BIDANG_ILMU_OPTIONS)[number];
