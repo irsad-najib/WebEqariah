@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { axiosInstance } from "@/lib/utils/api";
+import { useToast, ToastContainer } from "@/components/ui/toast";
 
 // Custom video node for Tiptap so we can embed uploaded mp4 files easily
 const Video = TiptapNode.create({
@@ -100,6 +101,7 @@ export default function MyEditor({
   uploadEndpoint = "/api/upload-media",
   showSendButton = true,
 }: MyEditorProps) {
+  const { toasts, closeToast, error: showError, warning } = useToast();
   const [isClient, setIsClient] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -279,18 +281,25 @@ export default function MyEditor({
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.code === "ECONNABORTED") {
-            alert("Upload timeout. Video terlalu besar atau koneksi lambat.");
+            showError(
+              "Muat naik gagal",
+              "Masa tamat. Video terlalu besar atau sambungan perlahan"
+            );
           } else if (error.response?.status === 413) {
-            alert("File terlalu besar. Maksimal 100MB.");
+            showError("Fail terlalu besar", "Maksimum 100MB sahaja");
           } else if (error.response?.status === 401) {
-            alert("Anda harus login terlebih dahulu.");
+            warning(
+              "Sila login dahulu",
+              "Anda perlu login untuk muat naik fail"
+            );
           } else {
-            alert(
-              `Upload gagal: ${error.response?.data?.message || error.message}`
+            showError(
+              "Muat naik gagal",
+              error.response?.data?.message || error.message
             );
           }
         } else {
-          alert("Upload gagal. Silakan coba lagi.");
+          showError("Muat naik gagal", "Sila cuba lagi");
         }
 
         return null;
@@ -379,6 +388,7 @@ export default function MyEditor({
 
   return (
     <>
+      <ToastContainer toasts={toasts} onClose={closeToast} />
       <div
         ref={containerRef}
         className={`whatsapp-editor-wrapper ${isDragOver ? "drag-over" : ""}`}>

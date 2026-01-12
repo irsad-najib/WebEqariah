@@ -1,5 +1,6 @@
 "use client";
 import { Navbar } from "@/components/layout/Navbar";
+import { useToast, ToastContainer } from "@/components/ui/toast";
 import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -20,8 +21,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
       variant === "error"
         ? "bg-red-100 text-red-700 border border-red-400"
         : "bg-green-100 text-green-700"
-    }`}
-  >
+    }`}>
     {children}
   </div>
 );
@@ -48,6 +48,7 @@ interface ErrorType {
 
 const RegisterMosque = () => {
   const router = useRouter();
+  const { toasts, closeToast, warning, success } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<ErrorType>({});
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -210,7 +211,7 @@ const RegisterMosque = () => {
     }
 
     if (uploading) {
-      alert("Please wait for image upload to complete");
+      warning("Tunggu sebentar", "Sila tunggu muat naik imej selesai");
       return;
     }
 
@@ -221,8 +222,8 @@ const RegisterMosque = () => {
         formData
       );
       if (response.status === 200) {
-        alert("Registration Mosque was succesfull");
-        router.push("/registration-success");
+        success("Berjaya!", "Pendaftaran masjid berjaya");
+        setTimeout(() => router.push("/registration-success"), 1500);
       } else {
         // Ambil pesan error dari response
         const errorMsg =
@@ -250,6 +251,7 @@ const RegisterMosque = () => {
 
   return (
     <>
+      <ToastContainer toasts={toasts} onClose={closeToast} />
       <Navbar />
       <div className="bg-gray-200 flex items-center justify-center min-h-screen pt-10 pb-10">
         <div className="bg-gray-50 p-12 pt-10 rounded-lg shadow-lg w-full md:w-[70%] lg:w-[538px]">
@@ -439,8 +441,7 @@ const RegisterMosque = () => {
                 {/* Image Upload Section */}
                 <button
                   onClick={() => setIsOpen(true)}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                >
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                   Select Mosque Image
                 </button>
 
@@ -458,8 +459,7 @@ const RegisterMosque = () => {
                         </h3>
                         <button
                           onClick={() => setIsOpen(false)}
-                          className="text-gray-500 hover:text-gray-700"
-                        >
+                          className="text-gray-500 hover:text-gray-700">
                           ✕
                         </button>
                       </div>
@@ -485,8 +485,7 @@ const RegisterMosque = () => {
                           />
                           <label
                             htmlFor="mosque-image-modal"
-                            className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer"
-                          >
+                            className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer">
                             <Upload className="h-6 w-6 mb-2" />
                             Choose Image
                           </label>
@@ -516,16 +515,14 @@ const RegisterMosque = () => {
                                   setPreview(null);
                                   setFile(null);
                                 }}
-                                className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                              >
+                                className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Cancel
                               </button>
                               <button
                                 type="button"
                                 onClick={handleUpload}
                                 disabled={uploading}
-                                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-                              >
+                                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50">
                                 {uploading ? "Uploading..." : "Upload"}
                               </button>
                             </div>
@@ -600,8 +597,7 @@ const RegisterMosque = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-black"
-                    >
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-black">
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
                       ) : (
@@ -638,8 +634,7 @@ const RegisterMosque = () => {
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
                       }
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-black"
-                    >
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-black">
                       {showConfirmPassword ? (
                         <EyeOff className="h-4 w-4" />
                       ) : (
@@ -658,8 +653,7 @@ const RegisterMosque = () => {
             <button
               type="submit"
               disabled={loading}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50"
-            >
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:opacity-50">
               {loading ? "Loading..." : "Register"}
             </button>
           </form>

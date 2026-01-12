@@ -98,6 +98,7 @@ export interface Announcement {
   speaker_id?: number | null;
   kitab_id?: number | null;
   kitab_title?: string | null;
+  bidang_ilmu?: string | null; // Optional field for kajian type
   event_date?: string | null;
   eventDate?: string | null;
 }
