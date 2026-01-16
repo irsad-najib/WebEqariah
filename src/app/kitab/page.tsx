@@ -84,7 +84,7 @@ export default function KitabPage() {
 
   return (
     <DirectoryGridPage
-      title="Daftar Kitab & Jadwal Kuliah"
+      title="Daftar Kitab & Jadual Kuliah"
       loading={loading}
       error={error}
       emptyTitle="Tiada data kitab lagi."
@@ -144,7 +144,7 @@ export default function KitabPage() {
               fallback={<BookOpen size={32} />}>
               <div className="border-t pt-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
-                  Jadwal Kuliah:
+                  Jadual Kuliah:
                 </h3>
                 {(() => {
                   const kitabAnnouncements = getKitabAnnouncements(kitab);
@@ -189,7 +189,7 @@ export default function KitabPage() {
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500 italic">
-                      Tiada jadwal kuliah lagi.
+                      Tiada jadual kuliah lagi.
                     </p>
                   );
                 })()}

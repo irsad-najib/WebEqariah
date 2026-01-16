@@ -111,7 +111,7 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
       );
 
       if (response.data.success) {
-        setSuccess(response.data.message || "Speaker berhasil didaftarkan!");
+        setSuccess(response.data.message || "Ustaz berhasil didaftarkan!");
         setFormData({ name: "", bio: "", expertise: "", photo_url: "" });
 
         // Call onSuccess callback after 1.5 seconds
@@ -126,7 +126,7 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
       };
       setError(
         errorResponse?.response?.data?.message ||
-          "Gagal mendaftarkan speaker. Silakan coba lagi."
+          "Gagal mendaftarkan Ustaz. Silakan coba lagi."
       );
     } finally {
       setLoading(false);
@@ -139,7 +139,7 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-800">
-            Daftar Ustadz Baru
+            Daftar Ustaz Baru
           </h2>
           <button
             onClick={onClose}
@@ -170,7 +170,7 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
             <label
               htmlFor="name"
               className="block text-sm font-medium text-gray-700 mb-1">
-              Nama Ustadz <span className="text-red-500">*</span>
+              Nama Ustaz <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -179,7 +179,7 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
               value={formData.name}
               onChange={handleChange}
               required
-              placeholder="Contoh: Ustadz Ahmad Zainuddin"
+              placeholder="Contoh: Ustaz Ahmad Zainuddin"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           </div>
@@ -215,7 +215,7 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
               value={formData.bio}
               onChange={handleChange}
               rows={4}
-              placeholder="Tulis biografi singkat ustadz..."
+              placeholder="Tulis biografi singkat ustaz..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
             />
           </div>
@@ -315,7 +315,7 @@ export const RegisterSpeakerModal: React.FC<RegisterSpeakerModalProps> = ({
                   <label className="cursor-pointer">
                     <Upload className="mx-auto h-12 w-12 text-gray-400" />
                     <p className="mt-2 text-sm text-gray-600">
-                      Klik untuk pilih foto
+                      Klik untuk pilih imej
                     </p>
                     <input
                       type="file"

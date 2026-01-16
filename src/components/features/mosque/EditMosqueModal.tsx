@@ -207,7 +207,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
             className="hidden"
           />
           <p className="text-sm text-gray-500 mt-2">
-            Click to change mosque photo
+            Klik untuk menukar foto masjid
           </p>
           {imageError && (
             <p className="text-sm text-red-500 mt-1">{imageError}</p>
@@ -223,7 +223,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
               value={formData.mosque_name}
               onChange={handleInputChange}
               required
-              placeholder="Enter mosque name"
+              placeholder="Masukkan Nama Masjid"
             />
           </div>
 
@@ -233,7 +233,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
             value={formData.contact_person}
             onChange={handleInputChange}
             required
-            placeholder="Enter contact person"
+            placeholder="Masukkan nama kontak"
           />
 
           <Input
@@ -243,7 +243,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
             value={formData.contact_phone}
             onChange={handleInputChange}
             required
-            placeholder="Enter contact phone"
+            placeholder="Masukkan nomor talifon kontak"
           />
 
           <div className="md:col-span-2">
@@ -253,7 +253,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
               value={formData.address_line1}
               onChange={handleInputChange}
               required
-              placeholder="Enter street address"
+              placeholder="Masukkan alamat"
             />
           </div>
 
@@ -263,7 +263,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
               name="address_line2"
               value={formData.address_line2}
               onChange={handleInputChange}
-              placeholder="Apartment, suite, etc."
+              placeholder="Masukkan alamat baris 2"
             />
           </div>
 
@@ -273,7 +273,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
             value={formData.city}
             onChange={handleInputChange}
             required
-            placeholder="Enter city"
+            placeholder="Masukkan nama bandar"
           />
 
           <Input
@@ -282,7 +282,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
             value={formData.state}
             onChange={handleInputChange}
             required
-            placeholder="Enter state"
+            placeholder="Masukkan nama negeri"
           />
 
           <div className="md:col-span-2">
@@ -292,7 +292,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
               value={formData.postal_code}
               onChange={handleInputChange}
               required
-              placeholder="Enter postal code"
+              placeholder="Masukkan kod pos"
             />
           </div>
         </div>

@@ -200,7 +200,7 @@ export const KitabSelect: React.FC<KitabSelectProps> = ({
                       {kitab.judul}
                     </div>
                     <div className="text-sm text-gray-600">
-                      Pengarang: {kitab.pengarang}
+                      Cipta: {kitab.pengarang}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
                       {kitab.bidang_ilmu} • {kitab.mazhab}

@@ -256,7 +256,7 @@ const RegisterMosque = () => {
       <div className="bg-gray-200 flex items-center justify-center min-h-screen pt-10 pb-10">
         <div className="bg-gray-50 p-12 pt-10 rounded-lg shadow-lg w-full md:w-[70%] lg:w-[538px]">
           <h1 className="text-[6vw] font-bold text-center text-green-600 mb-[4%] md:text-[3vw] lg:text-2xl">
-            Register Mosque
+            Register Masjid
           </h1>
 
           {errors.submit && (
@@ -272,7 +272,7 @@ const RegisterMosque = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                    Mosque Name
+                    Nama Masjid
                   </label>
                   <input
                     type="text"
@@ -282,7 +282,7 @@ const RegisterMosque = () => {
                     className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
                       errors.mosqueName ? "border-red-500" : "border-gray-300"
                     }`}
-                    placeholder="Enter Mosque Name"
+                    placeholder="Masukkan Nama Masjid"
                   />
                   {errors.mosqueName && (
                     <p className="text-red-500 text-sm mt-1">
@@ -305,7 +305,7 @@ const RegisterMosque = () => {
                         ? "border-red-500"
                         : "border-gray-300"
                     }`}
-                    placeholder="Enter the Name of the Mosque Administrator"
+                    placeholder="Masukkan Nama Pentadbir Masjid"
                   />
                   {errors.contactPerson && (
                     <p className="text-red-500 text-sm mt-1">
@@ -316,7 +316,7 @@ const RegisterMosque = () => {
 
                 <div>
                   <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                    Contact Phone
+                    Nombor Talifon
                   </label>
                   <input
                     type="tel"
@@ -326,7 +326,7 @@ const RegisterMosque = () => {
                     className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
                       errors.contactPhone ? "border-red-500" : "border-gray-300"
                     }`}
-                    placeholder="Enter Number Phone of Mosque Administrator"
+                    placeholder="Masukkan Nombor Talifon"
                   />
                   {errors.contactPhone && (
                     <p className="text-red-500 text-sm mt-1">
@@ -339,7 +339,7 @@ const RegisterMosque = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                      Address Line 1
+                      Alamat Baris 1
                     </label>
                     <input
                       type="text"
@@ -351,7 +351,7 @@ const RegisterMosque = () => {
                           ? "border-red-500"
                           : "border-gray-300"
                       }`}
-                      placeholder="Enter Street Name"
+                      placeholder="Masukkan Nama Jalan"
                     />
                     {errors.addressLine1 && (
                       <p className="text-red-500 text-sm mt-1">
@@ -362,7 +362,7 @@ const RegisterMosque = () => {
 
                   <div>
                     <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                      Address Line 2 (Optional)
+                      Alamat Baris 2 (Opsional)
                     </label>
                     <input
                       type="text"
@@ -376,7 +376,7 @@ const RegisterMosque = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                        City
+                        Bandar
                       </label>
                       <input
                         type="text"
@@ -396,7 +396,7 @@ const RegisterMosque = () => {
 
                     <div>
                       <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                        State
+                        Negeri
                       </label>
                       <input
                         type="text"
@@ -416,7 +416,7 @@ const RegisterMosque = () => {
 
                     <div>
                       <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                        Postal Code
+                        Poskod
                       </label>
                       <input
                         type="text"
@@ -442,7 +442,7 @@ const RegisterMosque = () => {
                 <button
                   onClick={() => setIsOpen(true)}
                   className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                  Select Mosque Image
+                  Pilih Gambar Masjid
                 </button>
 
                 {isOpen && (
@@ -455,7 +455,7 @@ const RegisterMosque = () => {
                     <div className="relative bg-white rounded-lg p-6 max-w-md w-full mx-4">
                       <div className="flex justify-between items-center mb-4">
                         <h3 className="text-lg font-semibold text-gray-700">
-                          Upload Mosque Image
+                          Unggah Gambar Masjid
                         </h3>
                         <button
                           onClick={() => setIsOpen(false)}
@@ -465,10 +465,10 @@ const RegisterMosque = () => {
                       </div>
 
                       <p className="text-sm text-gray-500">
-                        Select and preview your image before uploading
+                        Pilih dan pratonton imej anda sebelum memuat naik
                       </p>
                       <p className="text-sm text-gray-500">
-                        Maks size image 5 mb
+                        Maks saiz imej 5 mb
                       </p>
                       <p className="text-sm text-gray-500 mb-4">
                         format file: png, jpg, jpeg, heic, and heif
@@ -487,7 +487,7 @@ const RegisterMosque = () => {
                             htmlFor="mosque-image-modal"
                             className="flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline cursor-pointer">
                             <Upload className="h-6 w-6 mb-2" />
-                            Choose Image
+                            Pilih Imej
                           </label>
                         </div>
 
@@ -537,7 +537,7 @@ const RegisterMosque = () => {
             <div className="bg-white flex p-12 rounded-lg shadow-lg w-full">
               <div className="space-y-5">
                 <p className="text-black font-bold text-xl text-center">
-                  Register an Acount to Login into Mosque Admin Dashboard
+                  Daftar Akaun untuk Log Masuk ke halaman Login
                 </p>
                 <div>
                   <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
@@ -572,7 +572,7 @@ const RegisterMosque = () => {
                     className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
                       errors.email ? "border-red-500" : "border-gray-300"
                     }`}
-                    placeholder="Enter Email"
+                    placeholder="Masukkan Email"
                   />
                   {errors.email && (
                     <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -592,7 +592,7 @@ const RegisterMosque = () => {
                       className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
                         errors.password ? "border-red-500" : "border-gray-300"
                       }`}
-                      placeholder="Enter Pashword"
+                      placeholder="Masukkan Kata Laluan"
                     />
                     <button
                       type="button"
@@ -627,7 +627,7 @@ const RegisterMosque = () => {
                           ? "border-red-500"
                           : "border-gray-300"
                       }`}
-                      placeholder="Enter confirm Pashword"
+                      placeholder="Masukkan Pengesahan Kata Laluan"
                     />
                     <button
                       type="button"

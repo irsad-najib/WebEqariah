@@ -65,7 +65,7 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
       );
 
       if (response.data.success) {
-        setSuccess(response.data.message || "Kitab berhasil didaftarkan!");
+        setSuccess(response.data.message || "Kitab berjaya didaftarkan!");
         setFormData({
           judul: "",
           pengarang: "",
@@ -101,7 +101,7 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
         }
       } else {
         console.error("Unknown error registering kitab:", err);
-        setError("Gagal mendaftarkan kitab. Silakan coba lagi.");
+        setError("Gagal mendaftarkan kitab. Sila cuba lagi.");
       }
     } finally {
       setLoading(false);
@@ -114,7 +114,7 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-800">
-            Daftar Kitab Baru
+            Daftarkan Kitab Baru
           </h2>
           <button
             onClick={onClose}
@@ -145,7 +145,7 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
             <label
               htmlFor="judul"
               className="block text-sm font-medium text-gray-700 mb-1">
-              Judul Kitab <span className="text-red-500">*</span>
+              Tajuk Kitab <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -164,7 +164,7 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
             <label
               htmlFor="pengarang"
               className="block text-sm font-medium text-gray-700 mb-1">
-              Pengarang <span className="text-red-500">*</span>
+              Cipta <span className="text-red-500">*</span>
             </label>
             <input
               type="text"

@@ -526,7 +526,7 @@ const DashboardPage = () => {
                     <div className="grid grid-cols-1 gap-4 p-4 bg-green-50 rounded-lg border border-green-100 mb-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Pilih Ustadz
+                          Pilih Ustaz
                         </label>
                         <SpeakerSelect
                           value={newAnnouncement.speaker_id}
@@ -544,7 +544,7 @@ const DashboardPage = () => {
                             type="button"
                             onClick={() => setIsRegisterSpeakerModalOpen(true)}
                             className="text-sm text-green-600 hover:text-green-700 underline">
-                            Ustadz tidak ada? Daftarkan ustadz baru
+                            Ustaz tidak ada? Daftarkan ustaz baru
                           </button>
                         </div>
                       </div>
@@ -1034,7 +1034,7 @@ const DashboardPage = () => {
           onClose={() => setIsRegisterSpeakerModalOpen(false)}
           onSuccess={() => {
             // Optionally refresh or show success message
-            setSuccess("Ustadz berhasil didaftarkan!");
+            setSuccess("Ustaz berhasil didaftarkan!");
           }}
         />
 

@@ -166,7 +166,7 @@ const MosqueSettings = ({
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-600 mb-1">
-            Contact Phone
+            Nombor Talifon
           </label>
           <p className="text-lg text-gray-900">{mosqueData.contact_phone}</p>
         </div>

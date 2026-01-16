@@ -188,7 +188,7 @@ const Login = () => {
               </p>
               <div className="text-center mt-6">
                 <p className="text-gray-600 text-sm mb-3">
-                  Tid&apos;ak mempunyai akaun?
+                  Tidak mempunyai akaun?
                 </p>
                 <a
                   href="/register"

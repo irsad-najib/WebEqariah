@@ -58,10 +58,10 @@ export default function SpeakerPage() {
             ← Kembali
           </button>
 
-          {loading && <div>Memuat Ustadz...</div>}
+          {loading && <div>Memuat Ustaz...</div>}
 
           {error && (
-            <div className="text-red-600">Error memuat ustadz: {error}</div>
+            <div className="text-red-600">Error memuat ustaz: {error}</div>
           )}
 
           {speaker && (
@@ -98,7 +98,7 @@ export default function SpeakerPage() {
           )}
 
           {!loading && !speaker && !error && (
-            <div className="text-gray-600">Tiada ustadz ditemui.</div>
+            <div className="text-gray-600">Tiada ustaz ditemui.</div>
           )}
         </div>
       </main>

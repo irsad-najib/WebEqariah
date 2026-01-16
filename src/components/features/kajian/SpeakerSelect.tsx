@@ -173,13 +173,13 @@ export const SpeakerSelect: React.FC<SpeakerSelectProps> = ({
           <div className="overflow-y-auto max-h-64">
             {loading ? (
               <div className="p-4 text-center text-gray-500">
-                Loading ustadz...
+                Loading ustaz...
               </div>
             ) : filteredSpeakers.length === 0 ? (
               <div className="p-4 text-center text-gray-500">
                 {searchTerm
-                  ? "Tidak ada ustadz ditemukan"
-                  : "Belum ada ustadz yang approved"}
+                  ? "Tidak ada ustaz ditemukan"
+                  : "Belum ada ustaz yang approved"}
               </div>
             ) : (
               filteredSpeakers.map((speaker) => (

@@ -113,10 +113,10 @@ export default function UstadzPage() {
 
   return (
     <DirectoryGridPage
-      title="Daftar Ustadz & Jadwal Kuliah"
+      title="Daftar Ustaz & Jadual Kuliah"
       loading={loading}
       error={error}
-      emptyTitle="Belum ada data ustadz."
+      emptyTitle="Belum ada data ustaz."
       emptySubtitle="Silakan cek kembali nanti.">
       {/* Search Input */}
       <div className="mb-6">
@@ -127,7 +127,7 @@ export default function UstadzPage() {
           />
           <input
             type="text"
-            placeholder="Cari ustadz berdasarkan nama atau bidang keahlian..."
+            placeholder="Cari ustaz berdasarkan nama atau bidang ilmu..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:outline-none text-black"
@@ -142,7 +142,7 @@ export default function UstadzPage() {
         </div>
         {searchTerm && (
           <p className="mt-2 text-sm text-gray-600">
-            Menampilkan {filteredSpeakers.length} dari {speakers.length} ustadz
+            Menampilkan {filteredSpeakers.length} dari {speakers.length} ustaz
           </p>
         )}
       </div>
@@ -171,7 +171,7 @@ export default function UstadzPage() {
               fallback={<UserIcon size={32} />}>
               <div className="border-t pt-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
-                  Jadwal Kajian:
+                  Jadual Kuliah:
                 </h3>
                 {(() => {
                   const speakerAnnouncements = getSpeakerAnnouncements(speaker);
@@ -216,7 +216,7 @@ export default function UstadzPage() {
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500 italic">
-                      Belum ada jadwal kajian.
+                      Belum ada jadwal kuliah.
                     </p>
                   );
                 })()}

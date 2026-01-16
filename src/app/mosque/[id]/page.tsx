@@ -552,7 +552,7 @@ export default function MosquePage() {
             {/* Announcements Section */}
             <section className="md:col-span-2">
               <div>
-                <h2 className="text-2xl font-bold mb-4">Announcement</h2>
+                <h2 className="text-2xl font-bold mb-4">Pengumuman</h2>
                 {announcements && announcements.length > 0 ? (
                   <div className="grid gap-4">
                     {announcements.map((announcement) => {
@@ -620,7 +620,7 @@ export default function MosquePage() {
                                   </div>
                                   <div>
                                     <span className="text-white font-bold text-sm uppercase tracking-wider">
-                                      Kajian Islam
+                                      Kuliah
                                     </span>
                                     {statusLabel && (
                                       <span className="block text-emerald-100 text-xs mt-0.5">
@@ -682,7 +682,7 @@ export default function MosquePage() {
                                         </div>
                                         <div>
                                           <span className="block text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-1">
-                                            Pemateri
+                                            Ustaz
                                           </span>
                                           <span className="text-gray-900 font-medium">
                                             {announcement.speaker_name}
@@ -735,7 +735,7 @@ export default function MosquePage() {
                                           </div>
                                           <div>
                                             <span className="block text-xs uppercase tracking-wide text-emerald-700 font-semibold mb-1">
-                                              Tanggal
+                                              Tarikh
                                             </span>
                                             <span className="text-gray-900 font-medium">
                                               {eventDateLabel}
@@ -763,7 +763,7 @@ export default function MosquePage() {
                                                 Waktu
                                               </span>
                                               <span className="text-gray-900 font-medium">
-                                                {eventTimeLabel} WIB
+                                                {eventTimeLabel} 
                                               </span>
                                             </div>
                                           </div>
