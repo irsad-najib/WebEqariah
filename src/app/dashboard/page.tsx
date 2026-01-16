@@ -474,7 +474,7 @@ const DashboardPage = () => {
               <div className="bg-white text-black shadow-xl rounded-2xl mb-6 p-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-3xl font-bold text-gray-800 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                    Cipta Pengumuman Baharu
+                    Pengumuman Baharu
                   </h2>
                 </div>
 
@@ -537,7 +537,7 @@ const DashboardPage = () => {
                               speaker_name: speakerName,
                             }));
                           }}
-                          placeholder="Pilih pembicara untuk kuliah..."
+                          placeholder="Pilih pemateri untuk kuliah..."
                         />
                         <div className="mt-2">
                           <button
@@ -612,7 +612,7 @@ const DashboardPage = () => {
                       name="title"
                       value={newAnnouncement.title}
                       onChange={handleAnnouncementChange}
-                      placeholder="Title"
+                      placeholder="Tajuk"
                       className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>

@@ -216,7 +216,7 @@ export default function UstadzPage() {
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500 italic">
-                      Belum ada jadwal kuliah.
+                      Belum ada jadual kuliah.
                     </p>
                   );
                 })()}

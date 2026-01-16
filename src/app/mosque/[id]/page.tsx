@@ -1067,7 +1067,7 @@ export default function MosquePage() {
                 {/* Registration Date */}
                 <div className="mt-6">
                   <p className="text-gray-500 text-sm mt-2">
-                    Terdaftar sejak: {formatDate(mosque.createdAt)}
+                    Berdaftar mulai: {formatDate(mosque.createdAt)}
                   </p>
                 </div>
               </div>
