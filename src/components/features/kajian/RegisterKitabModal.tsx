@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Upload } from "lucide-react";
 import axios from "axios";
 import { axiosInstance } from "@/lib/utils/api";
-import { BIDANG_ILMU_OPTIONS } from "@/lib/constants/bidangIlmu";
+import { fetchBidangIlmu, type BidangIlmu } from "@/lib/api/bidangIlmu";
 
 interface RegisterKitabModalProps {
   isOpen: boolean;
@@ -40,11 +40,32 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [bidangIlmuOptions, setBidangIlmuOptions] = useState<BidangIlmu[]>([]);
+  const [loadingBidangIlmu, setLoadingBidangIlmu] = useState(true);
+
+  // Fetch bidang ilmu on mount
+  useEffect(() => {
+    const loadBidangIlmu = async () => {
+      setLoadingBidangIlmu(true);
+      try {
+        const data = await fetchBidangIlmu();
+        setBidangIlmuOptions(data);
+      } catch (err) {
+        console.error("Failed to fetch bidang ilmu:", err);
+      } finally {
+        setLoadingBidangIlmu(false);
+      }
+    };
+
+    if (isOpen) {
+      loadBidangIlmu();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -61,7 +82,7 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
         formData,
         {
           withCredentials: true,
-        }
+        },
       );
 
       if (response.data.success) {
@@ -96,7 +117,7 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
           setError(
             `Server responded with status ${status}${
               status === 404 ? " (Not Found - check backend endpoint)" : ""
-            }`
+            }`,
           );
         }
       } else {
@@ -191,13 +212,23 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
               value={formData.bidang_ilmu}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-              <option value="">Pilih Bidang Ilmu...</option>
-              {BIDANG_ILMU_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
+              disabled={loadingBidangIlmu}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed">
+              <option value="">
+                {loadingBidangIlmu
+                  ? "Memuat bidang ilmu..."
+                  : "Pilih Bidang Ilmu..."}
+              </option>
+              {bidangIlmuOptions.map((option) => (
+                <option key={option.id} value={option.name}>
+                  {option.name}
                 </option>
               ))}
+              {!loadingBidangIlmu && bidangIlmuOptions.length === 0 && (
+                <option value="" disabled>
+                  Tidak ada bidang ilmu tersedia
+                </option>
+              )}
             </select>
           </div>
 
