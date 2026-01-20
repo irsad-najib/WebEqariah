@@ -22,7 +22,7 @@ const MyEditor = dynamic(() => import("@/components/features/form/form"), {
 });
 const RichTextRenderer = dynamic(
   () => import("@/components/features/form/RichTextRenderer"),
-  { ssr: false }
+  { ssr: false },
 );
 
 // Interface untuk form pengumuman baru
@@ -63,7 +63,7 @@ const DashboardPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false);
   const [affiliatedMosqueId, setAffiliatedMosqueId] = useState<number | null>(
-    null
+    null,
   );
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isRegisterSpeakerModalOpen, setIsRegisterSpeakerModalOpen] =
@@ -115,7 +115,8 @@ const DashboardPage = () => {
     }
     return announcements.filter(
       (announcement) =>
-        normalizeAnnouncementType(announcement?.type) === announcementTypeFilter
+        normalizeAnnouncementType(announcement?.type) ===
+        announcementTypeFilter,
     );
   }, [announcements, announcementTypeFilter]);
 
@@ -123,18 +124,18 @@ const DashboardPage = () => {
     () =>
       announcements.reduce(
         (sum, announcement) => sum + (announcement?.like_count ?? 0),
-        0
+        0,
       ),
-    [announcements]
+    [announcements],
   );
 
   const totalComments = useMemo(
     () =>
       announcements.reduce(
         (sum, announcement) => sum + (announcement?.comment_count ?? 0),
-        0
+        0,
       ),
-    [announcements]
+    [announcements],
   );
 
   useEffect(() => {
@@ -155,7 +156,7 @@ const DashboardPage = () => {
         } else {
           warning(
             "Sila login dahulu",
-            "Anda perlu login untuk mengakses halaman ini"
+            "Anda perlu login untuk mengakses halaman ini",
           );
           setTimeout(() => router.replace("/login"), 1500);
         }
@@ -163,7 +164,7 @@ const DashboardPage = () => {
         console.log(errr);
         warning(
           "Sila login dahulu",
-          "Anda perlu login untuk mengakses halaman ini"
+          "Anda perlu login untuk mengakses halaman ini",
         );
         setTimeout(() => router.replace("/login"), 1500);
       }
@@ -234,7 +235,7 @@ const DashboardPage = () => {
 
   const { connectionStatus, lastMessage } = useWebSocket(
     "wss://api.eqariah.com/api/ws",
-    affiliatedMosqueId ? String(affiliatedMosqueId) : undefined
+    affiliatedMosqueId ? String(affiliatedMosqueId) : undefined,
   );
 
   useEffect(() => {
@@ -301,7 +302,7 @@ const DashboardPage = () => {
   const handleAnnouncementChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     setNewAnnouncement({
       ...newAnnouncement,
@@ -364,7 +365,7 @@ const DashboardPage = () => {
         payload,
         {
           withCredentials: true,
-        }
+        },
       );
       setSuccess(createAnnouncement.data.message);
       setNewAnnouncement({
@@ -410,7 +411,7 @@ const DashboardPage = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -793,7 +794,7 @@ const DashboardPage = () => {
                 filteredAnnouncements
                   .slice(
                     (currentPage - 1) * itemsPerPage,
-                    currentPage * itemsPerPage
+                    currentPage * itemsPerPage,
                   )
                   .map((announcement) => {
                     const isMarketplace =
@@ -832,7 +833,7 @@ const DashboardPage = () => {
                               </h3>
                               <p className="text-gray-500 mt-2 whitespace-pre-wrap">
                                 {new Date(
-                                  announcement.createdAt
+                                  announcement.createdAt,
                                 ).toLocaleDateString()}
                               </p>
                             </div>
@@ -841,10 +842,10 @@ const DashboardPage = () => {
                         <div className="flex items-center gap-2 mt-2">
                           <span
                             className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getTypeBadgeColors(
-                              announcement.type ?? "announcement"
+                              announcement.type ?? "announcement",
                             )}`}>
                             {formatAnnouncementTypeLabel(
-                              normalizeAnnouncementType(announcement.type)
+                              normalizeAnnouncementType(announcement.type),
                             )}
                           </span>
                           {isMarketplace && (
@@ -859,7 +860,7 @@ const DashboardPage = () => {
                         <RichTextRenderer
                           content={truncateHtmlContent(
                             announcement.content,
-                            100
+                            100,
                           )}
                         />
                         <div className="flex items-center gap-6 mt-4 text-gray-600">
@@ -948,8 +949,8 @@ const DashboardPage = () => {
                     setCurrentPage((prev) =>
                       Math.min(
                         prev + 1,
-                        Math.ceil(filteredAnnouncements.length / itemsPerPage)
-                      )
+                        Math.ceil(filteredAnnouncements.length / itemsPerPage),
+                      ),
                     )
                   }
                   disabled={
