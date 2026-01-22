@@ -2,7 +2,7 @@
 import { axiosInstance } from "@/lib/utils/api";
 import { useRouter, useParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
-import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+// import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { useToast, ToastContainer } from "@/components/ui/toast";
 import Link from "next/link";
@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 
 const QuillContentRenderer = dynamic(
   () => import("@/components/features/form/QuillContentRenderer"),
-  { ssr: false }
+  { ssr: false },
 );
 
 /**
@@ -73,7 +73,7 @@ async function getMosqueById(id: string): Promise<Mosque | null> {
  * Sort announcements by latest ID (descending order)
  */
 const sortAnnouncementsByLatestId = (
-  announcements: Announcement[]
+  announcements: Announcement[],
 ): Announcement[] => {
   return [...announcements].sort((a, b) => Number(b.id) - Number(a.id));
 };
@@ -100,7 +100,7 @@ export default function MosquePage() {
     [key: string]: boolean;
   }>({});
   const [commentInput, setCommentInput] = useState("");
-  const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false); // ✅ Add mobile chat sidebar state
+  // const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false); // ✅ Add mobile chat sidebar state
   const [showScrollTop, setShowScrollTop] = useState(false); // ✅ Add scroll to top state
 
   const router = useRouter();
@@ -108,7 +108,7 @@ export default function MosquePage() {
   // WebSocket connection
   const { connectionStatus, lastMessage } = useWebSocket(
     "wss://api.eqariah.com/api/ws",
-    mosqueId
+    mosqueId,
   );
 
   /**
@@ -184,7 +184,7 @@ export default function MosquePage() {
         try {
           const response = await axiosInstance.get(
             `/api/announcement/mosque/${mosqueId}`,
-            { withCredentials: true }
+            { withCredentials: true },
           );
 
           // Map response to consistent announcement objects
@@ -208,7 +208,7 @@ export default function MosquePage() {
                 eventDate: a.event_date ?? a.eventDate ?? null,
                 author: a.author_name ? { username: a.author_name } : undefined,
                 mosque: mosqueData, // Attach the freshly fetched mosque data
-              })) as Announcement[]
+              })) as Announcement[],
             );
           }
         } catch (announcementError) {
@@ -269,8 +269,8 @@ export default function MosquePage() {
                 liked_by_user:
                   content.user_id === "current_user" ? true : a.liked_by_user,
               }
-            : a
-        )
+            : a,
+        ),
       );
     } else if (wsMessage.type === "new_comment" && wsMessage.content) {
       // Handle new comments
@@ -285,8 +285,8 @@ export default function MosquePage() {
                 comment_count:
                   content.comment_count || (a.comment_count || 0) + 1,
               }
-            : a
-        )
+            : a,
+        ),
       );
 
       // Add new comment to state if available and not from current user
@@ -356,7 +356,7 @@ export default function MosquePage() {
       const res = await axiosInstance.post(
         `/api/announcement/${announcementId}/like`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       // Update local state with new like count
@@ -368,8 +368,8 @@ export default function MosquePage() {
                 like_count: res.data.like_count,
                 liked_by_user: true,
               }
-            : a
-        )
+            : a,
+        ),
       );
     } catch (err) {
       console.error("Failed to like announcement:", err);
@@ -383,7 +383,7 @@ export default function MosquePage() {
   const handleComment = async (
     announcementId: number | string,
     content: string,
-    resetInput: () => void
+    resetInput: () => void,
   ) => {
     if (!isLogin) {
       alert("Silakan login untuk berkomentar.");
@@ -397,7 +397,7 @@ export default function MosquePage() {
       await axiosInstance.post(
         `/api/announcement/${announcementId}/comments`,
         { content },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       // Update local announcement comment count
@@ -405,8 +405,8 @@ export default function MosquePage() {
         prev.map((a) =>
           a.id === announcementId
             ? { ...a, comment_count: (a.comment_count || 0) + 1 }
-            : a
-        )
+            : a,
+        ),
       );
 
       resetInput();
@@ -427,7 +427,7 @@ export default function MosquePage() {
         `/api/announcement/${announcementId}/comments`,
         {
           withCredentials: true,
-        }
+        },
       );
 
       setComments((prev) => ({
@@ -437,7 +437,7 @@ export default function MosquePage() {
     } catch (err) {
       console.error(
         `Failed to fetch comments for announcement ${announcementId}:`,
-        err
+        err,
       );
       setComments((prev) => ({
         ...prev,
@@ -763,7 +763,7 @@ export default function MosquePage() {
                                                 Waktu
                                               </span>
                                               <span className="text-gray-900 font-medium">
-                                                {eventTimeLabel} 
+                                                {eventTimeLabel}
                                               </span>
                                             </div>
                                           </div>
@@ -829,8 +829,8 @@ export default function MosquePage() {
                                   announcement.liked_by_user
                                     ? "text-blue-600"
                                     : isKajian
-                                    ? "text-emerald-700 hover:text-emerald-800"
-                                    : "text-gray-600 hover:text-blue-600"
+                                      ? "text-emerald-700 hover:text-emerald-800"
+                                      : "text-gray-600 hover:text-blue-600"
                                 }`}
                                 onClick={() => handleLike(announcement.id)}
                                 disabled={!isLogin}>
@@ -859,7 +859,7 @@ export default function MosquePage() {
                                 onClick={() => {
                                   document
                                     .getElementById(
-                                      `comment-input-${announcement.id}`
+                                      `comment-input-${announcement.id}`,
                                     )
                                     ?.focus();
                                 }}>
@@ -925,7 +925,7 @@ export default function MosquePage() {
                                     handleComment(
                                       announcement.id,
                                       commentInput,
-                                      () => setCommentInput("")
+                                      () => setCommentInput(""),
                                     );
                                   }}>
                                   <div className="flex bg-gray-100 rounded-full overflow-hidden">
@@ -946,7 +946,7 @@ export default function MosquePage() {
                                       onClick={() => {
                                         if (!isLogin) {
                                           alert(
-                                            "Silakan login untuk berkomentar."
+                                            "Silakan login untuk berkomentar.",
                                           );
                                           router.push("/login");
                                         }
@@ -1013,7 +1013,7 @@ export default function MosquePage() {
                                             </div>
                                           </div>
                                         </div>
-                                      )
+                                      ),
                                     )}
                                   </div>
                                 ) : (
@@ -1076,9 +1076,9 @@ export default function MosquePage() {
         </div>
 
         {/* Desktop Chat Sidebar - Fixed positioning */}
-        <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
+        {/* <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
           <ChatSidebar />
-        </div>
+        </div> */}
       </div>
 
       {/* ✅ Fixed Floating Buttons Container - Same as dashboard */}
@@ -1104,7 +1104,7 @@ export default function MosquePage() {
         )}
 
         {/* Mobile Chat Button */}
-        <button
+        {/* <button
           onClick={() => setIsChatSidebarOpen(true)}
           className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group">
           <svg
@@ -1118,22 +1118,22 @@ export default function MosquePage() {
               strokeWidth={2}
               d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
             />
-          </svg>
+          </svg> */}
 
-          {/* Notification Badge */}
-          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+        {/* Notification Badge */}
+        {/* <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
             3
           </div>
-        </button>
+        </button> */}
       </div>
 
       {/* ✅ Mobile Chat Sidebar Modal */}
-      <div className="lg:hidden">
+      {/* <div className="lg:hidden">
         <ChatSidebar
           isOpen={isChatSidebarOpen}
           onClose={() => setIsChatSidebarOpen(false)}
         />
-      </div>
+      </div> */}
     </>
   );
 }

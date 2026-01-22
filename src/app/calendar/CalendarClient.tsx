@@ -2,12 +2,12 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { Announcement, Kitab, Speaker } from "@/lib/types";
 import { buildMonthGrid, toDateKey } from "@/lib/utils/calendarGrid";
 import { useCalendarFilters } from "@/lib/hooks/useCalendarFilters";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { BIDANG_ILMU_OPTIONS } from "@/lib/constants/bidangIlmu";
+import { fetchBidangIlmu, type BidangIlmu } from "@/lib/api/bidangIlmu";
 import { FilterGroup } from "@/components/features/calendar/FilterGroup";
 import { CheckboxList } from "@/components/features/calendar/CheckboxList";
 import { useCalendarData } from "@/lib/hooks/useCalendarData";
@@ -27,6 +27,13 @@ export function CalendarClient() {
   } = useCalendarFilters();
 
   const { speakers, kitabs, announcements, loading, error } = useCalendarData();
+  const [bidangIlmuOptions, setBidangIlmuOptions] = useState<BidangIlmu[]>([]);
+
+  useEffect(() => {
+    fetchBidangIlmu()
+      .then(setBidangIlmuOptions)
+      .catch((err) => console.error("Failed to load bidang ilmu", err));
+  }, []);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -57,13 +64,13 @@ export function CalendarClient() {
       state.speakerIds
         .map((id) => speakerById.get(id)?.name)
         .filter((v): v is string => Boolean(v))
-        .map((v) => v.toLowerCase())
+        .map((v) => v.toLowerCase()),
     );
 
     return (announcements || [])
       .filter(
         (a) =>
-          (a?.type === "kajian" || !a?.type) && (a?.event_date || a?.eventDate)
+          (a?.type === "kajian" || !a?.type) && (a?.event_date || a?.eventDate),
       )
       .filter((a) => {
         if (!q) return true;
@@ -141,17 +148,17 @@ export function CalendarClient() {
         month: "long",
         year: "numeric",
       }),
-    [monthDate]
+    [monthDate],
   );
 
   const todayKey = useMemo(() => toDateKey(new Date()), []);
 
   const bidangIlmuItems = useMemo(() => {
     const s = bidangIlmuSearch.trim().toLowerCase();
-    return BIDANG_ILMU_OPTIONS.filter((x) =>
-      s ? x.toLowerCase().includes(s) : true
-    ).map((x) => ({ value: x, label: x }));
-  }, [bidangIlmuSearch]);
+    return bidangIlmuOptions
+      .filter((x) => (s ? x.name.toLowerCase().includes(s) : true))
+      .map((x) => ({ value: x.name, label: x.name }));
+  }, [bidangIlmuSearch, bidangIlmuOptions]);
 
   const speakerItems = useMemo(() => {
     const s = speakerSearch.trim().toLowerCase();
@@ -171,15 +178,15 @@ export function CalendarClient() {
 
   const selectedBidangIlmu = useMemo(
     () => new Set(state.bidangIlmu),
-    [state.bidangIlmu]
+    [state.bidangIlmu],
   );
   const selectedSpeakerIds = useMemo(
     () => new Set(state.speakerIds.map(String)),
-    [state.speakerIds]
+    [state.speakerIds],
   );
   const selectedKitabIds = useMemo(
     () => new Set(state.kitabIds.map(String)),
-    [state.kitabIds]
+    [state.kitabIds],
   );
 
   const filteredMonthEvents = useMemo(() => {
@@ -479,7 +486,7 @@ export function CalendarClient() {
                           ].map((d) => (
                             <div
                               key={d}
-                              className="bg-white px-4 py-2 text-[11px] font-semibold tracking-wide text-gray-700">
+                              className="bg-white px-4 py-3 text-base font-bold tracking-wide text-gray-900">
                               {d}
                             </div>
                           ))}
@@ -513,7 +520,7 @@ export function CalendarClient() {
                                 <div className="flex items-start justify-between gap-2">
                                   <div
                                     className={
-                                      "text-sm font-semibold leading-none " +
+                                      "text-2xl font-bold leading-none " +
                                       (showOutside
                                         ? "text-gray-400"
                                         : "text-gray-900")

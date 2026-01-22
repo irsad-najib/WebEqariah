@@ -14,11 +14,11 @@ interface EditAnnouncementModalProps {
     content: string;
     mediaUrl?: string;
     type?: string;
-    speaker_name?: string;
-    event_date?: string;
-    kitab_id?: number;
-    kitab_title?: string;
-    bidang_ilmu?: string;
+    speaker_name?: string | null;
+    event_date?: string | null;
+    kitab_id?: number | null;
+    kitab_title?: string | null;
+    bidang_ilmu?: string | null;
   };
 }
 

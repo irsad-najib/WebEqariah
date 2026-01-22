@@ -1,7 +1,7 @@
 // src/app/components/layout/PageLayout.tsx
 import React from "react";
 import { Navbar } from "@/components/layout/Navbar";
-import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+// import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -27,9 +27,10 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
           {children}
         </main>
         {showChat && (
-          <div className="sticky top-0 h-screen z-30">
-            <ChatSidebar />
-          </div>
+          <></>
+          // <div className="sticky top-0 h-screen z-30">
+          //   <ChatSidebar />
+          // </div>
         )}
       </div>
     </>

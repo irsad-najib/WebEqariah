@@ -3,9 +3,9 @@ import React, { useEffect, useState, ChangeEvent, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { axiosInstance } from "@/lib/utils/api";
 import { Navbar } from "@/components/layout/Navbar";
-import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+// import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 import Image from "next/image";
-import { Upload, Heart, MessageCircle, User } from "lucide-react";
+import { Upload, Heart, MessageCircle, User, Pencil } from "lucide-react";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { Announcement } from "@/lib/types";
 import dynamic from "next/dynamic";
@@ -13,7 +13,10 @@ import { RegisterSpeakerModal } from "@/components/features/kajian/RegisterSpeak
 import { SpeakerSelect } from "@/components/features/kajian/SpeakerSelect";
 import { RegisterKitabModal } from "@/components/features/kajian/RegisterKitabModal";
 import { KitabSelect } from "@/components/features/kajian/KitabSelect";
-import { BIDANG_ILMU_OPTIONS } from "@/lib/constants/bidangIlmu";
+import { fetchBidangIlmu, type BidangIlmu } from "@/lib/api/bidangIlmu";
+import { RegisterBidangIlmuModal } from "@/components/features/kajian/RegisterBidangIlmuModal";
+import { EditAnnouncementModal } from "@/components/features/announcement/EditAnnouncementModal";
+import { FEATURES } from "@/lib/config/features";
 import { useToast, ToastContainer } from "@/components/ui/toast";
 
 // Import MyEditor with no SSR
@@ -61,7 +64,7 @@ const DashboardPage = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false);
+  // const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false);
   const [affiliatedMosqueId, setAffiliatedMosqueId] = useState<number | null>(
     null,
   );
@@ -70,6 +73,13 @@ const DashboardPage = () => {
     useState(false);
   const [announcementTypeFilter, setAnnouncementTypeFilter] =
     useState<string>("all");
+  const [bidangIlmuOptions, setBidangIlmuOptions] = useState<BidangIlmu[]>([]);
+  const [isRegisterBidangIlmuModalOpen, setIsRegisterBidangIlmuModalOpen] =
+    useState(false);
+  const [editingAnnouncement, setEditingAnnouncement] =
+    useState<Announcement | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -138,6 +148,48 @@ const DashboardPage = () => {
     [announcements],
   );
 
+  // Fetch announcements function - moved out of useEffect for reusability
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await axiosInstance.get(`/api/announcement`, {
+        withCredentials: true,
+      });
+      const transformedAnnouncements =
+        response.data?.map((ann: Announcement) => ({
+          id: ann.id,
+          title: ann.title,
+          content: ann.content,
+          url: ann.media_url || null,
+          type: ann.type || "announcement",
+          mosqueId: ann.mosque_id,
+          author_id: ann.author_id || ann.authorId,
+          author_name:
+            ann.author_name ||
+            ann.userInfo?.username ||
+            ann.mosqueInfo?.name ||
+            "Unknown",
+          like_count: ann.like_count || 0,
+          comment_count: ann.comment_count || 0,
+          mosqueInfo: {
+            id: ann.mosque_id,
+            name: ann.mosqueInfo?.name,
+            image: ann.mosqueInfo?.image || null,
+          },
+          userInfo: ann.userInfo
+            ? {
+                id: ann.userInfo.id,
+                username: ann.userInfo.username,
+                email: ann.userInfo.email,
+              }
+            : null,
+          createdAt: ann.createdAt,
+        })) || [];
+      setAnnouncements(sortAnnouncementsByLatestId(transformedAnnouncements));
+    } catch (error) {
+      console.log("error fetching announcements", error);
+    }
+  };
+
   useEffect(() => {
     const authsession = async () => {
       try {
@@ -147,6 +199,7 @@ const DashboardPage = () => {
         if (auth.data.Authenticated === true) {
           setIsAuthenticated(true);
           setUserRole(auth.data.user.role);
+          setUserId(auth.data.user.id);
           setAffiliatedMosqueId(auth.data.user.affiliated_mosque_id);
           if (auth.data.user.role === "admin") {
             router.replace("/adminDashboard");
@@ -170,48 +223,17 @@ const DashboardPage = () => {
       }
     };
 
-    const fetchAnnouncements = async () => {
+    const loadBidangIlmu = async () => {
       try {
-        const response = await axiosInstance.get(`/api/announcement`, {
-          withCredentials: true,
-        });
-        const transformedAnnouncements =
-          response.data?.map((ann: Announcement) => ({
-            id: ann.id,
-            title: ann.title,
-            content: ann.content,
-            url: ann.media_url || null,
-            type: ann.type || "announcement",
-            mosqueId: ann.mosque_id,
-            author_id: ann.author_id || ann.authorId,
-            author_name:
-              ann.author_name ||
-              ann.userInfo?.username ||
-              ann.mosqueInfo?.name ||
-              "Unknown",
-            like_count: ann.like_count || 0,
-            comment_count: ann.comment_count || 0,
-            mosqueInfo: {
-              id: ann.mosque_id,
-              name: ann.mosqueInfo?.name,
-              image: ann.mosqueInfo?.image || null,
-            },
-            userInfo: ann.userInfo
-              ? {
-                  id: ann.userInfo.id,
-                  username: ann.userInfo.username,
-                  email: ann.userInfo.email,
-                }
-              : null,
-            createdAt: ann.createdAt,
-          })) || [];
-        setAnnouncements(sortAnnouncementsByLatestId(transformedAnnouncements));
-      } catch (error) {
-        console.log("error fetching announcements", error);
+        const data = await fetchBidangIlmu();
+        setBidangIlmuOptions(data);
+      } catch (err) {
+        console.error("Failed to fetch bidang ilmu:", err);
       }
     };
 
     authsession();
+    loadBidangIlmu();
   }, [router]);
 
   // Scroll listener untuk scroll to top button
@@ -586,23 +608,35 @@ const DashboardPage = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Bidang Ilmu (Pilihan)
-                        </label>
-                        <select
-                          name="bidang_ilmu"
-                          value={newAnnouncement.bidang_ilmu || ""}
-                          onChange={handleAnnouncementChange}
-                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
-                          <option value="">
-                            -- Pilih Bidang Ilmu (Pilihan) --
-                          </option>
-                          {BIDANG_ILMU_OPTIONS.map((bidang) => (
-                            <option key={bidang} value={bidang}>
-                              {bidang}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Bidang Ilmu (Pilihan)
+                          </label>
+                          <select
+                            name="bidang_ilmu"
+                            value={newAnnouncement.bidang_ilmu || ""}
+                            onChange={handleAnnouncementChange}
+                            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+                            <option value="">
+                              -- Pilih Bidang Ilmu (Pilihan) --
                             </option>
-                          ))}
-                        </select>
+                            {bidangIlmuOptions.map((bidang) => (
+                              <option key={bidang.id} value={bidang.name}>
+                                {bidang.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="mt-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setIsRegisterBidangIlmuModalOpen(true)
+                              }
+                              className="text-sm text-green-600 hover:text-green-700 underline">
+                              Bidang Ilmu tidak ada? Daftarkan baru
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -741,24 +775,28 @@ const DashboardPage = () => {
                   {announcements.length}
                 </p>
               </div>
-              <div className="bg-white rounded-xl shadow-lg p-5 border border-gray-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <Heart className="w-4 h-4 text-red-500" />
-                  <p className="text-sm text-gray-500">Total Likes</p>
+              {FEATURES.ENABLE_LIKES && (
+                <div className="bg-white rounded-xl shadow-lg p-5 border border-gray-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Heart className="w-4 h-4 text-red-500" />
+                    <p className="text-sm text-gray-500">Total Likes</p>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-800">
+                    {totalLikes.toLocaleString()}
+                  </p>
                 </div>
-                <p className="text-3xl font-bold text-gray-800">
-                  {totalLikes.toLocaleString()}
-                </p>
-              </div>
-              <div className="bg-white rounded-xl shadow-lg p-5 border border-gray-100">
-                <div className="flex items-center gap-2 mb-1">
-                  <MessageCircle className="w-4 h-4 text-blue-500" />
-                  <p className="text-sm text-gray-500">Total Komentar</p>
+              )}
+              {FEATURES.ENABLE_COMMENTS && (
+                <div className="bg-white rounded-xl shadow-lg p-5 border border-gray-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <MessageCircle className="w-4 h-4 text-blue-500" />
+                    <p className="text-sm text-gray-500">Total Komentar</p>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-800">
+                    {totalComments.toLocaleString()}
+                  </p>
                 </div>
-                <p className="text-3xl font-bold text-gray-800">
-                  {totalComments.toLocaleString()}
-                </p>
-              </div>
+              )}
             </div>
 
             {/* Filter Section */}
@@ -838,6 +876,24 @@ const DashboardPage = () => {
                               </p>
                             </div>
                           </div>
+                          {/* Edit button - only show for owner */}
+                          <div className="flex flex-col items-end gap-1">
+                            {userId &&
+                              announcement.author_id &&
+                              Number(announcement.author_id) ===
+                                Number(userId) && (
+                                <button
+                                  onClick={() => {
+                                    setEditingAnnouncement(announcement);
+                                    setIsEditModalOpen(true);
+                                  }}
+                                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                                  title="Edit pengumuman">
+                                  <Pencil className="w-4 h-4" />
+                                  <span>Edit</span>
+                                </button>
+                              )}
+                          </div>
                         </div>
                         <div className="flex items-center gap-2 mt-2">
                           <span
@@ -864,18 +920,22 @@ const DashboardPage = () => {
                           )}
                         />
                         <div className="flex items-center gap-6 mt-4 text-gray-600">
-                          <div className="flex items-center gap-2">
-                            <Heart className="w-5 h-5 text-red-500" />
-                            <span className="text-sm font-medium">
-                              {announcement.like_count || 0} Likes
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <MessageCircle className="w-5 h-5 text-blue-500" />
-                            <span className="text-sm font-medium">
-                              {announcement.comment_count || 0} Komentar
-                            </span>
-                          </div>
+                          {FEATURES.ENABLE_LIKES && (
+                            <div className="flex items-center gap-2">
+                              <Heart className="w-5 h-5 text-red-500" />
+                              <span className="text-sm font-medium">
+                                {announcement.like_count || 0} Likes
+                              </span>
+                            </div>
+                          )}
+                          {FEATURES.ENABLE_COMMENTS && (
+                            <div className="flex items-center gap-2">
+                              <MessageCircle className="w-5 h-5 text-blue-500" />
+                              <span className="text-sm font-medium">
+                                {announcement.comment_count || 0} Komentar
+                              </span>
+                            </div>
+                          )}
                         </div>
                         {announcement.url && (
                           <div className="mt-4 inline-block">
@@ -970,9 +1030,9 @@ const DashboardPage = () => {
           </div>
 
           {/* Desktop Chat Sidebar - Fixed positioning */}
-          <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
+          {/* <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
             <ChatSidebar />
-          </div>
+          </div> */}
         </div>
 
         {/* Fixed Floating Buttons Container */}
@@ -998,8 +1058,8 @@ const DashboardPage = () => {
           )}
 
           {/* Mobile Chat Button */}
-          <button
-            onClick={() => setIsChatSidebarOpen(true)}
+          {/* <button
+            // onClick={() => setIsChatSidebarOpen(true)}
             className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group">
             <svg
               className="w-6 h-6 group-hover:scale-110 transition-transform"
@@ -1012,22 +1072,22 @@ const DashboardPage = () => {
                 strokeWidth={2}
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
               />
-            </svg>
+            </svg>*/}
 
-            {/* Notification Badge */}
-            <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+          {/* Notification Badge */}
+          {/* <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
               3
             </div>
-          </button>
+          </button> */}
         </div>
 
         {/* Mobile Chat Sidebar Modal */}
-        <div className="lg:hidden">
+        {/* <div className="lg:hidden">
           <ChatSidebar
             isOpen={isChatSidebarOpen}
             onClose={() => setIsChatSidebarOpen(false)}
           />
-        </div>
+        </div> */}
 
         {/* Register Speaker Modal */}
         <RegisterSpeakerModal
@@ -1048,6 +1108,36 @@ const DashboardPage = () => {
             setSuccess("Kitab berhasil didaftarkan!");
           }}
         />
+
+        {/* Register Bidang Ilmu Modal */}
+        <RegisterBidangIlmuModal
+          isOpen={isRegisterBidangIlmuModalOpen}
+          onClose={() => setIsRegisterBidangIlmuModalOpen(false)}
+          onSuccess={() => {
+            // Reload bidang ilmu list
+            fetchBidangIlmu().then(setBidangIlmuOptions);
+            setSuccess("Bidang Ilmu berhasil didaftarkan!");
+          }}
+        />
+
+        {/* Edit Announcement Modal */}
+        {editingAnnouncement && (
+          <EditAnnouncementModal
+            isOpen={isEditModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+              setEditingAnnouncement(null);
+            }}
+            announcement={editingAnnouncement}
+            onSuccess={() => {
+              // Refresh announcement list after successful edit
+              fetchAnnouncements();
+              setSuccess("Pengumuman berjaya dikemaskini!");
+              setIsEditModalOpen(false);
+              setEditingAnnouncement(null);
+            }}
+          />
+        )}
       </div>
     </>
   );

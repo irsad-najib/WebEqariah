@@ -8,101 +8,6 @@ import { useAuth } from "@/lib/hooks/useAuth";
 
 const BIDANG_ILMU_STORAGE_KEY = "eqariah_bidang_ilmu";
 
-// ... (keep interface and other components)
-
-const NavbarInner = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const hideBidangIlmuDropdown = (pathname ?? "").startsWith("/calendar");
-  const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
-
-  const bidangIlmuFromUrl = searchParams.get("bidang_ilmu") ?? "";
-  const [selectedBidangIlmu, setSelectedBidangIlmu] = useState<string>("");
-  const [bidangIlmuOptions, setBidangIlmuOptions] = useState<BidangIlmu[]>([]);
-
-  useEffect(() => {
-    const loadBidangIlmu = async () => {
-      try {
-        const data = await fetchBidangIlmu();
-        setBidangIlmuOptions(data);
-      } catch (err) {
-        console.error("Failed to fetch bidang ilmu:", err);
-      }
-    };
-    loadBidangIlmu();
-  }, []);
-
-  useEffect(() => {
-    // Prefer URL param when present; otherwise fallback to sessionStorage.
-    if (bidangIlmuFromUrl) {
-      setSelectedBidangIlmu(bidangIlmuFromUrl);
-      try {
-        sessionStorage.setItem(BIDANG_ILMU_STORAGE_KEY, bidangIlmuFromUrl);
-      } catch {
-        // ignore storage failures
-      }
-      return;
-    }
-
-    try {
-      const stored = sessionStorage.getItem(BIDANG_ILMU_STORAGE_KEY) ?? "";
-      if (stored) setSelectedBidangIlmu(stored);
-    } catch {
-      // ignore storage failures
-    }
-  }, [bidangIlmuFromUrl]);
-
-  // ... (keep handleLogout and handleBidangIlmuChange)
-
-  // ... (inside desktop render)
-              {/* Bidang Ilmu Dropdown */}
-              {!hideBidangIlmuDropdown && (
-                <div className="flex items-center">
-                  <select
-                    aria-label="Pilih Bidang Ilmu"
-                    value={selectedBidangIlmu}
-                    onChange={(e) => handleBidangIlmuChange(e.target.value)}
-                    className="text-white text-lg bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-all border border-white/20">
-                    <option value="" className="text-gray-900">
-                      Bidang Ilmu...
-                    </option>
-                    {bidangIlmuOptions.map((opt) => (
-                      <option key={opt.id} value={opt.name} className="text-gray-900">
-                        {opt.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-  // ... (inside mobile render)
-            {/* Bidang Ilmu Dropdown */}
-            {!hideBidangIlmuDropdown && (
-              <div className="mt-3">
-                <label
-                  htmlFor="navbar_bidang_ilmu"
-                  className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                  Bidang Ilmu
-                </label>
-                <select
-                  id="navbar_bidang_ilmu"
-                  value={selectedBidangIlmu}
-                  onChange={(e) => handleBidangIlmuChange(e.target.value)}
-                  className="w-full p-3 text-gray-700 bg-white border border-gray-200 rounded-lg">
-                  <option value="">Pilih Bidang Ilmu...</option>
-                  {bidangIlmuOptions.map((opt) => (
-                    <option key={opt.id} value={opt.name}>
-                      {opt.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-
 interface NavLinkProps {
   href: string;
   children: React.ReactNode;
@@ -259,6 +164,19 @@ const NavbarInner = () => {
 
   const bidangIlmuFromUrl = searchParams.get("bidang_ilmu") ?? "";
   const [selectedBidangIlmu, setSelectedBidangIlmu] = useState<string>("");
+  const [bidangIlmuOptions, setBidangIlmuOptions] = useState<BidangIlmu[]>([]);
+
+  useEffect(() => {
+    const loadBidangIlmu = async () => {
+      try {
+        const data = await fetchBidangIlmu();
+        setBidangIlmuOptions(data);
+      } catch (err) {
+        console.error("Failed to fetch bidang ilmu:", err);
+      }
+    };
+    loadBidangIlmu();
+  }, []);
 
   useEffect(() => {
     // Prefer URL param when present; otherwise fallback to sessionStorage.
@@ -360,9 +278,12 @@ const NavbarInner = () => {
                     <option value="" className="text-gray-900">
                       Bidang Ilmu...
                     </option>
-                    {BIDANG_ILMU_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt} className="text-gray-900">
-                        {opt}
+                    {bidangIlmuOptions.map((opt) => (
+                      <option
+                        key={opt.id}
+                        value={opt.name}
+                        className="text-gray-900">
+                        {opt.name}
                       </option>
                     ))}
                   </select>
@@ -551,9 +472,9 @@ const NavbarInner = () => {
                   onChange={(e) => handleBidangIlmuChange(e.target.value)}
                   className="w-full p-3 text-gray-700 bg-white border border-gray-200 rounded-lg">
                   <option value="">Pilih Bidang Ilmu...</option>
-                  {BIDANG_ILMU_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
+                  {bidangIlmuOptions.map((opt) => (
+                    <option key={opt.id} value={opt.name}>
+                      {opt.name}
                     </option>
                   ))}
                 </select>

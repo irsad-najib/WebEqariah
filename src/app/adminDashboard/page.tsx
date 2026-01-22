@@ -13,6 +13,7 @@ import {
   fetchAllKitabs,
   updateKitabStatus,
 } from "@/lib/api/adminKitab";
+import { BidangIlmuManagement } from "@/components/features/admin/BidangIlmuManagement";
 
 type ApiErrorResponse = {
   message?: Record<string, string> | string;
@@ -21,7 +22,7 @@ type ApiErrorResponse = {
 
 function getErrorMessage(
   error: unknown,
-  fallback = "An unexpected error occurred"
+  fallback = "An unexpected error occurred",
 ): string {
   if (isAxiosError(error) && error.response) {
     const data = error.response.data as ApiErrorResponse | undefined;
@@ -49,7 +50,7 @@ const fetchData = async <T,>(
   url: string,
   setData: React.Dispatch<React.SetStateAction<T[]>>,
   setError: React.Dispatch<React.SetStateAction<string | null>>,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   try {
     setLoading(true);
@@ -101,7 +102,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
-    "users" | "announcements" | "mosque" | "speakers" | "kitab"
+    "users" | "announcements" | "mosque" | "speakers" | "kitab" | "bidang_ilmu"
   >("users");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
@@ -157,18 +158,18 @@ const AdminDashboard: React.FC = () => {
     () =>
       (announcements || []).reduce(
         (sum, announcement) => sum + (announcement?.like_count ?? 0),
-        0
+        0,
       ),
-    [announcements]
+    [announcements],
   );
 
   const totalAnnouncementComments = useMemo(
     () =>
       (announcements || []).reduce(
         (sum, announcement) => sum + (announcement?.comment_count ?? 0),
-        0
+        0,
       ),
-    [announcements]
+    [announcements],
   );
 
   useEffect(() => {
@@ -200,7 +201,7 @@ const AdminDashboard: React.FC = () => {
     fetchData("/api/admin/users", setUsers, setError, setLoading);
     const intervalId = setInterval(
       () => fetchData("/api/admin/users", setUsers, setError, setLoading),
-      300000
+      300000,
     );
     return () => clearInterval(intervalId);
   }, []);
@@ -210,7 +211,7 @@ const AdminDashboard: React.FC = () => {
       "/api/admin/announcements",
       setAnnouncements,
       setError,
-      setLoading
+      setLoading,
     );
     const intervalId = setInterval(
       () =>
@@ -218,9 +219,9 @@ const AdminDashboard: React.FC = () => {
           "/api/admin/announcements",
           setAnnouncements,
           setError,
-          setLoading
+          setLoading,
         ),
-      300000
+      300000,
     );
     return () => clearInterval(intervalId);
   }, []);
@@ -229,7 +230,7 @@ const AdminDashboard: React.FC = () => {
     fetchData("/api/admin/mosques", setMosques, setError, setLoading);
     const intervalId = setInterval(
       () => fetchData("/api/admin/mosques", setMosques, setError, setLoading),
-      300000
+      300000,
     );
     return () => clearInterval(intervalId);
   }, []);
@@ -284,12 +285,12 @@ const AdminDashboard: React.FC = () => {
       const response = await axiosInstance.post(
         `/api/admin/approve-mosque/${mosqueId}`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       const statusFromServer = response?.data?.status as string | undefined;
       const fallbackStatus = mosques.find(
-        (mosque) => String(mosque.id) === String(mosqueId)
+        (mosque) => String(mosque.id) === String(mosqueId),
       )?.status;
 
       const normalizedStatus = statusFromServer
@@ -299,15 +300,15 @@ const AdminDashboard: React.FC = () => {
       const toggledStatus: Mosque["status"] = normalizedStatus
         ? normalizedStatus
         : fallbackStatus === "APPROVED"
-        ? "PENDING"
-        : "APPROVED";
+          ? "PENDING"
+          : "APPROVED";
 
       setMosques((prevMosques) =>
         prevMosques.map((mosque) =>
           String(mosque.id) === String(mosqueId)
             ? { ...mosque, status: toggledStatus }
-            : mosque
-        )
+            : mosque,
+        ),
       );
 
       setError(null);
@@ -336,7 +337,7 @@ const AdminDashboard: React.FC = () => {
   const filteredUsers = (users || []).filter(
     (user) =>
       (user?.username || "").toLowerCase().includes(normalizedSearchTerm) ||
-      (user?.email || "").toLowerCase().includes(normalizedSearchTerm)
+      (user?.email || "").toLowerCase().includes(normalizedSearchTerm),
   );
   const filteredAnnouncements = (announcements || []).filter((announcement) => {
     const matchesSearch =
@@ -354,12 +355,12 @@ const AdminDashboard: React.FC = () => {
     return matchesSearch && matchesType;
   });
   const filteredMosque = (mosques || []).filter((mosque) =>
-    (mosque?.mosqueName || "").toLowerCase().includes(normalizedSearchTerm)
+    (mosque?.mosqueName || "").toLowerCase().includes(normalizedSearchTerm),
   );
   const filteredSpeakers = (speakers || []).filter(
     (speaker) =>
       (speaker?.name || "").toLowerCase().includes(normalizedSearchTerm) ||
-      (speaker?.expertise || "").toLowerCase().includes(normalizedSearchTerm)
+      (speaker?.expertise || "").toLowerCase().includes(normalizedSearchTerm),
   );
   const filteredKitabs = (kitabs || []).filter((kitab) => {
     const judul = (kitab?.judul || "").toLowerCase();
@@ -401,7 +402,7 @@ const AdminDashboard: React.FC = () => {
     type: "users" | "mosque" | "speakers" | "kitab" | "announcements",
     id: number | string,
     name: string,
-    e: React.MouseEvent
+    e: React.MouseEvent,
   ) => {
     e.stopPropagation();
     setDeleteConfirmation({ show: true, type, id: Number(id), name });
@@ -420,30 +421,30 @@ const AdminDashboard: React.FC = () => {
           withCredentials: true,
         });
         setUsers(
-          users.filter((user) => Number(user.id) !== deleteConfirmation.id)
+          users.filter((user) => Number(user.id) !== deleteConfirmation.id),
         );
       } else if (deleteConfirmation.type === "mosque") {
         await axiosInstance.delete(
           `api/admin/mosques/${deleteConfirmation.id}`,
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setMosques(
-          mosques.filter((mosque) => mosque.id !== deleteConfirmation.id)
+          mosques.filter((mosque) => mosque.id !== deleteConfirmation.id),
         );
       } else if (deleteConfirmation.type === "speakers") {
         await axiosInstance.delete(`api/speaker/${deleteConfirmation.id}`, {
           withCredentials: true,
         });
         setSpeakers(
-          speakers.filter((speaker) => speaker.id !== deleteConfirmation.id)
+          speakers.filter((speaker) => speaker.id !== deleteConfirmation.id),
         );
       } else if (deleteConfirmation.type === "announcements") {
         await axiosInstance.delete(
           `/api/announcement/${deleteConfirmation.id}`,
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setAnnouncements(
-          announcements.filter((ann) => ann.id !== deleteConfirmation.id)
+          announcements.filter((ann) => ann.id !== deleteConfirmation.id),
         );
       }
       setDeleteConfirmation({ show: false, type: null, id: null, name: "" });
@@ -461,21 +462,21 @@ const AdminDashboard: React.FC = () => {
 
   const handleUpdateSpeakerStatus = async (
     speakerId: number,
-    status: "approved" | "rejected"
+    status: "approved" | "rejected",
   ) => {
     try {
       const response = await axiosInstance.put(
         `/api/speaker/${speakerId}/status`,
         { status },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (response.data.success) {
         // Update local state
         setSpeakers((prevSpeakers) =>
           prevSpeakers.map((speaker) =>
-            speaker.id === speakerId ? { ...speaker, status } : speaker
-          )
+            speaker.id === speakerId ? { ...speaker, status } : speaker,
+          ),
         );
         setError(null);
       }
@@ -487,12 +488,12 @@ const AdminDashboard: React.FC = () => {
 
   const handleUpdateKitabStatus = async (
     kitabId: number,
-    status: "approved" | "rejected"
+    status: "approved" | "rejected",
   ) => {
     try {
       await updateKitabStatus(kitabId, status);
       setKitabs((prev) =>
-        prev.map((k) => (k.id === kitabId ? { ...k, status } : k))
+        prev.map((k) => (k.id === kitabId ? { ...k, status } : k)),
       );
       setError(null);
     } catch (err) {
@@ -504,7 +505,7 @@ const AdminDashboard: React.FC = () => {
   const renderTable = <T extends object>(
     data: T[],
     columns: string[],
-    type: string
+    type: string,
   ) => {
     // Safety check untuk data
     const safeData = data || [];
@@ -589,11 +590,11 @@ const AdminDashboard: React.FC = () => {
               safeData.map((item) => (
                 <React.Fragment
                   key={String(
-                    (item as Record<string, unknown>)?.id ?? Math.random()
+                    (item as Record<string, unknown>)?.id ?? Math.random(),
                   )}>
                   <tr
                     key={String(
-                      (item as Record<string, unknown>)?.id ?? Math.random()
+                      (item as Record<string, unknown>)?.id ?? Math.random(),
                     )}
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() =>
@@ -601,7 +602,7 @@ const AdminDashboard: React.FC = () => {
                         expandedRow ===
                           String((item as Record<string, unknown>)?.id ?? "")
                           ? null
-                          : String((item as Record<string, unknown>)?.id ?? "")
+                          : String((item as Record<string, unknown>)?.id ?? ""),
                       )
                     }>
                     {columns.map((col) => {
@@ -632,8 +633,8 @@ const AdminDashboard: React.FC = () => {
                               e.stopPropagation();
                               handleApproveMosque(
                                 String(
-                                  (item as Record<string, unknown>)?.id ?? ""
-                                )
+                                  (item as Record<string, unknown>)?.id ?? "",
+                                ),
                               );
                             }}>
                             {(item as Record<string, unknown>)?.status ===
@@ -657,17 +658,17 @@ const AdminDashboard: React.FC = () => {
                                 | number) ?? "",
                               type === "users"
                                 ? String(
-                                    (item as Record<string, unknown>)?.username
+                                    (item as Record<string, unknown>)?.username,
                                   )
                                 : type === "announcements"
-                                ? String(
-                                    (item as Record<string, unknown>)?.title
-                                  )
-                                : String(
-                                    (item as Record<string, unknown>)
-                                      ?.mosqueName
-                                  ),
-                              e
+                                  ? String(
+                                      (item as Record<string, unknown>)?.title,
+                                    )
+                                  : String(
+                                      (item as Record<string, unknown>)
+                                        ?.mosqueName,
+                                    ),
+                              e,
                             )
                           }>
                           <Trash2 size={16} />
@@ -823,6 +824,15 @@ const AdminDashboard: React.FC = () => {
                   onClick={() => setActiveTab("kitab")}>
                   Kitab
                 </button>
+                <button
+                  className={`px-6 py-3 text-sm font-medium ${
+                    activeTab === "bidang_ilmu"
+                      ? "text-blue-600 border-b-2 border-blue-600"
+                      : "text-gray-500 hover:text-blue-500"
+                  }`}
+                  onClick={() => setActiveTab("bidang_ilmu")}>
+                  Bidang Ilmu
+                </button>
               </div>
             </div>
 
@@ -843,13 +853,13 @@ const AdminDashboard: React.FC = () => {
                     {renderTable(
                       filteredUsers || [],
                       ["username", "email", "role", "affiliatedMosqueId"],
-                      "users"
+                      "users",
                     )}
                     {(filteredUsers?.length || 0) > 0 && (
                       <Pagination
                         currentPage={currentUserPage}
                         totalPages={Math.ceil(
-                          (filteredUsers?.length || 0) / itemsPerPage
+                          (filteredUsers?.length || 0) / itemsPerPage,
                         )}
                         paginate={paginate}
                         type="users"
@@ -909,13 +919,13 @@ const AdminDashboard: React.FC = () => {
                         "mosque.contactPerson",
                         "mosque.contactPhone",
                       ],
-                      "announcements"
+                      "announcements",
                     )}
                     {(filteredAnnouncements?.length || 0) > 0 && (
                       <Pagination
                         currentPage={currentAnnouncementPage}
                         totalPages={Math.ceil(
-                          (filteredAnnouncements?.length || 0) / itemsPerPage
+                          (filteredAnnouncements?.length || 0) / itemsPerPage,
                         )}
                         paginate={paginate}
                         type="announcements"
@@ -956,13 +966,13 @@ const AdminDashboard: React.FC = () => {
                         "createdAt",
                         "adminId",
                       ],
-                      "mosque"
+                      "mosque",
                     )}
                     {(filteredMosque?.length || 0) > 0 && (
                       <Pagination
                         currentPage={currentMosquePage}
                         totalPages={Math.ceil(
-                          (filteredMosque?.length || 0) / itemsPerPage
+                          (filteredMosque?.length || 0) / itemsPerPage,
                         )}
                         paginate={paginate}
                         type="mosque"
@@ -1015,7 +1025,7 @@ const AdminDashboard: React.FC = () => {
                           {filteredSpeakers
                             .slice(
                               (currentSpeakerPage - 1) * itemsPerPage,
-                              currentSpeakerPage * itemsPerPage
+                              currentSpeakerPage * itemsPerPage,
                             )
                             .map((speaker) => (
                               <tr key={speaker.id}>
@@ -1053,15 +1063,15 @@ const AdminDashboard: React.FC = () => {
                                       speaker.status === "approved"
                                         ? "bg-green-100 text-green-800"
                                         : speaker.status === "rejected"
-                                        ? "bg-red-100 text-red-800"
-                                        : "bg-yellow-100 text-yellow-800"
+                                          ? "bg-red-100 text-red-800"
+                                          : "bg-yellow-100 text-yellow-800"
                                     }`}>
                                     {speaker.status}
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                   {new Date(
-                                    speaker.created_at
+                                    speaker.created_at,
                                   ).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -1071,7 +1081,7 @@ const AdminDashboard: React.FC = () => {
                                         onClick={() =>
                                           handleUpdateSpeakerStatus(
                                             speaker.id,
-                                            "approved"
+                                            "approved",
                                           )
                                         }
                                         className="text-green-600 hover:text-green-900">
@@ -1083,7 +1093,7 @@ const AdminDashboard: React.FC = () => {
                                         onClick={() =>
                                           handleUpdateSpeakerStatus(
                                             speaker.id,
-                                            "rejected"
+                                            "rejected",
                                           )
                                         }
                                         className="text-red-600 hover:text-red-900">
@@ -1096,7 +1106,7 @@ const AdminDashboard: React.FC = () => {
                                           "speakers",
                                           speaker.id,
                                           speaker.name,
-                                          e
+                                          e,
                                         )
                                       }
                                       className="text-red-600 hover:text-red-900">
@@ -1113,7 +1123,7 @@ const AdminDashboard: React.FC = () => {
                       <Pagination
                         currentPage={currentSpeakerPage}
                         totalPages={Math.ceil(
-                          (filteredSpeakers?.length || 0) / itemsPerPage
+                          (filteredSpeakers?.length || 0) / itemsPerPage,
                         )}
                         paginate={paginate}
                         type="speakers"
@@ -1166,7 +1176,7 @@ const AdminDashboard: React.FC = () => {
                           {filteredKitabs
                             .slice(
                               (currentKitabPage - 1) * itemsPerPage,
-                              currentKitabPage * itemsPerPage
+                              currentKitabPage * itemsPerPage,
                             )
                             .map((kitab) => (
                               <tr key={kitab.id}>
@@ -1190,8 +1200,8 @@ const AdminDashboard: React.FC = () => {
                                       kitab.status === "approved"
                                         ? "bg-green-100 text-green-800"
                                         : kitab.status === "rejected"
-                                        ? "bg-red-100 text-red-800"
-                                        : "bg-yellow-100 text-yellow-800"
+                                          ? "bg-red-100 text-red-800"
+                                          : "bg-yellow-100 text-yellow-800"
                                     }`}>
                                     {kitab.status || "pending"}
                                   </span>
@@ -1199,7 +1209,7 @@ const AdminDashboard: React.FC = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                   {kitab.created_at
                                     ? new Date(
-                                        kitab.created_at
+                                        kitab.created_at,
                                       ).toLocaleDateString()
                                     : "-"}
                                 </td>
@@ -1210,7 +1220,7 @@ const AdminDashboard: React.FC = () => {
                                         onClick={() =>
                                           handleUpdateKitabStatus(
                                             kitab.id,
-                                            "approved"
+                                            "approved",
                                           )
                                         }
                                         className="text-green-600 hover:text-green-900">
@@ -1222,7 +1232,7 @@ const AdminDashboard: React.FC = () => {
                                         onClick={() =>
                                           handleUpdateKitabStatus(
                                             kitab.id,
-                                            "rejected"
+                                            "rejected",
                                           )
                                         }
                                         className="text-red-600 hover:text-red-900">
@@ -1235,7 +1245,7 @@ const AdminDashboard: React.FC = () => {
                                           "kitab",
                                           kitab.id,
                                           kitab.judul,
-                                          e
+                                          e,
                                         )
                                       }
                                       className="text-red-600 hover:text-red-900"
@@ -1253,7 +1263,7 @@ const AdminDashboard: React.FC = () => {
                       <Pagination
                         currentPage={currentKitabPage}
                         totalPages={Math.ceil(
-                          (filteredKitabs?.length || 0) / itemsPerPage
+                          (filteredKitabs?.length || 0) / itemsPerPage,
                         )}
                         paginate={paginate}
                         type="kitab"
@@ -1261,6 +1271,13 @@ const AdminDashboard: React.FC = () => {
                     )}
                   </>
                 )}
+              </div>
+            )}
+
+            {/* Bidang Ilmu Tab */}
+            {activeTab === "bidang_ilmu" && (
+              <div className="p-6">
+                <BidangIlmuManagement />
               </div>
             )}
           </div>

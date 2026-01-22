@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
-import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+// import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { axiosInstance } from "@/lib/utils/api";
 import { Button } from "@/components/ui/button";
@@ -191,8 +191,8 @@ const MosqueSettings = ({
               mosqueData.status === "APPROVED"
                 ? "text-green-600"
                 : mosqueData.status === "PENDING"
-                ? "text-yellow-600"
-                : "text-red-600"
+                  ? "text-yellow-600"
+                  : "text-red-600"
             }`}>
             {mosqueData.status}
           </p>
@@ -373,9 +373,9 @@ const Profile = () => {
         {/* Main Content */}
         <div className="flex-1 relative">{handlePageChange()}</div>
         {/* Right Sidebar (Chat) */}
-        <div className="sticky top-0 h-screen z-30">
+        {/* <div className="sticky top-0 h-screen z-30">
           <ChatSidebar />
-        </div>
+        </div> */}
       </div>
 
       {/* Modals */}

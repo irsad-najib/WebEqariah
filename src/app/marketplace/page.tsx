@@ -6,7 +6,8 @@ import { Upload, User, Heart, MessageCircle, ArrowUp } from "lucide-react";
 import { axiosInstance } from "@/lib/utils/api";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { Navbar } from "@/components/layout/Navbar";
-import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+// import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+import { FEATURES } from "@/lib/config/features";
 import dynamic from "next/dynamic";
 
 // Import MyEditor with dynamic import to prevent SSR issues
@@ -22,7 +23,7 @@ const MyEditor = dynamic(() => import("@/components/features/form/form"), {
 
 const QuillContentRenderer = dynamic(
   () => import("@/components/features/form/QuillContentRenderer"),
-  { ssr: false }
+  { ssr: false },
 );
 
 // Interface definitions
@@ -76,7 +77,7 @@ export default function MarketplacePage() {
   const [uploading, setUploading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [marketplaceItems, setMarketplaceItems] = useState<MarketplaceItem[]>(
-    []
+    [],
   );
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserInfo | null>(null);
@@ -87,12 +88,12 @@ export default function MarketplacePage() {
   const [newComment, setNewComment] = useState("");
   const [loadingComments, setLoadingComments] = useState(false);
   const [loadingLike, setLoadingLike] = useState<{ [key: number]: boolean }>(
-    {}
+    {},
   );
   const [fullContentModal, setFullContentModal] = useState<number | null>(null);
 
   // Chat sidebar states
-  const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false);
+  // const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Add new state for expanded content
@@ -229,7 +230,7 @@ export default function MarketplacePage() {
         itemData,
         {
           withCredentials: true,
-        }
+        },
       );
 
       setSuccess("Item pasaran berjaya dicipta!");
@@ -255,7 +256,7 @@ export default function MarketplacePage() {
               created.author_name || created.authorName || currentUser.username,
             likeCount: Number(created.like_count || created.likeCount || 0),
             commentCount: Number(
-              created.comment_count || created.commentCount || 0
+              created.comment_count || created.commentCount || 0,
             ),
             createdAt: created.created_at || new Date().toISOString(),
             updatedAt: created.updated_at || new Date().toISOString(),
@@ -306,7 +307,7 @@ export default function MarketplacePage() {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -346,7 +347,7 @@ export default function MarketplacePage() {
       const response = await axiosInstance.post(
         `/api/announcement/${itemId}/like`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       // Update the marketplace item with new like count
@@ -360,7 +361,7 @@ export default function MarketplacePage() {
             };
           }
           return item;
-        })
+        }),
       );
     } catch (error) {
       console.error("Error menyukai item:", error);
@@ -387,7 +388,7 @@ export default function MarketplacePage() {
       try {
         const response = await axiosInstance.get(
           `/api/announcement/${itemId}/comments`,
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setComments((prev) => ({ ...prev, [itemId]: response.data }));
       } catch (error) {
@@ -414,7 +415,7 @@ export default function MarketplacePage() {
       const response = await axiosInstance.post(
         `/api/announcement/${itemId}/comments`,
         { content: newComment },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       // Add the new comment to the comments list
@@ -434,7 +435,7 @@ export default function MarketplacePage() {
             };
           }
           return item;
-        })
+        }),
       );
 
       // Reset the new comment field
@@ -456,7 +457,7 @@ export default function MarketplacePage() {
   // WebSocket hook untuk menerima update real-time
   const { connectionStatus, lastMessage } = useWebSocket(
     "wss://api.eqariah.com/api/ws",
-    "marketplace" // Special subscription for marketplace
+    "marketplace", // Special subscription for marketplace
   );
 
   // Replace your existing WebSocket effect with this improved version
@@ -485,7 +486,7 @@ export default function MarketplacePage() {
         authorName: payload.author_name || payload.authorName || "Anonymous",
         likeCount: Number(payload.like_count || payload.likeCount || 0),
         commentCount: Number(
-          payload.comment_count || payload.commentCount || 0
+          payload.comment_count || payload.commentCount || 0,
         ),
         createdAt:
           payload.created_at || payload.createdAt || new Date().toISOString(),
@@ -500,7 +501,7 @@ export default function MarketplacePage() {
             i.id === newItem.id ||
             (i.title === newItem.title &&
               i.content === newItem.content &&
-              i.authorId === newItem.authorId)
+              i.authorId === newItem.authorId),
         );
         if (exists) return prev;
         return sortMarketplaceItemsByLatest([newItem, ...prev]);
@@ -616,9 +617,7 @@ export default function MarketplacePage() {
           {isAuthenticated && (
             <div className="bg-white text-black shadow-md rounded-lg mb-6 p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">
-                  Cipta Item Pasaran Baru
-                </h2>
+                <h2 className="text-2xl font-bold">Cipta Item Pasaran Baru</h2>
               </div>
 
               <form
@@ -816,37 +815,43 @@ export default function MarketplacePage() {
                     </div>
 
                     {/* Like and Comment buttons - Fixed at bottom */}
-                    <div className="flex items-center border-t border-gray-100 pt-3 mt-auto">
-                      {/* Like Button */}
-                      <button
-                        onClick={() => handleLike(item.id)}
-                        disabled={loadingLike[item.id]}
-                        className={`flex items-center mr-6 focus:outline-none group ${
-                          item.likedByUser
-                            ? "text-red-500"
-                            : "text-gray-500 hover:text-red-500"
-                        }`}>
-                        <Heart
-                          className={`h-5 w-5 mr-1 ${
-                            item.likedByUser
-                              ? "fill-red-500"
-                              : "fill-transparent group-hover:fill-red-200"
-                          } transition-all`}
-                        />
-                        <span className="text-sm">{item.likeCount}</span>
-                      </button>
+                    {(FEATURES.ENABLE_LIKES || FEATURES.ENABLE_COMMENTS) && (
+                      <div className="flex items-center border-t border-gray-100 pt-3 mt-auto">
+                        {/* Like Button */}
+                        {FEATURES.ENABLE_LIKES && (
+                          <button
+                            onClick={() => handleLike(item.id)}
+                            disabled={loadingLike[item.id]}
+                            className={`flex items-center mr-6 focus:outline-none group ${
+                              item.likedByUser
+                                ? "text-red-500"
+                                : "text-gray-500 hover:text-red-500"
+                            }`}>
+                            <Heart
+                              className={`h-5 w-5 mr-1 ${
+                                item.likedByUser
+                                  ? "fill-red-500"
+                                  : "fill-transparent group-hover:fill-red-200"
+                              } transition-all`}
+                            />
+                            <span className="text-sm">{item.likeCount}</span>
+                          </button>
+                        )}
 
-                      {/* Comment Button */}
-                      <button
-                        onClick={() => toggleComments(item.id)}
-                        className="flex items-center text-gray-500 hover:text-blue-500 focus:outline-none group">
-                        <MessageCircle className="h-5 w-5 mr-1 group-hover:text-blue-500" />
-                        <span className="text-sm">{item.commentCount}</span>
-                      </button>
-                    </div>
+                        {/* Comment Button */}
+                        {FEATURES.ENABLE_COMMENTS && (
+                          <button
+                            onClick={() => toggleComments(item.id)}
+                            className="flex items-center text-gray-500 hover:text-blue-500 focus:outline-none group">
+                            <MessageCircle className="h-5 w-5 mr-1 group-hover:text-blue-500" />
+                            <span className="text-sm">{item.commentCount}</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
 
                     {/* Comments Section - Outside the fixed height container */}
-                    {commentOpen === item.id && (
+                    {FEATURES.ENABLE_COMMENTS && commentOpen === item.id && (
                       <div className="mt-4 border-t border-gray-100 pt-4 -mx-6 -mb-6 px-6 pb-6 bg-gray-50">
                         <h4 className="text-sm font-semibold mb-3">Komen</h4>
 
@@ -877,7 +882,7 @@ export default function MarketplacePage() {
                                     </span>
                                     <span className="text-xs text-gray-500 ml-2 whitespace-nowrap">
                                       {new Date(
-                                        comment.createdAt
+                                        comment.createdAt,
                                       ).toLocaleDateString()}
                                     </span>
                                   </div>
@@ -989,9 +994,9 @@ export default function MarketplacePage() {
       )}
 
       {/* Desktop Chat Sidebar - Fixed positioning */}
-      <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
+      {/* <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
         <ChatSidebar />
-      </div>
+      </div> */}
 
       {/* Fixed Floating Buttons Container */}
       <div className="fixed bottom-6 right-6 flex flex-col items-end space-y-3 z-50">
@@ -1005,25 +1010,25 @@ export default function MarketplacePage() {
         )}
 
         {/* Mobile Chat Button */}
-        <button
+        {/* <button
           onClick={() => setIsChatSidebarOpen(true)}
           className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group">
-          <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+          <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" /> */}
 
-          {/* Notification Badge */}
-          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+        {/* Notification Badge */}
+        {/* <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
             3
           </div>
-        </button>
+        </button> */}
       </div>
 
       {/* Mobile Chat Sidebar Modal */}
-      <div className="lg:hidden">
+      {/* <div className="lg:hidden">
         <ChatSidebar
           isOpen={isChatSidebarOpen}
           onClose={() => setIsChatSidebarOpen(false)}
         />
-      </div>
+      </div> */}
     </div>
   );
 }
