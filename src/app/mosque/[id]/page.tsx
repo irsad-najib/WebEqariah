@@ -2,13 +2,14 @@
 import { axiosInstance } from "@/lib/utils/api";
 import { useRouter, useParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
-// import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { useToast, ToastContainer } from "@/components/ui/toast";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { FEATURES } from "@/lib/config/features";
 
 const QuillContentRenderer = dynamic(
   () => import("@/components/features/form/QuillContentRenderer"),
@@ -100,7 +101,7 @@ export default function MosquePage() {
     [key: string]: boolean;
   }>({});
   const [commentInput, setCommentInput] = useState("");
-  // const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false); // ✅ Add mobile chat sidebar state
+  const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false); // ✅ Add mobile chat sidebar state
   const [showScrollTop, setShowScrollTop] = useState(false); // ✅ Add scroll to top state
 
   const router = useRouter();
@@ -817,212 +818,223 @@ export default function MosquePage() {
                             )}
 
                             {/* Like and Comment Section */}
-                            <div
-                              className={`flex border-t mt-4 pt-3 ${
-                                isKajian
-                                  ? "border-emerald-200"
-                                  : "border-gray-300"
-                              }`}>
-                              {/* Like Button */}
-                              <button
-                                className={`flex-1 flex items-center justify-center gap-2 py-2 font-semibold focus:outline-none transition-colors ${
-                                  announcement.liked_by_user
-                                    ? "text-blue-600"
-                                    : isKajian
-                                      ? "text-emerald-700 hover:text-emerald-800"
-                                      : "text-gray-600 hover:text-blue-600"
-                                }`}
-                                onClick={() => handleLike(announcement.id)}
-                                disabled={!isLogin}>
-                                <svg
-                                  className="w-5 h-5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  viewBox="0 0 24 24">
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M14 9V5a3 3 0 00-6 0v4M5 15h14a2 2 0 002-2v-5a2 2 0 00-2-2H5a2 2 0 00-2 2v5a2 2 0 002 2z"
-                                  />
-                                </svg>
-                                Like ({announcement.like_count || 0})
-                              </button>
-
-                              {/* Comment Button */}
-                              <button
-                                className={`flex-1 flex items-center justify-center gap-2 py-2 font-semibold focus:outline-none transition-colors ${
+                            {(FEATURES.ENABLE_LIKES ||
+                              FEATURES.ENABLE_COMMENTS) && (
+                              <div
+                                className={`flex border-t mt-4 pt-3 ${
                                   isKajian
-                                    ? "text-emerald-700 hover:text-emerald-800"
-                                    : "text-gray-600 hover:text-blue-600"
-                                }`}
-                                onClick={() => {
-                                  document
-                                    .getElementById(
-                                      `comment-input-${announcement.id}`,
-                                    )
-                                    ?.focus();
-                                }}>
-                                <svg
-                                  className="w-5 h-5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  viewBox="0 0 24 24">
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V10a2 2 0 012-2h2m5-4h-4a2 2 0 00-2 2v4a2 2 0 002 2h4a2 2 0 002-2V6a2 2 0 00-2-2z"
-                                  />
-                                </svg>
-                                Comment ({announcement.comment_count || 0})
-                              </button>
-                            </div>
+                                    ? "border-emerald-200"
+                                    : "border-gray-300"
+                                }`}>
+                                {/* Like Button */}
+                                {FEATURES.ENABLE_LIKES && (
+                                  <button
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2 font-semibold focus:outline-none transition-colors ${
+                                      announcement.liked_by_user
+                                        ? "text-blue-600"
+                                        : isKajian
+                                          ? "text-emerald-700 hover:text-emerald-800"
+                                          : "text-gray-600 hover:text-blue-600"
+                                    }`}
+                                    onClick={() => handleLike(announcement.id)}
+                                    disabled={!isLogin}>
+                                    <svg
+                                      className="w-5 h-5"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24">
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M14 9V5a3 3 0 00-6 0v4M5 15h14a2 2 0 002-2v-5a2 2 0 00-2-2H5a2 2 0 00-2 2v5a2 2 0 002 2z"
+                                      />
+                                    </svg>
+                                    Like ({announcement.like_count || 0})
+                                  </button>
+                                )}
+
+                                {/* Comment Button */}
+                                {FEATURES.ENABLE_COMMENTS && (
+                                  <button
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2 font-semibold focus:outline-none transition-colors ${
+                                      isKajian
+                                        ? "text-emerald-700 hover:text-emerald-800"
+                                        : "text-gray-600 hover:text-blue-600"
+                                    }`}
+                                    onClick={() => {
+                                      document
+                                        .getElementById(
+                                          `comment-input-${announcement.id}`,
+                                        )
+                                        ?.focus();
+                                    }}>
+                                    <svg
+                                      className="w-5 h-5"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24">
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V10a2 2 0 012-2h2m5-4h-4a2 2 0 00-2 2v4a2 2 0 002 2h4a2 2 0 002-2V6a2 2 0 00-2-2z"
+                                      />
+                                    </svg>
+                                    Comment ({announcement.comment_count || 0})
+                                  </button>
+                                )}
+                              </div>
+                            )}
 
                             {/* Comments Section */}
-                            <div
-                              className={`mt-4 border-t pt-3 ${
-                                isKajian
-                                  ? "border-emerald-100"
-                                  : "border-gray-200"
-                              }`}>
-                              {/* Comment Counter */}
-                              <div className="flex items-center mb-3">
-                                <svg
-                                  className="w-5 h-5 text-gray-500 mr-2"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24">
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                                  />
-                                </svg>
-                                <span className="text-gray-600 font-medium">
-                                  {announcement.comment_count || 0} Komentar
-                                </span>
-                              </div>
-
-                              {/* Comment Input */}
-                              <div className="flex gap-2 mb-4">
-                                <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
-                                  <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
-                                    {isLogin ? "U" : "?"}
-                                  </div>
-                                </div>
-
-                                <form
-                                  className="flex-1"
-                                  onSubmit={(e) => {
-                                    e.preventDefault();
-                                    if (!isLogin) {
-                                      alert("Silakan login untuk berkomentar.");
-                                      router.push("/login");
-                                      return;
-                                    }
-                                    handleComment(
-                                      announcement.id,
-                                      commentInput,
-                                      () => setCommentInput(""),
-                                    );
-                                  }}>
-                                  <div className="flex bg-gray-100 rounded-full overflow-hidden">
-                                    <input
-                                      id={`comment-input-${announcement.id}`}
-                                      type="text"
-                                      className="flex-1 bg-transparent border-none px-4 py-2 focus:outline-none text-sm"
-                                      placeholder={
-                                        isLogin
-                                          ? "Tulis komentar..."
-                                          : "Login untuk berkomentar"
-                                      }
-                                      value={commentInput}
-                                      onChange={(e) =>
-                                        setCommentInput(e.target.value)
-                                      }
-                                      disabled={!isLogin}
-                                      onClick={() => {
-                                        if (!isLogin) {
-                                          alert(
-                                            "Silakan login untuk berkomentar.",
-                                          );
-                                          router.push("/login");
-                                        }
-                                      }}
+                            {FEATURES.ENABLE_COMMENTS && (
+                              <div
+                                className={`mt-4 border-t pt-3 ${
+                                  isKajian
+                                    ? "border-emerald-100"
+                                    : "border-gray-200"
+                                }`}>
+                                {/* Comment Counter */}
+                                <div className="flex items-center mb-3">
+                                  <svg
+                                    className="w-5 h-5 text-gray-500 mr-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                                     />
-                                    <button
-                                      type="submit"
-                                      className={`px-4 py-2 text-sm font-medium ${
-                                        !isLogin || !commentInput.trim()
-                                          ? "text-gray-400 cursor-not-allowed"
-                                          : "text-blue-600 hover:text-blue-700"
-                                      }`}
-                                      disabled={
-                                        !isLogin || !commentInput.trim()
-                                      }>
-                                      Kirim
-                                    </button>
-                                  </div>
-                                </form>
-                              </div>
-
-                              {/* Comments Loading State */}
-                              {loadingComments[announcement.id] && (
-                                <div className="flex items-center justify-center py-3 text-black">
-                                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
-                                  <span className="ml-2 text-sm text-gray-500">
-                                    Memuat komentar...
+                                  </svg>
+                                  <span className="text-gray-600 font-medium">
+                                    {announcement.comment_count || 0} Komentar
                                   </span>
                                 </div>
-                              )}
 
-                              {/* Comments List */}
-                              {!loadingComments[announcement.id] &&
-                                comments[announcement.id] &&
-                                (comments[announcement.id].length > 0 ? (
-                                  <div className="space-y-3">
-                                    {comments[announcement.id].map(
-                                      (comment) => (
-                                        <div
-                                          key={comment.id}
-                                          className="flex gap-2">
-                                          {/* Avatar */}
-                                          <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
-                                            <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
-                                              {comment.username
-                                                .charAt(0)
-                                                .toUpperCase()}
-                                            </div>
-                                          </div>
+                                {/* Comment Input */}
+                                <div className="flex gap-2 mb-4">
+                                  <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
+                                    <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
+                                      {isLogin ? "U" : "?"}
+                                    </div>
+                                  </div>
 
-                                          <div>
-                                            {/* Comment Bubble */}
-                                            <div className="bg-gray-100 rounded-2xl px-3 py-2 inline-block max-w-md">
-                                              <div className="font-semibold text-sm">
-                                                {comment.username}
+                                  <form
+                                    className="flex-1"
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      if (!isLogin) {
+                                        alert(
+                                          "Silakan login untuk berkomentar.",
+                                        );
+                                        router.push("/login");
+                                        return;
+                                      }
+                                      handleComment(
+                                        announcement.id,
+                                        commentInput,
+                                        () => setCommentInput(""),
+                                      );
+                                    }}>
+                                    <div className="flex bg-gray-100 rounded-full overflow-hidden">
+                                      <input
+                                        id={`comment-input-${announcement.id}`}
+                                        type="text"
+                                        className="flex-1 bg-transparent border-none px-4 py-2 focus:outline-none text-sm"
+                                        placeholder={
+                                          isLogin
+                                            ? "Tulis komentar..."
+                                            : "Login untuk berkomentar"
+                                        }
+                                        value={commentInput}
+                                        onChange={(e) =>
+                                          setCommentInput(e.target.value)
+                                        }
+                                        disabled={!isLogin}
+                                        onClick={() => {
+                                          if (!isLogin) {
+                                            alert(
+                                              "Silakan login untuk berkomentar.",
+                                            );
+                                            router.push("/login");
+                                          }
+                                        }}
+                                      />
+                                      <button
+                                        type="submit"
+                                        className={`px-4 py-2 text-sm font-medium ${
+                                          !isLogin || !commentInput.trim()
+                                            ? "text-gray-400 cursor-not-allowed"
+                                            : "text-blue-600 hover:text-blue-700"
+                                        }`}
+                                        disabled={
+                                          !isLogin || !commentInput.trim()
+                                        }>
+                                        Kirim
+                                      </button>
+                                    </div>
+                                  </form>
+                                </div>
+
+                                {/* Comments Loading State */}
+                                {loadingComments[announcement.id] && (
+                                  <div className="flex items-center justify-center py-3 text-black">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
+                                    <span className="ml-2 text-sm text-gray-500">
+                                      Memuat komentar...
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Comments List */}
+                                {!loadingComments[announcement.id] &&
+                                  comments[announcement.id] &&
+                                  (comments[announcement.id].length > 0 ? (
+                                    <div className="space-y-3">
+                                      {comments[announcement.id].map(
+                                        (comment) => (
+                                          <div
+                                            key={comment.id}
+                                            className="flex gap-2">
+                                            {/* Avatar */}
+                                            <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden">
+                                              <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
+                                                {comment.username
+                                                  .charAt(0)
+                                                  .toUpperCase()}
                                               </div>
-                                              <p className="text-gray-700 text-sm">
-                                                {comment.content}
-                                              </p>
                                             </div>
-                                            {/* Timestamp */}
-                                            <div className="text-xs text-gray-500 mt-1 ml-2">
-                                              {formatDate(comment.created_at)}
+
+                                            <div>
+                                              {/* Comment Bubble */}
+                                              <div className="bg-gray-100 rounded-2xl px-3 py-2 inline-block max-w-md">
+                                                <div className="font-semibold text-sm">
+                                                  {comment.username}
+                                                </div>
+                                                <p className="text-gray-700 text-sm">
+                                                  {comment.content}
+                                                </p>
+                                              </div>
+                                              {/* Timestamp */}
+                                              <div className="text-xs text-gray-500 mt-1 ml-2">
+                                                {formatDate(comment.created_at)}
+                                              </div>
                                             </div>
                                           </div>
-                                        </div>
-                                      ),
-                                    )}
-                                  </div>
-                                ) : (
-                                  <div className="text-center py-4 text-gray-500">
-                                    Belum ada komentar. Jadilah yang pertama
-                                    berkomentar!
-                                  </div>
-                                ))}
-                            </div>
+                                        ),
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="text-center py-4 text-gray-500">
+                                      Belum ada komentar. Jadilah yang pertama
+                                      berkomentar!
+                                    </div>
+                                  ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -1076,9 +1088,9 @@ export default function MosquePage() {
         </div>
 
         {/* Desktop Chat Sidebar - Fixed positioning */}
-        {/* <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
+        <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
           <ChatSidebar />
-        </div> */}
+        </div>
       </div>
 
       {/* ✅ Fixed Floating Buttons Container - Same as dashboard */}
@@ -1104,7 +1116,7 @@ export default function MosquePage() {
         )}
 
         {/* Mobile Chat Button */}
-        {/* <button
+        <button
           onClick={() => setIsChatSidebarOpen(true)}
           className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group">
           <svg
@@ -1118,22 +1130,22 @@ export default function MosquePage() {
               strokeWidth={2}
               d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
             />
-          </svg> */}
+          </svg>
 
-        {/* Notification Badge */}
-        {/* <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+          {/* Notification Badge */}
+          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
             3
           </div>
-        </button> */}
+        </button>
       </div>
 
       {/* ✅ Mobile Chat Sidebar Modal */}
-      {/* <div className="lg:hidden">
+      <div className="lg:hidden">
         <ChatSidebar
           isOpen={isChatSidebarOpen}
           onClose={() => setIsChatSidebarOpen(false)}
         />
-      </div> */}
+      </div>
     </>
   );
 }

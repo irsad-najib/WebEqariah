@@ -17,15 +17,12 @@ export const FEATURES = {
    * Backend remains intact for future use
    */
   ENABLE_CHAT: false,
-<<<<<<< HEAD
-=======
 
   /**
    * Enable/disable like functionality across the application
    * Backend remains intact for future use
    */
   ENABLE_LIKES: false,
->>>>>>> c40b79b (benerin update)
 } as const;
 
 export type FeatureFlags = typeof FEATURES;
