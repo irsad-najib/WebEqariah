@@ -1,15 +1,16 @@
 "use client";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import type { Announcement, Kitab, Speaker } from "@/lib/types";
 import { buildMonthGrid, toDateKey } from "@/lib/utils/calendarGrid";
 import { useCalendarFilters } from "@/lib/hooks/useCalendarFilters";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { BIDANG_ILMU_OPTIONS } from "@/lib/constants/bidangIlmu";
+import { fetchBidangIlmu, type BidangIlmu } from "@/lib/api/bidangIlmu";
 import { FilterGroup } from "@/components/features/calendar/FilterGroup";
 import { CheckboxList } from "@/components/features/calendar/CheckboxList";
 import { useCalendarData } from "@/lib/hooks/useCalendarData";
+import { axiosInstance } from "@/lib/utils/api";
 
 export default function CalendarPage() {
   return (
@@ -36,6 +37,26 @@ function CalendarPageInner() {
   } = useCalendarFilters();
 
   const { speakers, kitabs, announcements, loading, error } = useCalendarData();
+  const [bidangIlmuOptions, setBidangIlmuOptions] = useState<BidangIlmu[]>([]);
+  const [approvedMosqueIds, setApprovedMosqueIds] =
+    useState<Set<number> | null>(null);
+
+  useEffect(() => {
+    fetchBidangIlmu()
+      .then(setBidangIlmuOptions)
+      .catch((err) => console.error("Failed to load bidang ilmu", err));
+
+    axiosInstance
+      .get("/api/mosque/")
+      .then((res) => {
+        if (res.data && res.data.success && Array.isArray(res.data.data)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const ids = new Set(res.data.data.map((m: any) => m.id));
+          setApprovedMosqueIds(ids as Set<number>);
+        }
+      })
+      .catch((err) => console.error("Failed to load approved mosques", err));
+  }, []);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -56,6 +77,15 @@ function CalendarPageInner() {
     return map;
   }, [speakers]);
 
+  const validAnnouncements = useMemo(() => {
+    if (!announcements) return [];
+    if (!approvedMosqueIds) return []; // Don't show anything until we know which mosques are approved
+    return announcements.filter((a) => {
+      const mId = a.mosque_id || a.mosqueId || a.mosqueInfo?.id;
+      return mId && approvedMosqueIds.has(mId);
+    });
+  }, [announcements, approvedMosqueIds]);
+
   const filteredEvents = useMemo(() => {
     const q = state.q.trim().toLowerCase();
 
@@ -68,13 +98,13 @@ function CalendarPageInner() {
       state.speakerIds
         .map((id) => speakerById.get(id)?.name)
         .filter((v): v is string => Boolean(v))
-        .map((v) => v.toLowerCase())
+        .map((v) => v.toLowerCase()),
     );
 
-    return (announcements || [])
+    return validAnnouncements
       .filter(
         (a) =>
-          (a?.type === "kajian" || !a?.type) && (a?.event_date || a?.eventDate)
+          (a?.type === "kajian" || !a?.type) && (a?.event_date || a?.eventDate),
       )
       .filter((a) => {
         if (!q) return true;
@@ -117,7 +147,7 @@ function CalendarPageInner() {
         return Boolean(bidang) && selectedBidangIlmu.has(bidang as string);
       });
   }, [
-    announcements,
+    validAnnouncements,
     kitabById,
     speakerById,
     state.bidangIlmu,
@@ -132,6 +162,7 @@ function CalendarPageInner() {
     for (const e of filteredEvents) {
       const raw = e.event_date || e.eventDate;
       if (!raw) continue;
+
       const d = new Date(raw);
       if (Number.isNaN(d.getTime())) continue;
       const key = toDateKey(d);
@@ -159,17 +190,17 @@ function CalendarPageInner() {
         month: "long",
         year: "numeric",
       }),
-    [monthDate]
+    [monthDate],
   );
 
   const todayKey = useMemo(() => toDateKey(new Date()), []);
 
   const bidangIlmuItems = useMemo(() => {
     const s = bidangIlmuSearch.trim().toLowerCase();
-    return BIDANG_ILMU_OPTIONS.filter((x) =>
-      s ? x.toLowerCase().includes(s) : true
-    ).map((x) => ({ value: x, label: x }));
-  }, [bidangIlmuSearch]);
+    return bidangIlmuOptions
+      .filter((x) => (s ? x.name.toLowerCase().includes(s) : true))
+      .map((x) => ({ value: x.name, label: x.name }));
+  }, [bidangIlmuSearch, bidangIlmuOptions]);
 
   const speakerItems = useMemo(() => {
     const s = speakerSearch.trim().toLowerCase();
@@ -191,7 +222,7 @@ function CalendarPageInner() {
     const s = masjidSearch.trim().toLowerCase();
     const masjidMap = new Map<number, { id: number; name: string }>();
 
-    for (const a of announcements || []) {
+    for (const a of validAnnouncements || []) {
       const id = a.mosque_id || a.mosqueId || a.mosqueInfo?.id;
       const name = a.mosqueInfo?.name || (a as any)?.mosque?.mosqueName;
       if (id && name && !masjidMap.has(id)) {
@@ -203,23 +234,23 @@ function CalendarPageInner() {
       .filter((m) => (s ? m.name.toLowerCase().includes(s) : true))
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((m) => ({ value: String(m.id), label: m.name }));
-  }, [announcements, masjidSearch]);
+  }, [validAnnouncements, masjidSearch]);
 
   const selectedBidangIlmu = useMemo(
     () => new Set(state.bidangIlmu),
-    [state.bidangIlmu]
+    [state.bidangIlmu],
   );
   const selectedSpeakerIds = useMemo(
     () => new Set(state.speakerIds.map(String)),
-    [state.speakerIds]
+    [state.speakerIds],
   );
   const selectedKitabIds = useMemo(
     () => new Set(state.kitabIds.map(String)),
-    [state.kitabIds]
+    [state.kitabIds],
   );
   const selectedMasjidIds = useMemo(
     () => new Set(state.masjidIds.map(String)),
-    [state.masjidIds]
+    [state.masjidIds],
   );
 
   const filteredMonthEvents = useMemo(() => {
@@ -459,7 +490,7 @@ function CalendarPageInner() {
                                   key={dayKey}
                                   className="rounded-xl border border-gray-200 bg-white p-4">
                                   <div className="flex items-center justify-between">
-                                    <div className="text-sm font-semibold text-gray-900">
+                                    <div className="text-base font-bold text-gray-900">
                                       {label}
                                     </div>
                                     {isToday ? (
@@ -545,7 +576,7 @@ function CalendarPageInner() {
                           ].map((d) => (
                             <div
                               key={d}
-                              className="bg-white px-4 py-2 text-[11px] font-semibold tracking-wide text-gray-700">
+                              className="bg-white px-4 py-2 text-sm font-bold tracking-wide text-gray-800 uppercase text-center">
                               {d}
                             </div>
                           ))}
@@ -579,7 +610,7 @@ function CalendarPageInner() {
                                 <div className="flex items-start justify-between gap-2">
                                   <div
                                     className={
-                                      "text-sm font-semibold leading-none " +
+                                      "text-xl font-bold leading-none " +
                                       (showOutside
                                         ? "text-gray-400"
                                         : "text-gray-900")

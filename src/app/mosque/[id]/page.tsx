@@ -2,7 +2,7 @@
 import { axiosInstance } from "@/lib/utils/api";
 import { useRouter, useParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
-import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
+// import { ChatSidebar } from "@/components/features/chat/ChatSidebar";
 import { useWebSocket } from "@/lib/hooks/useWs";
 import { useToast, ToastContainer } from "@/components/ui/toast";
 import Link from "next/link";
@@ -101,7 +101,7 @@ export default function MosquePage() {
     [key: string]: boolean;
   }>({});
   const [commentInput, setCommentInput] = useState("");
-  const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false); // ✅ Add mobile chat sidebar state
+  // const [isChatSidebarOpen, setIsChatSidebarOpen] = useState(false); // ✅ Add mobile chat sidebar state
   const [showScrollTop, setShowScrollTop] = useState(false); // ✅ Add scroll to top state
 
   const router = useRouter();
@@ -1088,9 +1088,9 @@ export default function MosquePage() {
         </div>
 
         {/* Desktop Chat Sidebar - Fixed positioning */}
-        <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
+        {/* <div className="hidden lg:block fixed top-16 right-0 h-[calc(100vh-4rem)] z-30">
           <ChatSidebar />
-        </div>
+        </div> */}
       </div>
 
       {/* ✅ Fixed Floating Buttons Container - Same as dashboard */}
@@ -1116,7 +1116,7 @@ export default function MosquePage() {
         )}
 
         {/* Mobile Chat Button */}
-        <button
+        {/* <button
           onClick={() => setIsChatSidebarOpen(true)}
           className="lg:hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 group">
           <svg
@@ -1130,22 +1130,22 @@ export default function MosquePage() {
               strokeWidth={2}
               d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
             />
-          </svg>
+          </svg> */}
 
           {/* Notification Badge */}
-          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+          {/* <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
             3
           </div>
-        </button>
+        </button> */}
       </div>
 
       {/* ✅ Mobile Chat Sidebar Modal */}
-      <div className="lg:hidden">
+      {/* <div className="lg:hidden">
         <ChatSidebar
           isOpen={isChatSidebarOpen}
           onClose={() => setIsChatSidebarOpen(false)}
         />
-      </div>
+      </div> */}
     </>
   );
 }
