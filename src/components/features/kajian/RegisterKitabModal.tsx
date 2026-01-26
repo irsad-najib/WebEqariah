@@ -185,7 +185,7 @@ export const RegisterKitabModal: React.FC<RegisterKitabModalProps> = ({
             <label
               htmlFor="pengarang"
               className="block text-sm font-medium text-gray-700 mb-1">
-              Cipta <span className="text-red-500">*</span>
+              Pengarang Kitab <span className="text-red-500">*</span>
             </label>
             <input
               type="text"

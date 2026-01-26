@@ -24,30 +24,20 @@ const Instructions = () => {
 
   const faqItems: FAQItem[] = [
     {
-      question: "How do I register for an account?",
+      question: "Bagaimanakah saya boleh mendaftar untuk akaun?",
       answer:
-        'Click on the "Register" button in the top right corner, fill in your details including username, email, and password, then submit the form.',
+        'Klik butang "Register" di penjuru kanan sebelah atas, isikan butiran anda termasuk nama pengguna, email dan kata laluan, kemudian hantarkan.',
     },
     {
       question:
-        "What's the difference between a user and mosque admin account?",
+        "Apakah perbezaan antara akaun pengguna dan akaun pentadbir masjid?",
       answer:
-        "Regular users can view announcements and participate in community chats. Mosque admins can also create and manage announcements for their mosque.",
+        "Pengguna tetap boleh melihat pengumuman dan menyertai sembang komuniti. Pentadbir masjid juga boleh mencipta dan mengurus pengumuman untuk masjid mereka.",
     },
     {
-      question: "How do I register my mosque?",
+      question: "Bagaimanakah saya boleh mendaftar masjid saya?",
       answer:
-        'Navigate to "Register Mosque" from the menu, fill in all required information about your mosque, and submit for approval by the system administrator.',
-    },
-    {
-      question: "Can I follow multiple mosques?",
-      answer:
-        "Yes! You can follow any number of mosques to receive their announcements and stay connected with multiple communities.",
-    },
-    {
-      question: "Is my data secure?",
-      answer:
-        "Absolutely. We use industry-standard encryption and security practices to protect your personal information and ensure data privacy.",
+        'Navigasi ke "Register Mosque" daripada dashboard, isikan semua maklumat yang diperlukan tentang masjid anda dan serahkan untuk kelulusan pentadbir sistem.',
     },
   ];
 
@@ -74,10 +64,10 @@ const Instructions = () => {
                 <Info className="w-12 h-12" />
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
-                How to Use Eqariah
+                Cara Menggunakan Eqariah
               </h1>
               <p className="text-xl text-blue-100">
-                A comprehensive guide to get you started with our platform
+                Panduan komprehensif untuk anda bermula dengan platform kami
               </p>
             </div>
           </div>
@@ -95,7 +85,7 @@ const Instructions = () => {
                     : "text-gray-600 hover:bg-gray-50"
                 }`}>
                 <User className="w-5 h-5" />
-                For Users
+                Untuk Pengguna
               </button>
               <button
                 onClick={() => setActiveTab("admin")}
@@ -105,7 +95,7 @@ const Instructions = () => {
                     : "text-gray-600 hover:bg-gray-50"
                 }`}>
                 <Building2 className="w-5 h-5" />
-                For Mosque Admins
+                Untuk Pentadbir Masjid
               </button>
             </div>
           </div>
@@ -123,30 +113,29 @@ const Instructions = () => {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-800 mb-3">
-                      Create Your Account
+                      Cipta Akaun Anda
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Start by registering for a free account. You&apos;ll need
-                      to provide:
+                      Mulakan dengan mendaftar untuk akaun. Anda perlu menyediakan:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>A unique username</span>
+                        <span>Nama pengguna yang unik</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Your email address</span>
+                        <span>Alamat email anda</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>A secure password</span>
+                        <span>Kata laluan</span>
                       </li>
                     </ul>
                     <a
                       href="/register"
                       className="inline-block mt-4 text-blue-600 hover:text-blue-700 font-semibold">
-                      Register Now →
+                      Daftar Sekarang
                     </a>
                   </div>
                 </div>
@@ -163,36 +152,36 @@ const Instructions = () => {
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-800 mb-3 flex items-center gap-2">
                       <Bell className="w-6 h-6 text-blue-600" />
-                      View Announcements
+                      Lihat Pengumuman
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Once logged in, you&apos;ll see your dashboard with
-                      announcements from mosques you follow. Each announcement
-                      includes:
+                      Setelah login, anda akan melihat dashboard anda dengan
+                      pengumuman daripada masjid yang anda ikuti. Setiap pengumuman
+                      termasuk:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Title and detailed content</span>
+                        <span>Tajuk dan kandungan terperinci</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Images or media attachments</span>
+                        <span>Imej atau lampiran media</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Date and time of posting</span>
+                        <span>Tarikh dan masa pengeposan</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Mosque information</span>
+                        <span>Maklumat masjid</span>
                       </li>
                     </ul>
                   </div>
                 </div>
               </div>
 
-              {/* Step 3 */}
+              {/* Step 3
               <div className="bg-white rounded-xl shadow-lg p-8">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
@@ -231,7 +220,7 @@ const Instructions = () => {
                     </ul>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Step 4 */}
               <div className="bg-white rounded-xl shadow-lg p-8">
@@ -243,26 +232,21 @@ const Instructions = () => {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-800 mb-3">
-                      Discover Mosques
+                      Cari Masjid
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Browse and connect with mosques in your area:
+                      Layari Masjid:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Visit the mosque list page to see all registered
-                          mosques
+                        Lawati halaman senarai masjid untuk melihat semua masjid berdaftar
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>View detailed information about each mosque</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Follow mosques to receive their updates</span>
+                        <span>Lihat maklumat terperinci tentang setiap masjid</span>
                       </li>
                     </ul>
                   </div>
@@ -284,41 +268,39 @@ const Instructions = () => {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-800 mb-3">
-                      Register Your Mosque
+                      Daftarkan Masjid Anda
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Before creating announcements, you need to register your
-                      mosque:
+                      Sebelum membuat pengumuman, anda perlu mendaftarkan masjid anda:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Navigate to &quot;Register Mosque&quot; in the menu
+                          Navigasi ke &quot;Daftar Masjid&quot; dalam dashboard
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Fill in all required information (name, address,
-                          contact details)
+                        Isi semua maklumat yang diperlukan (nama, alamat, butiran perhubungan)
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Upload a clear image of your mosque</span>
+                        <span>Unggah imej masjid anda</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Wait for admin approval (usually within 24-48 hours)
+                          Tunggu kelulusan admin (biasanya dalam masa 24 jam)
                         </span>
                       </li>
                     </ul>
                     <a
                       href="/register-mosque"
                       className="inline-block mt-4 text-green-600 hover:text-green-700 font-semibold">
-                      Register Mosque →
+                      Daftarkan Masjid →
                     </a>
                   </div>
                 </div>
@@ -334,31 +316,28 @@ const Instructions = () => {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-800 mb-3">
-                      Access Admin Dashboard
+                      Akses Dashboard Pentadbir
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Once your mosque is approved and you&apos;re set as an
-                      admin:
+                      Ketika masjid anda telah diapprove dan anda ditetapkan sebagai pentadbir:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Log in with your mosque admin account credentials
+                          Login dengan kelayakan akaun pentadbir masjid anda
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          You&apos;ll be automatically redirected to your admin
-                          dashboard
+                          Anda akan dialihkan secara automatik ke dashboard pentadbir anda
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          View your mosque&apos;s profile and community
-                          statistics
+                          Lihat profil dan statistik komuniti masjid anda
                         </span>
                       </li>
                     </ul>
@@ -377,37 +356,36 @@ const Instructions = () => {
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-800 mb-3 flex items-center gap-2">
                       <Bell className="w-6 h-6 text-green-600" />
-                      Create Announcements
+                      Lihat profil dan statistik masjid anda
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Share important updates with your community:
+                      Cipta pengumuman untuk komuniti masjid anda:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Click &quot;Create New Announcement&quot; on your
-                          dashboard
+                          Pada Dashboard "Cipta Pengumuman Baharu" akan muncul
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Add a clear, descriptive title</span>
+                        <span>Tambahkan tajuk yang jelas dan deskriptif</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Write your message using the rich text editor
+                          Tulis isi pengumuman anda
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Optionally add images or media</span>
+                        <span>Secara pilihan, tambahkan imej atau media</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Preview and publish to all your followers instantly
+                          Pratonton dan terbitkan dengan klik "Create announcement"
                         </span>
                       </li>
                     </ul>
@@ -416,7 +394,7 @@ const Instructions = () => {
               </div>
 
               {/* Step 4 */}
-              <div className="bg-white rounded-xl shadow-lg p-8">
+              {/* <div className="bg-white rounded-xl shadow-lg p-8">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-xl">
@@ -452,7 +430,7 @@ const Instructions = () => {
                     </ul>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
 
@@ -495,12 +473,12 @@ const Instructions = () => {
           {/* Need Help Section */}
           <div className="max-w-4xl mx-auto mt-16">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-2xl p-12 text-center text-white">
-              <h2 className="text-3xl font-bold mb-4">Still Need Help?</h2>
+              <h2 className="text-3xl font-bold mb-4">Masih Perlukan Bantuan?</h2>
               <p className="text-xl mb-8 text-blue-100">
-                Our support team is here to assist you with any questions
+                Team kami sedia membantu anda dengan sebarang pertanyaan
               </p>
               <a
-                href="mailto:irsad.putra270305@gmail.com"
+                href="mailto:gammanasim@gmail.com"
                 className="inline-block bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors duration-300 shadow-lg">
                 Contact Support
               </a>
