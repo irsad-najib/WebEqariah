@@ -110,7 +110,7 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
       );
 
       if (response.data.success) {
-        setSuccess(response.data.message || "Announcement berhasil diupdate!");
+        setSuccess(response.data.message || "Announcement berjaya diupdate!");
 
         // Call onSuccess callback after 1.5 seconds
         setTimeout(() => {

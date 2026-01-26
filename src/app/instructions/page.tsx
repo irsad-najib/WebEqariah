@@ -475,7 +475,7 @@ const Instructions = () => {
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-2xl p-12 text-center text-white">
               <h2 className="text-3xl font-bold mb-4">Masih Perlukan Bantuan?</h2>
               <p className="text-xl mb-8 text-blue-100">
-                Team kami sedia membantu anda dengan sebarang pertanyaan
+                Tim kami sedia membantu anda dengan sebarang pertanyaan
               </p>
               <a
                 href="mailto:gammanasim@gmail.com"

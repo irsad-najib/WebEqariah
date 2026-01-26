@@ -21,20 +21,14 @@ export const Footer = () => {
       </div>
 
       <div className="flex flex-col justify-center lg:ml-72">
-        <h1 className="py-4 font-bold text-lg lg:text-2xl">Company</h1>
-        <a className="text-gray-300">About us</a>
-        <a className="text-gray-300">Blog</a>
-        <a className="text-gray-300">Contact us</a>
-        <a className="text-gray-300">Pricing</a>
+        <h1 className="py-4 font-bold text-lg lg:text-2xl">Kompeni</h1>
+        <a className="text-gray-300">Tentang Kami</a>
+        <a className="text-gray-300">Hubungi kami</a>
       </div>
 
       <div className="flex flex-col justify-center">
         <h1 className="font-bold py-4 text-lg lg:text-2xl">Support</h1>
-        <a className="text-gray-300">Help center</a>
-        <a className="text-gray-300">Terms and services</a>
-        <a className="text-gray-300">Legal</a>
-        <a className="text-gray-300">Privacy policy</a>
-        <a className="text-gray-300">Status</a>
+        <a className="text-gray-300">Pusat bantuan</a>
       </div>
 
       <div className="flex flex-col justify-center">
@@ -42,7 +36,7 @@ export const Footer = () => {
         <div className="relative">
           <input
             name="email"
-            placeholder="Your email address"
+            placeholder="Email Anda"
             className="bg-gray-500 placeholder-slate-200 rounded py-2 px-4 w-full"
           />
           <button
