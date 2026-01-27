@@ -27,21 +27,15 @@ import {
   Comment,
 } from "@/lib/types";
 
+import { formatDateIndonesian } from "@/lib/utils/dayNames";
+
 /**
  * Format a date string to localized format
  * @param dateString - ISO date string to format
  * @returns Formatted date string in Indonesian locale
  */
 function formatDate(dateString: string | null | undefined): string {
-  if (!dateString) return "-";
-
-  const date = new Date(dateString);
-  return date.toLocaleDateString("id-ID", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return formatDateIndonesian(dateString);
 }
 
 /**
@@ -1132,8 +1126,8 @@ export default function MosquePage() {
             />
           </svg> */}
 
-          {/* Notification Badge */}
-          {/* <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+        {/* Notification Badge */}
+        {/* <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
             3
           </div>
         </button> */}

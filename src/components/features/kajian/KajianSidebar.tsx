@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { axiosInstance } from "@/lib/utils/api";
 import { Calendar, Clock, MapPin, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { formatDateIndonesian } from "@/lib/utils/dayNames";
 
 interface Kajian {
   id: number;
@@ -145,13 +146,7 @@ export const KajianSidebar = () => {
 
                 <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
                   <Calendar className="w-3 h-3" />
-                  <span>
-                    {eventDate.toLocaleDateString("id-ID", {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                    })}
-                  </span>
+                  <span>{formatDateIndonesian(eventDate)}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">

@@ -3,6 +3,11 @@ import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { axiosInstance } from "@/lib/utils/api";
 import { fetchBidangIlmu, type BidangIlmu } from "@/lib/api/bidangIlmu";
+import { SpeakerSelect } from "@/components/features/kajian/SpeakerSelect";
+import { KitabSelect } from "@/components/features/kajian/KitabSelect";
+import { RegisterSpeakerModal } from "@/components/features/kajian/RegisterSpeakerModal";
+import { RegisterKitabModal } from "@/components/features/kajian/RegisterKitabModal";
+import { RegisterBidangIlmuModal } from "@/components/features/kajian/RegisterBidangIlmuModal";
 
 interface EditAnnouncementModalProps {
   isOpen: boolean;
@@ -14,6 +19,7 @@ interface EditAnnouncementModalProps {
     content: string;
     mediaUrl?: string;
     type?: string;
+    speaker_id?: number | null;
     speaker_name?: string | null;
     event_date?: string | null;
     kitab_id?: number | null;
@@ -33,6 +39,7 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
     content: announcement.content || "",
     mediaUrl: announcement.mediaUrl || "",
     type: announcement.type || "",
+    speaker_id: announcement.speaker_id || undefined,
     speaker_name: announcement.speaker_name || "",
     event_date: announcement.event_date || "",
     kitab_id: announcement.kitab_id || undefined,
@@ -44,6 +51,14 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
   const [success, setSuccess] = useState("");
   const [bidangIlmuOptions, setBidangIlmuOptions] = useState<BidangIlmu[]>([]);
   const [loadingBidangIlmu, setLoadingBidangIlmu] = useState(true);
+
+  // Modal states
+  const [isRegisterSpeakerModalOpen, setIsRegisterSpeakerModalOpen] =
+    useState(false);
+  const [isRegisterKitabModalOpen, setIsRegisterKitabModalOpen] =
+    useState(false);
+  const [isRegisterBidangIlmuModalOpen, setIsRegisterBidangIlmuModalOpen] =
+    useState(false);
 
   // Fetch bidang ilmu on mount
   useEffect(() => {
@@ -72,6 +87,7 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
         content: announcement.content || "",
         mediaUrl: announcement.mediaUrl || "",
         type: announcement.type || "",
+        speaker_id: announcement.speaker_id || undefined,
         speaker_name: announcement.speaker_name || "",
         event_date: announcement.event_date || "",
         kitab_id: announcement.kitab_id || undefined,
@@ -213,21 +229,30 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
           {/* Kajian-specific fields */}
           {isKajian && (
             <>
-              {/* Speaker Name */}
+              {/* Speaker Select */}
               <div>
-                <label
-                  htmlFor="speaker_name"
-                  className="block text-sm font-medium text-gray-700 mb-1">
-                  Nama Ustadz
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nama Ustaz
                 </label>
-                <input
-                  type="text"
-                  id="speaker_name"
-                  name="speaker_name"
-                  value={formData.speaker_name}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                <SpeakerSelect
+                  value={formData.speaker_id || undefined}
+                  onChange={(speakerId, speakerName) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      speaker_id: speakerId || undefined,
+                      speaker_name: speakerName,
+                    }));
+                  }}
+                  placeholder="Pilih pemateri..."
                 />
+              </div>
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsRegisterSpeakerModalOpen(true)}
+                  className="text-sm text-green-600 hover:text-green-700 underline">
+                  Ustaz tidak ada? Daftarkan ustaz baru
+                </button>
               </div>
 
               {/* Event Date */}
@@ -251,21 +276,30 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
                 />
               </div>
 
-              {/* Kitab Title */}
+              {/* Kitab Select */}
               <div>
-                <label
-                  htmlFor="kitab_title"
-                  className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Judul Kitab
                 </label>
-                <input
-                  type="text"
-                  id="kitab_title"
-                  name="kitab_title"
-                  value={formData.kitab_title}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                <KitabSelect
+                  value={formData.kitab_id || undefined}
+                  onChange={(kitabId, kitabTitle) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      kitab_id: kitabId || undefined,
+                      kitab_title: kitabTitle,
+                    }));
+                  }}
+                  placeholder="Pilih kitab..."
                 />
+              </div>
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsRegisterKitabModalOpen(true)}
+                  className="text-sm text-green-600 hover:text-green-700 underline">
+                  Kitab tidak ada? Daftarkan kitab baru
+                </button>
               </div>
 
               {/* Bidang Ilmu */}
@@ -293,6 +327,14 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
                     </option>
                   ))}
                 </select>
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsRegisterBidangIlmuModalOpen(true)}
+                    className="text-sm text-green-600 hover:text-green-700 underline">
+                    Bidang Ilmu tidak ada? Daftarkan baru
+                  </button>
+                </div>
               </div>
             </>
           )}
@@ -315,6 +357,41 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
           </div>
         </form>
       </div>
+
+      {/* Registration Modals */}
+      <RegisterSpeakerModal
+        isOpen={isRegisterSpeakerModalOpen}
+        onClose={() => setIsRegisterSpeakerModalOpen(false)}
+        onSuccess={() => {
+          // Refresh data handled by Select component internal fetch or we might want to force refresh?
+          // For now just close, user can search for new speaker
+          setIsRegisterSpeakerModalOpen(false);
+        }}
+      />
+      <RegisterKitabModal
+        isOpen={isRegisterKitabModalOpen}
+        onClose={() => setIsRegisterKitabModalOpen(false)}
+        onSuccess={() => {
+          setIsRegisterKitabModalOpen(false);
+        }}
+      />
+      <RegisterBidangIlmuModal
+        isOpen={isRegisterBidangIlmuModalOpen}
+        onClose={() => setIsRegisterBidangIlmuModalOpen(false)}
+        onSuccess={async () => {
+          // Refresh Bidang Ilmu options
+          try {
+            setLoadingBidangIlmu(true);
+            const data = await fetchBidangIlmu();
+            setBidangIlmuOptions(data);
+          } catch (err) {
+            console.error("Failed to fetch bidang ilmu:", err);
+          } finally {
+            setLoadingBidangIlmu(false);
+          }
+          setIsRegisterBidangIlmuModalOpen(false);
+        }}
+      />
     </div>
   );
 };

@@ -183,6 +183,13 @@ const DashboardPage = () => {
               }
             : null,
           createdAt: ann.createdAt,
+          // Kajian specific fields
+          bidang_ilmu: ann.bidang_ilmu,
+          speaker_id: ann.speaker_id,
+          speaker_name: ann.speaker_name,
+          event_date: ann.event_date,
+          kitab_id: ann.kitab_id,
+          kitab_title: ann.kitab_title,
         })) || [];
       setAnnouncements(sortAnnouncementsByLatestId(transformedAnnouncements));
     } catch (error) {

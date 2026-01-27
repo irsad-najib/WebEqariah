@@ -83,7 +83,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
   }, [isOpen, mosqueData, setPreview]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -116,7 +116,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
             headers: {
               "Content-Type": "multipart/form-data",
             },
-          }
+          },
         );
 
         if (uploadResponse.data.success) {
@@ -133,8 +133,8 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
       };
 
       const response = await axiosInstance.put(
-        `/api/mosques/${mosqueData.id}`,
-        updateData
+        `/api/mosque/${mosqueData.id}`,
+        updateData,
       );
 
       if (response.data.success) {
@@ -155,7 +155,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
     } catch (err: any) {
       console.error("Error updating mosque:", err);
       setError(
-        err.response?.data?.error || err.message || "Failed to update mosque"
+        err.response?.data?.error || err.message || "Failed to update mosque",
       );
     } finally {
       setLoading(false);
