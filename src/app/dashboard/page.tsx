@@ -151,9 +151,7 @@ const DashboardPage = () => {
   // Fetch announcements function - moved out of useEffect for reusability
   const fetchAnnouncements = async () => {
     try {
-      const response = await axiosInstance.get(`/api/announcement`, {
-        withCredentials: true,
-      });
+      const response = await axiosInstance.get(`/api/announcement`);
       const transformedAnnouncements =
         response.data?.map((ann: Announcement) => ({
           id: ann.id,
@@ -197,6 +195,54 @@ const DashboardPage = () => {
     }
   };
 
+  // Fetch announcements filtered by mosque id (for mosque_admin)
+  const fetchAnnouncementsByMosque = async (mosqueId: number) => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/announcement/mosque/${mosqueId}`,
+      );
+      const transformedAnnouncements =
+        response.data?.map((ann: Announcement) => ({
+          id: ann.id,
+          title: ann.title,
+          content: ann.content,
+          url: ann.media_url || null,
+          type: ann.type || "announcement",
+          mosqueId: ann.mosque_id,
+          author_id: ann.author_id || ann.authorId,
+          author_name:
+            ann.author_name ||
+            ann.userInfo?.username ||
+            ann.mosqueInfo?.name ||
+            "Unknown",
+          like_count: ann.like_count || 0,
+          comment_count: ann.comment_count || 0,
+          mosqueInfo: {
+            id: ann.mosque_id,
+            name: ann.mosqueInfo?.name,
+            image: ann.mosqueInfo?.image || null,
+          },
+          userInfo: ann.userInfo
+            ? {
+                id: ann.userInfo.id,
+                username: ann.userInfo.username,
+                email: ann.userInfo.email,
+              }
+            : null,
+          createdAt: ann.createdAt,
+          bidang_ilmu: ann.bidang_ilmu,
+          speaker_id: ann.speaker_id,
+          speaker_name: ann.speaker_name,
+          event_date: ann.event_date,
+          kitab_id: ann.kitab_id,
+          kitab_title: ann.kitab_title,
+        })) || [];
+      setAnnouncements(sortAnnouncementsByLatestId(transformedAnnouncements));
+    } catch (error) {
+      console.log("error fetching announcements by mosque", error);
+    }
+  };
+
   useEffect(() => {
     const authsession = async () => {
       try {
@@ -210,23 +256,23 @@ const DashboardPage = () => {
           setAffiliatedMosqueId(auth.data.user.affiliated_mosque_id);
           if (auth.data.user.role === "admin") {
             router.replace("/adminDashboard");
+          } else if (
+            auth.data.user.role === "mosque_admin" &&
+            auth.data.user.affiliated_mosque_id
+          ) {
+            // Mosque admin only sees announcements from their mosque
+            fetchAnnouncementsByMosque(auth.data.user.affiliated_mosque_id);
           } else {
             fetchAnnouncements();
           }
         } else {
-          warning(
-            "Sila login dahulu",
-            "Anda perlu login untuk mengakses halaman ini",
-          );
-          setTimeout(() => router.replace("/login"), 1500);
+          // Not logged in — show all announcements publicly
+          fetchAnnouncements();
         }
       } catch (errr) {
         console.log(errr);
-        warning(
-          "Sila login dahulu",
-          "Anda perlu login untuk mengakses halaman ini",
-        );
-        setTimeout(() => router.replace("/login"), 1500);
+        // Auth check failed — show all announcements publicly
+        fetchAnnouncements();
       }
     };
 
