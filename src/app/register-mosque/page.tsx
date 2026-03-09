@@ -316,7 +316,7 @@ const RegisterMosque = () => {
 
                 <div>
                   <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                    Nombor Talifon
+                    Nombor Telefon
                   </label>
                   <input
                     type="tel"
@@ -326,7 +326,7 @@ const RegisterMosque = () => {
                     className={`shadow appearance-none border rounded w-full py-[2%] lg:py-2 px-[3%] lg:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline${
                       errors.contactPhone ? "border-red-500" : "border-gray-300"
                     }`}
-                    placeholder="Masukkan Nombor Talifon"
+                    placeholder="Masukkan Nombor Telefon"
                   />
                   {errors.contactPhone && (
                     <p className="text-red-500 text-sm mt-1">
@@ -362,7 +362,7 @@ const RegisterMosque = () => {
 
                   <div>
                     <label className="block text-gray-700 text-[3.5vw] md:text-[2.5vw] lg:text-base font-bold mb-[1%] lg:mb-1">
-                      Alamat Baris 2 (Opsional)
+                      Alamat Baris 2 (Tidak Wajib)
                     </label>
                     <input
                       type="text"

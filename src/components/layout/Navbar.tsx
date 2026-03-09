@@ -74,7 +74,7 @@ const mainNavLinks = [
   },
   {
     href: "/ustadz",
-    children: "Ustadz",
+    children: "Ustaz",
     icon: (
       <svg width="20" height="20" fill="none" stroke="currentColor">
         <path
