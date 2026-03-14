@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { EditProfileModal } from "@/components/features/profile/EditProfileModal";
 import { EditMosqueModal } from "@/components/features/mosque/EditMosqueModal";
 import { Edit, User as UserIcon } from "lucide-react";
+import { ToastContainer, useToast } from "@/components/ui/toast";
+import { handleError } from "@/lib/utils/errorHandler";
 
 interface MosqueData {
   id: number;
@@ -212,6 +214,124 @@ const MosqueSettings = ({
   );
 };
 
+const PasswordSettings = () => {
+  const { toasts, closeToast, success, error } = useToast();
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (newPassword.length < 8) {
+      error("Ralat", "Password minimal 8 karakter");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      error("Ralat", "Password tidak sama");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await axiosInstance.post(
+        "/api/auth/change-password",
+        {
+          current_password: currentPassword,
+          new_password: newPassword,
+        },
+        { withCredentials: true },
+      );
+
+      if (res.data?.success) {
+        success("Berjaya", "Password berjaya dikemaskini");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        error("Gagal", res.data?.message || "Gagal kemaskini password");
+      }
+    } catch (err) {
+      const appError = handleError(err);
+      error(
+        appError.message,
+        appError.description || "Gagal kemaskini password",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <ToastContainer toasts={toasts} onClose={closeToast} />
+      <div className="bg-gray-200 text-black p-8 h-full">
+        <h1 className="text-3xl font-bold mb-6">Tukar Password</h1>
+        <div className="bg-white rounded-lg shadow-md p-6 max-w-xl">
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Password semasa
+              </label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                placeholder="Masukkan password semasa"
+                disabled={saving}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Jika akaun anda login Google dan belum ada password, boleh
+                biarkan kosong.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Password baru
+              </label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                placeholder="Minimum 8 karakter"
+                disabled={saving}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Sahkan password baru
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                placeholder="Ulang password baru"
+                disabled={saving}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-300 w-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg">
+              {saving ? "Menyimpan..." : "Kemaskini Password"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+};
+
 const Profile = () => {
   const [activePage, setActivePage] = useState<string>("Settings");
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
@@ -284,6 +404,8 @@ const Profile = () => {
             onEdit={() => setIsMosqueModalOpen(true)}
           />
         );
+      case "Password":
+        return <PasswordSettings />;
       case "Settings":
         return (
           <Settings
@@ -355,6 +477,16 @@ const Profile = () => {
               }`}
               onClick={() => setActivePage("Settings")}>
               Settings
+            </li>
+
+            <li
+              className={`hover:bg-gray-300 hover:px-20 hover:py-4 cursor-pointer transition-all ${
+                activePage === "Password"
+                  ? "border rounded-lg bg-gray-300 px-20 py-4 items-center"
+                  : ""
+              }`}
+              onClick={() => setActivePage("Password")}>
+              Password
             </li>
             {isMosqueAdmin && profileData?.mosque && (
               <li
