@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -8,7 +8,7 @@ import { ToastContainer, useToast } from "@/components/ui/toast";
 import { axiosInstance } from "@/lib/utils/api";
 import { handleError } from "@/lib/utils/errorHandler";
 
-const ResetPasswordPage = () => {
+const ResetPasswordContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toasts, closeToast, success, error } = useToast();
@@ -134,6 +134,19 @@ const ResetPasswordPage = () => {
       </div>
       <Footer />
     </>
+  );
+};
+
+const ResetPasswordPage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 };
 
