@@ -183,14 +183,14 @@ const Login = () => {
                   )}
                 </button>
               </form>
-              <p className="mt-6 text-center">
+              {/* <p className="mt-6 text-center">
                 <a
                   href="/forgot-password"
                   className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors">
                   Lupa kata laluan?
                 </a>
-              </p>
-              <div className="text-center mt-6">
+              </p> */}
+              {/* <div className="text-center mt-6">
                 <p className="text-gray-600 text-sm mb-3">
                   Tidak mempunyai akaun?
                 </p>
@@ -199,7 +199,7 @@ const Login = () => {
                   className="inline-block bg-gray-100 hover:bg-gray-200 text-green-600 font-bold py-2.5 px-6 rounded-lg transition-all duration-200 border-2 border-green-600">
                   Cipta akaun baharu
                 </a>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

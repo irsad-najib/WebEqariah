@@ -126,7 +126,7 @@ const mainNavLinks = [
   },
   {
     href: "/register-mosque",
-    children: "Register Masjid",
+    children: "Daftar Masjid",
     icon: (
       <svg
         width="20"
