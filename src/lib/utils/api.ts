@@ -15,7 +15,7 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
   ): Promise<ApiResponse<T>> {
     try {
       const { token } = authCookies.getAuthData();
@@ -105,7 +105,7 @@ class ApiClient {
   // File upload method
   async uploadFile<T>(
     endpoint: string,
-    formData: FormData
+    formData: FormData,
   ): Promise<ApiResponse<T>> {
     try {
       const { token } = authCookies.getAuthData();
@@ -161,6 +161,7 @@ export const apiClient = new ApiClient();
 // Configure axios instance with timeout and size limits for video uploads
 export const axiosInstance = axios.create({
   baseURL: "https://api.eqariah.com",
+  // baseURL: "http://localhost:5000",
   withCredentials: true,
   timeout: 300000, // 5 minutes timeout for large video uploads
   maxContentLength: 100 * 1024 * 1024, // 100 MB max content length
@@ -186,7 +187,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 // ========== AUTH API ==========
@@ -195,7 +196,7 @@ export const authApi = {
   login: async (credentials: { identifier: string; password: string }) => {
     const response = await apiClient.post<{ token: string; user: User }>(
       "/api/auth/login",
-      credentials
+      credentials,
     );
 
     // Set cookies kalau berhasil
@@ -304,7 +305,7 @@ export const announcementApi = {
   // Update announcement
   update: async (
     id: string | number,
-    announcementData: Partial<Announcement>
+    announcementData: Partial<Announcement>,
   ) => {
     return apiClient.put(`/api/announcement/${id}`, announcementData);
   },

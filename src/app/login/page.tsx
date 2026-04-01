@@ -40,7 +40,10 @@ const Login = () => {
     }
 
     if (formData.password.length < 6) {
-      error("Ralat Pengesahan", "Password mestilah sekurang-kurangnya 6 aksara");
+      error(
+        "Ralat Pengesahan",
+        "Password mestilah sekurang-kurangnya 6 aksara",
+      );
       setLoading(false);
       return;
     }
@@ -56,7 +59,7 @@ const Login = () => {
 
         success(
           "Login Berjaya!",
-          "Selamat kembali! Menghala ke papan pemuka..."
+          "Selamat kembali! Menghala ke papan pemuka...",
         );
 
         // Delay redirect to show success message - loading tetap true selama redirect
@@ -67,7 +70,7 @@ const Login = () => {
         // Jangan redirect, hanya tampilkan error
         error(
           "Login Gagal",
-          response.data.message || "Kelayakan tidak sah. Sila cuba lagi."
+          response.data.message || "Kelayakan tidak sah. Sila cuba lagi.",
         );
         setLoading(false);
       }
@@ -78,7 +81,7 @@ const Login = () => {
       // Jangan redirect, hanya tampilkan error message
       error(
         appError.message,
-        appError.description || "Sila semak kelayakan dan cuba lagi."
+        appError.description || "Sila semak kelayakan dan cuba lagi.",
       );
       setLoading(false);
     }
@@ -96,7 +99,8 @@ const Login = () => {
               Eqariah
             </h1>
             <p className="text-gray-700 text-[4vw] md:text-[3vw] lg:text-xl mt-4 animate-fade-in-delay">
-              Eqariah membantu anda berhubung dan berkongsi dengan semua umat Islam di dunia.
+              Eqariah membantu anda berhubung dan berkongsi dengan semua umat
+              Islam di dunia.
             </p>
           </div>
           {/* Right Section (Login Box) */}
@@ -181,7 +185,7 @@ const Login = () => {
               </form>
               <p className="mt-6 text-center">
                 <a
-                  href="#"
+                  href="/forgot-password"
                   className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors">
                   Lupa kata laluan?
                 </a>

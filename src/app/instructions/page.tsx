@@ -116,7 +116,8 @@ const Instructions = () => {
                       Cipta Akaun Anda
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Mulakan dengan mendaftar untuk akaun. Anda perlu menyediakan:
+                      Mulakan dengan mendaftar untuk akaun. Anda perlu
+                      menyediakan:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
@@ -156,8 +157,8 @@ const Instructions = () => {
                     </h3>
                     <p className="text-gray-600 mb-4">
                       Setelah login, anda akan melihat dashboard anda dengan
-                      pengumuman daripada masjid yang anda ikuti. Setiap pengumuman
-                      termasuk:
+                      pengumuman daripada masjid yang anda ikuti. Setiap
+                      pengumuman termasuk:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
@@ -234,19 +235,20 @@ const Instructions = () => {
                     <h3 className="text-2xl font-bold text-gray-800 mb-3">
                       Cari Masjid
                     </h3>
-                    <p className="text-gray-600 mb-4">
-                      Layari Masjid:
-                    </p>
+                    <p className="text-gray-600 mb-4">Layari Masjid:</p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                        Lawati halaman senarai masjid untuk melihat semua masjid berdaftar
+                          Lawati halaman senarai masjid untuk melihat semua
+                          masjid berdaftar
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Lihat maklumat terperinci tentang setiap masjid</span>
+                        <span>
+                          Lihat maklumat terperinci tentang setiap masjid
+                        </span>
                       </li>
                     </ul>
                   </div>
@@ -271,7 +273,8 @@ const Instructions = () => {
                       Daftarkan Masjid Anda
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Sebelum membuat pengumuman, anda perlu mendaftarkan masjid anda:
+                      Sebelum membuat pengumuman, anda perlu mendaftarkan masjid
+                      anda:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
@@ -283,7 +286,8 @@ const Instructions = () => {
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                        Isi semua maklumat yang diperlukan (nama, alamat, butiran perhubungan)
+                          Isi semua maklumat yang diperlukan (nama, alamat,
+                          butiran perhubungan)
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
@@ -319,7 +323,8 @@ const Instructions = () => {
                       Akses Dashboard Pentadbir
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Ketika masjid anda telah diapprove dan anda ditetapkan sebagai pentadbir:
+                      Ketika masjid anda telah diapprove dan anda ditetapkan
+                      sebagai pentadbir:
                     </p>
                     <ul className="space-y-2 text-gray-600">
                       <li className="flex items-start gap-2">
@@ -331,7 +336,8 @@ const Instructions = () => {
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Anda akan dialihkan secara automatik ke dashboard pentadbir anda
+                          Anda akan dialihkan secara automatik ke dashboard
+                          pentadbir anda
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
@@ -365,7 +371,8 @@ const Instructions = () => {
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Pada Dashboard "Cipta Pengumuman Baharu" akan muncul
+                          Pada Dashboard &quot;Cipta Pengumuman Baharu&quot;
+                          akan muncul
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
@@ -374,9 +381,7 @@ const Instructions = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>
-                          Tulis isi pengumuman anda
-                        </span>
+                        <span>Tulis isi pengumuman anda</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
@@ -385,7 +390,8 @@ const Instructions = () => {
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>
-                          Pratonton dan terbitkan dengan klik "Create announcement"
+                          Pratonton dan terbitkan dengan klik &quot;Create
+                          announcement&quot;
                         </span>
                       </li>
                     </ul>
@@ -473,7 +479,9 @@ const Instructions = () => {
           {/* Need Help Section */}
           <div className="max-w-4xl mx-auto mt-16">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-2xl p-12 text-center text-white">
-              <h2 className="text-3xl font-bold mb-4">Masih Perlukan Bantuan?</h2>
+              <h2 className="text-3xl font-bold mb-4">
+                Masih Perlukan Bantuan?
+              </h2>
               <p className="text-xl mb-8 text-blue-100">
                 Tim kami sedia membantu anda dengan sebarang pertanyaan
               </p>
