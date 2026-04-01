@@ -301,7 +301,7 @@ function CalendarPageInner() {
                   Kalendar
                 </h1>
                 <p className="mt-1 text-sm text-gray-600">
-                  Tapis kajian berdasarkan bidang ilmu, ustadz, dan kitab.
+                  Tapis kajian berdasarkan bidang ilmu, ustaz, dan kitab.
                 </p>
 
                 <div className="mt-5 space-y-5">
@@ -312,7 +312,7 @@ function CalendarPageInner() {
                     <input
                       value={state.q}
                       onChange={(e) => setQ(e.target.value)}
-                      placeholder="Cari judul, ustadz, masjid..."
+                      placeholder="Cari judul, ustaz, masjid..."
                       className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
@@ -339,11 +339,11 @@ function CalendarPageInner() {
                   </FilterGroup>
 
                   <FilterGroup
-                    title="Ustadz"
+                    title="Ustaz"
                     selectedCount={state.speakerIds.length}
                     searchValue={speakerSearch}
                     onSearchChange={setSpeakerSearch}
-                    searchPlaceholder="Cari ustadz...">
+                    searchPlaceholder="Cari ustaz...">
                     <CheckboxList
                       items={speakerItems}
                       selectedValues={selectedSpeakerIds}
@@ -352,7 +352,7 @@ function CalendarPageInner() {
                         if (Number.isFinite(id)) toggleSpeakerId(id);
                       }}
                       emptyLabel={
-                        loading ? "Loading ustadz..." : "Tidak ada ustadz."
+                        loading ? "Loading ustaz..." : "Tidak ada ustaz."
                       }
                     />
                     {state.speakerIds.length > 0 ? (
@@ -360,7 +360,7 @@ function CalendarPageInner() {
                         type="button"
                         onClick={() => setSpeakerIds([])}
                         className="mt-2 text-xs font-medium text-gray-600 hover:text-gray-900">
-                        Clear ustadz
+                        Clear ustaz
                       </button>
                     ) : null}
                   </FilterGroup>
@@ -723,7 +723,7 @@ function CalendarPageInner() {
                     Tapis
                   </div>
                   <div className="text-xs text-gray-600">
-                    Susun bidang ilmu, ustadz, dan kitab
+                    Susun bidang ilmu, ustaz, dan kitab
                   </div>
                 </div>
                 <button
@@ -742,7 +742,7 @@ function CalendarPageInner() {
                   <input
                     value={state.q}
                     onChange={(e) => setQ(e.target.value)}
-                    placeholder="Cari judul, ustadz, masjid..."
+                    placeholder="Cari judul, ustaz, masjid..."
                     className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -770,11 +770,11 @@ function CalendarPageInner() {
                   </FilterGroup>
 
                   <FilterGroup
-                    title="Ustadz"
+                    title="Ustaz"
                     selectedCount={state.speakerIds.length}
                     searchValue={speakerSearch}
                     onSearchChange={setSpeakerSearch}
-                    searchPlaceholder="Cari ustadz...">
+                    searchPlaceholder="Cari ustaz...">
                     <CheckboxList
                       items={speakerItems}
                       selectedValues={selectedSpeakerIds}
@@ -783,7 +783,7 @@ function CalendarPageInner() {
                         if (Number.isFinite(id)) toggleSpeakerId(id);
                       }}
                       emptyLabel={
-                        loading ? "Loading ustadz..." : "Tidak ada ustadz."
+                        loading ? "Loading ustaz..." : "Tidak ada ustaz."
                       }
                     />
                     {state.speakerIds.length > 0 ? (
@@ -791,7 +791,7 @@ function CalendarPageInner() {
                         type="button"
                         onClick={() => setSpeakerIds([])}
                         className="mt-2 text-xs font-medium text-gray-600 hover:text-gray-900">
-                        Clear ustadz
+                        Clear ustaz
                       </button>
                     ) : null}
                   </FilterGroup>
