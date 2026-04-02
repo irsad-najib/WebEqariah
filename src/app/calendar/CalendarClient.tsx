@@ -144,7 +144,7 @@ export function CalendarClient() {
   const grid = useMemo(() => buildMonthGrid(monthDate), [monthDate]);
   const monthLabel = useMemo(
     () =>
-      monthDate.toLocaleDateString("id-ID", {
+      monthDate.toLocaleDateString("ms-MY", {
         month: "long",
         year: "numeric",
       }),
@@ -388,7 +388,7 @@ export function CalendarClient() {
                                 .split("-")
                                 .map((v) => Number.parseInt(v, 10));
                               const d = new Date(yy, (mm || 1) - 1, dd || 1);
-                              const label = d.toLocaleDateString("id-ID", {
+                              const label = d.toLocaleDateString("ms-MY", {
                                 weekday: "long",
                                 day: "2-digit",
                                 month: "long",
