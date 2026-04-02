@@ -566,13 +566,13 @@ function CalendarPageInner() {
                         {/* Weekday header row (fixed height) */}
                         <div className="grid grid-cols-7 gap-px bg-gray-200">
                           {[
-                            "Ahd",
-                            "Isn",
-                            "Sel",
-                            "Rab",
-                            "Kam",
-                            "Jum",
-                            "Sab",
+                            "Ahad",
+                            "Isnin",
+                            "Selasa",
+                            "Rabu",
+                            "Khamis",
+                            "Jumaat",
+                            "Sabtu",
                           ].map((d) => (
                             <div
                               key={d}
