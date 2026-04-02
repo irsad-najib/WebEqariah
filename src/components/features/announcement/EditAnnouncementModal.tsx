@@ -9,6 +9,40 @@ import { RegisterSpeakerModal } from "@/components/features/kajian/RegisterSpeak
 import { RegisterKitabModal } from "@/components/features/kajian/RegisterKitabModal";
 import { RegisterBidangIlmuModal } from "@/components/features/kajian/RegisterBidangIlmuModal";
 
+const pad2 = (value: number) => String(value).padStart(2, "0");
+
+const isDateTimeLocalValue = (value: string) =>
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value);
+
+// Convert ISO/RFC3339 string (usually UTC from DB) into a datetime-local value in the user's timezone.
+const toDateTimeLocalValue = (value?: string | null) => {
+  if (!value) return "";
+  if (isDateTimeLocalValue(value)) return value;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(
+    date.getDate(),
+  )}T${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+};
+
+// Convert a datetime-local value (user timezone) into RFC3339 UTC string for the API.
+const dateTimeLocalValueToUtcIso = (value?: string | null) => {
+  if (!value) return "";
+  if (!isDateTimeLocalValue(value)) {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+  }
+
+  const [datePart, timePart] = value.split("T");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hour, minute] = timePart.split(":").map(Number);
+
+  const date = new Date(year, month - 1, day, hour, minute);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+};
+
 interface EditAnnouncementModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -41,7 +75,7 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
     type: announcement.type || "",
     speaker_id: announcement.speaker_id || undefined,
     speaker_name: announcement.speaker_name || "",
-    event_date: announcement.event_date || "",
+    event_date: toDateTimeLocalValue(announcement.event_date) || "",
     kitab_id: announcement.kitab_id || undefined,
     kitab_title: announcement.kitab_title || "",
     bidang_ilmu: announcement.bidang_ilmu || "",
@@ -89,7 +123,7 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
         type: announcement.type || "",
         speaker_id: announcement.speaker_id || undefined,
         speaker_name: announcement.speaker_name || "",
-        event_date: announcement.event_date || "",
+        event_date: toDateTimeLocalValue(announcement.event_date) || "",
         kitab_id: announcement.kitab_id || undefined,
         kitab_title: announcement.kitab_title || "",
         bidang_ilmu: announcement.bidang_ilmu || "",
@@ -117,9 +151,14 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
     setSuccess("");
 
     try {
+      const payload = { ...formData };
+      if (payload.type === "kajian" && payload.event_date) {
+        payload.event_date = dateTimeLocalValueToUtcIso(payload.event_date);
+      }
+
       const response = await axiosInstance.put(
         `/api/announcement/${announcement.id}`,
-        formData,
+        payload,
         {
           withCredentials: true,
         },
@@ -266,11 +305,7 @@ export const EditAnnouncementModal: React.FC<EditAnnouncementModalProps> = ({
                   type="datetime-local"
                   id="event_date"
                   name="event_date"
-                  value={
-                    formData.event_date
-                      ? new Date(formData.event_date).toISOString().slice(0, 16)
-                      : ""
-                  }
+                  value={formData.event_date}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
