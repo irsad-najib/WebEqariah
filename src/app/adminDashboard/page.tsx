@@ -81,7 +81,8 @@ const Pagination: React.FC<PaginationProps> = ({
         currentPage === 1
           ? "bg-gray-200 cursor-not-allowed"
           : "bg-gray-100 hover:bg-gray-200"
-      }`}>
+      }`}
+    >
       <ChevronLeft size={16} />
     </button>
     <span className="px-3 py-1">
@@ -94,7 +95,8 @@ const Pagination: React.FC<PaginationProps> = ({
         currentPage === totalPages || totalPages === 0
           ? "bg-gray-200 cursor-not-allowed"
           : "bg-gray-100 hover:bg-gray-200"
-      }`}>
+      }`}
+    >
       <ChevronRight size={16} />
     </button>
   </div>
@@ -576,7 +578,8 @@ const AdminDashboard: React.FC = () => {
               {columns.map((col) => (
                 <th
                   key={col}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   {col}
                 </th>
               ))}
@@ -591,7 +594,8 @@ const AdminDashboard: React.FC = () => {
                 <React.Fragment
                   key={String(
                     (item as Record<string, unknown>)?.id ?? Math.random(),
-                  )}>
+                  )}
+                >
                   <tr
                     key={String(
                       (item as Record<string, unknown>)?.id ?? Math.random(),
@@ -604,7 +608,8 @@ const AdminDashboard: React.FC = () => {
                           ? null
                           : String((item as Record<string, unknown>)?.id ?? ""),
                       )
-                    }>
+                    }
+                  >
                     {columns.map((col) => {
                       const value = getCellValue(item, col);
                       const isLongContent =
@@ -614,7 +619,8 @@ const AdminDashboard: React.FC = () => {
                         <td
                           key={col}
                           className="px-3 py-2 text-sm text-gray-500"
-                          title={isLongContent ? value : ""}>
+                          title={isLongContent ? value : ""}
+                        >
                           <div className="truncate max-w-xs">{value}</div>
                         </td>
                       );
@@ -636,7 +642,8 @@ const AdminDashboard: React.FC = () => {
                                   (item as Record<string, unknown>)?.id ?? "",
                                 ),
                               );
-                            }}>
+                            }}
+                          >
                             {(item as Record<string, unknown>)?.status ===
                             "APPROVED"
                               ? "Unapprove"
@@ -645,7 +652,8 @@ const AdminDashboard: React.FC = () => {
                         )}
                         <button
                           className="text-blue-600 hover:text-blue-900"
-                          onClick={(e) => e.stopPropagation()}>
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <Edit size={16} />
                         </button>
                         <button
@@ -670,7 +678,8 @@ const AdminDashboard: React.FC = () => {
                                     ),
                               e,
                             )
-                          }>
+                          }
+                        >
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -681,20 +690,19 @@ const AdminDashboard: React.FC = () => {
                     <tr>
                       <td
                         colSpan={columns.length + 1}
-                        className="px-3 py-2 bg-gray-50">
+                        className="px-3 py-2 bg-gray-50"
+                      >
                         <div className="p-2">
                           {columns.map((col) => {
                             const value = getCellValue(item, col);
-                            return value &&
-                              typeof value === "string" &&
-                              value.length > 50 ? (
+                            return (
                               <div key={col} className="mb-2">
                                 <span className="font-medium">{col}: </span>
-                                <span className="whitespace-pre-wrap">
-                                  {value}
+                                <span className="whitespace-pre-wrap break-words">
+                                  {value || "-"}
                                 </span>
                               </div>
-                            ) : null;
+                            );
                           })}
                         </div>
                       </td>
@@ -706,7 +714,8 @@ const AdminDashboard: React.FC = () => {
               <tr>
                 <td
                   colSpan={columns.length + 1}
-                  className="px-6 py-4 text-center text-sm text-gray-500">
+                  className="px-6 py-4 text-center text-sm text-gray-500"
+                >
                   {searchTerm
                     ? `No ${type} match your search criteria`
                     : `No ${type} found`}
@@ -721,7 +730,7 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="bg-gray-100 min-h-screen p-6 text-gray-500">
       {isAuthenticated && isLogin === true && userRole === "admin" && (
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto">
           <header className="bg-white p-6 rounded-lg shadow mb-6 flex justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-800">
@@ -731,7 +740,8 @@ const AdminDashboard: React.FC = () => {
             </div>
             <button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+            >
               Logout
             </button>
           </header>
@@ -751,7 +761,7 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
+          {/* <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
             <div className="bg-white rounded-lg shadow p-5">
               <p className="text-sm text-gray-500 mb-1">
                 Total Likes di Semua Pengumuman
@@ -768,7 +778,7 @@ const AdminDashboard: React.FC = () => {
                 {totalAnnouncementComments.toLocaleString()}
               </p>
             </div>
-          </div>
+          </div> */}
 
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
@@ -785,7 +795,8 @@ const AdminDashboard: React.FC = () => {
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
-                  onClick={() => setActiveTab("users")}>
+                  onClick={() => setActiveTab("users")}
+                >
                   Users
                 </button>
                 <button
@@ -794,7 +805,8 @@ const AdminDashboard: React.FC = () => {
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
-                  onClick={() => setActiveTab("announcements")}>
+                  onClick={() => setActiveTab("announcements")}
+                >
                   Announcements
                 </button>
                 <button
@@ -803,7 +815,8 @@ const AdminDashboard: React.FC = () => {
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
-                  onClick={() => setActiveTab("mosque")}>
+                  onClick={() => setActiveTab("mosque")}
+                >
                   Mosque
                 </button>
                 <button
@@ -812,7 +825,8 @@ const AdminDashboard: React.FC = () => {
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
-                  onClick={() => setActiveTab("speakers")}>
+                  onClick={() => setActiveTab("speakers")}
+                >
                   Speakers
                 </button>
                 <button
@@ -821,7 +835,8 @@ const AdminDashboard: React.FC = () => {
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
-                  onClick={() => setActiveTab("kitab")}>
+                  onClick={() => setActiveTab("kitab")}
+                >
                   Kitab
                 </button>
                 <button
@@ -830,7 +845,8 @@ const AdminDashboard: React.FC = () => {
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
-                  onClick={() => setActiveTab("bidang_ilmu")}>
+                  onClick={() => setActiveTab("bidang_ilmu")}
+                >
                   Bidang Ilmu
                 </button>
               </div>
@@ -851,7 +867,10 @@ const AdminDashboard: React.FC = () => {
                 ) : (
                   <>
                     {renderTable(
-                      filteredUsers || [],
+                      (filteredUsers || []).slice(
+                        (currentUserPage - 1) * itemsPerPage,
+                        currentUserPage * itemsPerPage,
+                      ),
                       ["username", "email", "role", "affiliatedMosqueId"],
                       "users",
                     )}
@@ -880,7 +899,8 @@ const AdminDashboard: React.FC = () => {
                   <div className="flex flex-col gap-2 text-sm text-gray-600 md:flex-row md:items-center">
                     <label
                       htmlFor="announcement-type-filter"
-                      className="font-medium">
+                      className="font-medium"
+                    >
                       Filter tipe pengumuman
                     </label>
                     <select
@@ -889,7 +909,8 @@ const AdminDashboard: React.FC = () => {
                       onChange={(e) =>
                         setAnnouncementTypeFilter(e.target.value)
                       }
-                      className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
                       <option value="all">Semua tipe</option>
                       {announcementTypeOptions.map((typeOption) => (
                         <option key={typeOption} value={typeOption}>
@@ -906,7 +927,10 @@ const AdminDashboard: React.FC = () => {
                 ) : (
                   <>
                     {renderTable(
-                      filteredAnnouncements || [],
+                      (filteredAnnouncements || []).slice(
+                        (currentAnnouncementPage - 1) * itemsPerPage,
+                        currentAnnouncementPage * itemsPerPage,
+                      ),
                       [
                         "title",
                         "content",
@@ -914,6 +938,11 @@ const AdminDashboard: React.FC = () => {
                         "like_count",
                         "comment_count",
                         "createdAt",
+                        "updatedAt",
+                        "event_date",
+                        "speaker_name",
+                        "kitab_title",
+                        "bidang_ilmu",
                         "authorId",
                         "imageUrl",
                         "mosque.contactPerson",
@@ -951,7 +980,10 @@ const AdminDashboard: React.FC = () => {
                 ) : (
                   <>
                     {renderTable(
-                      filteredMosque || [],
+                      (filteredMosque || []).slice(
+                        (currentMosquePage - 1) * itemsPerPage,
+                        currentMosquePage * itemsPerPage,
+                      ),
                       [
                         "mosqueName",
                         "addressLine1",
@@ -1065,7 +1097,8 @@ const AdminDashboard: React.FC = () => {
                                         : speaker.status === "rejected"
                                           ? "bg-red-100 text-red-800"
                                           : "bg-yellow-100 text-yellow-800"
-                                    }`}>
+                                    }`}
+                                  >
                                     {speaker.status}
                                   </span>
                                 </td>
@@ -1084,7 +1117,8 @@ const AdminDashboard: React.FC = () => {
                                             "approved",
                                           )
                                         }
-                                        className="text-green-600 hover:text-green-900">
+                                        className="text-green-600 hover:text-green-900"
+                                      >
                                         Approve
                                       </button>
                                     )}
@@ -1096,7 +1130,8 @@ const AdminDashboard: React.FC = () => {
                                             "rejected",
                                           )
                                         }
-                                        className="text-red-600 hover:text-red-900">
+                                        className="text-red-600 hover:text-red-900"
+                                      >
                                         Reject
                                       </button>
                                     )}
@@ -1109,7 +1144,8 @@ const AdminDashboard: React.FC = () => {
                                           e,
                                         )
                                       }
-                                      className="text-red-600 hover:text-red-900">
+                                      className="text-red-600 hover:text-red-900"
+                                    >
                                       <Trash2 className="h-4 w-4" />
                                     </button>
                                   </div>
@@ -1202,7 +1238,8 @@ const AdminDashboard: React.FC = () => {
                                         : kitab.status === "rejected"
                                           ? "bg-red-100 text-red-800"
                                           : "bg-yellow-100 text-yellow-800"
-                                    }`}>
+                                    }`}
+                                  >
                                     {kitab.status || "pending"}
                                   </span>
                                 </td>
@@ -1223,7 +1260,8 @@ const AdminDashboard: React.FC = () => {
                                             "approved",
                                           )
                                         }
-                                        className="text-green-600 hover:text-green-900">
+                                        className="text-green-600 hover:text-green-900"
+                                      >
                                         Approve
                                       </button>
                                     )}
@@ -1235,7 +1273,8 @@ const AdminDashboard: React.FC = () => {
                                             "rejected",
                                           )
                                         }
-                                        className="text-red-600 hover:text-red-900">
+                                        className="text-red-600 hover:text-red-900"
+                                      >
                                         Reject
                                       </button>
                                     )}
@@ -1249,7 +1288,8 @@ const AdminDashboard: React.FC = () => {
                                         )
                                       }
                                       className="text-red-600 hover:text-red-900"
-                                      title="Delete">
+                                      title="Delete"
+                                    >
                                       <Trash2 className="h-4 w-4" />
                                     </button>
                                   </div>
@@ -1284,10 +1324,12 @@ const AdminDashboard: React.FC = () => {
           {previewImage && (
             <div
               className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-              onClick={() => setPreviewImage(null)}>
+              onClick={() => setPreviewImage(null)}
+            >
               <div
                 className="bg-white p-4 rounded-lg overflow-hidden"
-                onClick={(e) => e.stopPropagation()}>
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="relative w-96 h-96 md:w-[500px] md:h-[700px]">
                   <Image
                     src={previewImage}
@@ -1298,7 +1340,8 @@ const AdminDashboard: React.FC = () => {
                 </div>
                 <button
                   className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded w-full"
-                  onClick={() => setPreviewImage(null)}>
+                  onClick={() => setPreviewImage(null)}
+                >
                   Tutup
                 </button>
               </div>
@@ -1309,10 +1352,12 @@ const AdminDashboard: React.FC = () => {
           {deleteConfirmation.show && (
             <div
               className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-              onClick={handleDeleteCancel}>
+              onClick={handleDeleteCancel}
+            >
               <div
                 className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
-                onClick={(e) => e.stopPropagation()}>
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="flex items-start mb-4">
                   <div className="flex-shrink-0 bg-red-100 rounded-full p-3">
                     <Trash2 className="h-6 w-6 text-red-600" />
@@ -1379,31 +1424,36 @@ const AdminDashboard: React.FC = () => {
                   <button
                     onClick={handleDeleteCancel}
                     disabled={deleting}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
                     Cancel
                   </button>
                   <button
                     onClick={handleDeleteConfirm}
                     disabled={deleting}
-                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center">
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                  >
                     {deleting ? (
                       <>
                         <svg
                           className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
-                          viewBox="0 0 24 24">
+                          viewBox="0 0 24 24"
+                        >
                           <circle
                             className="opacity-25"
                             cx="12"
                             cy="12"
                             r="10"
                             stroke="currentColor"
-                            strokeWidth="4"></circle>
+                            strokeWidth="4"
+                          ></circle>
                           <path
                             className="opacity-75"
                             fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         Deleting...
                       </>

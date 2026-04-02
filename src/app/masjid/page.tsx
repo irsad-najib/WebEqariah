@@ -17,8 +17,7 @@ export default function Masjid() {
       <Navbar />
 
       <main className="min-h-screen bg-gray-50">
-        {/* Main Content */}
-        <div className="container mx-auto px-4 py-12">
+        <div className="mx-auto w-full px-6 lg:px-32 py-10">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Mobile Kajian Section (Visible only on mobile) */}
             <div className="lg:hidden mb-8">
@@ -26,17 +25,15 @@ export default function Masjid() {
             </div>
 
             {/* Mosque List (Main Content) */}
-            <div className="flex-1">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
-                Cari Masjid Berhampiran Anda
-              </h2>
+
+            <div className="flex gap-8 w-full">
               <Mosque onClick={handleMosqueClick} />
+              <div className="hidden lg:block w-80 flex-shrink-0 pt-36">
+                <KajianSidebar />
+              </div>
             </div>
 
             {/* Desktop Kajian Sidebar (Visible only on desktop) */}
-            <div className="hidden lg:block w-80 flex-shrink-0 ml-auto">
-              <KajianSidebar />
-            </div>
           </div>
         </div>
       </main>

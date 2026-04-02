@@ -12,22 +12,15 @@ interface NavLinkProps {
   href: string;
   children: React.ReactNode;
   className?: string;
-  icon?: React.ReactNode;
   onClick?: () => void;
 }
 
-const NavLink = ({
-  href,
-  children,
-  className = "",
-  icon,
-  onClick,
-}: NavLinkProps) => (
+const NavLink = ({ href, children, className = "", onClick }: NavLinkProps) => (
   <Link
     href={href}
     onClick={onClick}
-    className={`flex items-center gap-3 hover:text-gray-200 transition-colors duration-200 ${className}`}>
-    {icon && <span className="flex-shrink-0">{icon}</span>}
+    className={`transition-colors duration-200 ${className}`}
+  >
     {children}
   </Link>
 );
@@ -37,117 +30,28 @@ const mainNavLinks = [
   {
     href: "/dashboard",
     children: "Dashboard",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-        />
-      </svg>
-    ),
   },
   {
     href: "/masjid",
     children: "Masjid/Surau",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 3v2m0 0l3 3m-3-3L9 8m3-3v13m-7 0h14a1 1 0 001-1v-7a1 1 0 00-.553-.894l-6.447-3.224a1 1 0 00-.894 0l-6.447 3.224A1 1 0 003 10v7a1 1 0 001 1z"
-        />
-      </svg>
-    ),
   },
   {
     href: "/ustadz",
     children: "Ustaz",
-    icon: (
-      <svg width="20" height="20" fill="none" stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM4 20h16a2 2 0 002-2v-2a3 3 0 00-3-3H5a3 3 0 00-3 3v2a2 2 0 002 2z"
-        />
-      </svg>
-    ),
   },
   {
     href: "/kitab",
     children: "Kitab",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-        />
-      </svg>
-    ),
   },
   {
     href: "/instructions",
     children: "Cara Penggunaan",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-        />
-      </svg>
-    ),
-  },
-  {
-    href: "/register-mosque",
-    children: "Daftar Masjid",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 3v2m0 0l3 3m-3-3L9 8m3-3v13m-7 0h14a1 1 0 001-1v-7a1 1 0 00-.553-.894l-6.447-3.224a1 1 0 00-.894 0l-6.447 3.224A1 1 0 003 10v7a1 1 0 001 1z"
-        />
-      </svg>
-    ),
   },
 ];
 
 export const Navbar = () => {
   return (
-    <Suspense fallback={<div className="h-14 bg-[#4caf4f]" />}>
+    <Suspense fallback={<div className="h-14 bg-white" />}>
       <NavbarInner />
     </Suspense>
   );
@@ -159,7 +63,7 @@ const NavbarInner = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const hideBidangIlmuDropdown = (pathname ?? "").startsWith("/calendar");
+  const showBidangIlmuDropdown = true;
   const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
 
   const bidangIlmuFromUrl = searchParams.get("bidang_ilmu") ?? "";
@@ -233,8 +137,8 @@ const NavbarInner = () => {
   return (
     <>
       {/* Top Navbar */}
-      <nav className="bg-[#4caf4f] py-3 lg:py-4 sticky top-0 z-50 shadow-lg">
-        <div className="w-full flex justify-between items-center px-4 lg:px-8">
+      <nav className="bg-white py-3 lg:py-4 sticky top-0 z-50 border-b border-gray-200">
+        <div className=" mx-auto w-full flex justify-between items-center px-20">
           {/* Logo */}
           <div className="flex items-center gap-3 min-w-0">
             <Image
@@ -247,46 +151,73 @@ const NavbarInner = () => {
             />
             <NavLink
               href="/"
-              className="text-white text-xl lg:text-2xl font-bold truncate"
-              onClick={closeMenu}>
+              className="text-[#4caf4f] text-xl lg:text-2xl font-bold truncate"
+              onClick={closeMenu}
+            >
               Eqariah
             </NavLink>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
-            <div className="flex items-center space-x-6">
-              {/* Main Navigation Links */}
-              {mainNavLinks.map(({ href, children, icon }) => (
-                <NavLink
-                  key={href}
-                  href={href}
-                  className="text-white text-lg hover:bg-white/10 px-3 py-2 rounded-lg transition-all"
-                  icon={icon}>
-                  {children}
-                </NavLink>
-              ))}
+          <div className="hidden lg:flex items-center gap-8">
+            {/* Main Navigation Links */}
+            <div className="flex items-center gap-8">
+              {mainNavLinks.map(({ href, children }) => {
+                const isActive =
+                  href === "/"
+                    ? pathname === "/"
+                    : (pathname ?? "").startsWith(href);
 
-              {/* Bidang Ilmu Dropdown */}
-              {!hideBidangIlmuDropdown && (
+                return (
+                  <NavLink
+                    key={href}
+                    href={href}
+                    className={`text-sm lg:text-base font-medium pb-1 border-b-2 transition-colors ${
+                      isActive
+                        ? "text-[#4caf4f] border-[#4caf4f]"
+                        : "text-gray-600 border-transparent hover:text-[#4caf4f]"
+                    }`}
+                    onClick={closeMenu}
+                  >
+                    {children}
+                  </NavLink>
+                );
+              })}
+
+              {showBidangIlmuDropdown && (
                 <div className="flex items-center">
-                  <select
-                    aria-label="Pilih Bidang Ilmu"
-                    value={selectedBidangIlmu}
-                    onChange={(e) => handleBidangIlmuChange(e.target.value)}
-                    className="text-white text-lg bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-all border border-white/20">
-                    <option value="" className="text-gray-900">
-                      Bidang Ilmu...
-                    </option>
-                    {bidangIlmuOptions.map((opt) => (
-                      <option
-                        key={opt.id}
-                        value={opt.name}
-                        className="text-gray-900">
-                        {opt.name}
+                  <div className="relative">
+                    <select
+                      aria-label="Pilih Bidang Ilmu"
+                      value={selectedBidangIlmu}
+                      onChange={(e) => handleBidangIlmuChange(e.target.value)}
+                      className="appearance-none text-sm lg:text-base bg-white px-4 py-2 rounded-full transition-colors border border-gray-200 text-gray-700 pr-10 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <option value="" className="text-gray-900">
+                        Bidang Ilmu...
                       </option>
-                    ))}
-                  </select>
+                      {bidangIlmuOptions.map((opt) => (
+                        <option key={opt.id} value={opt.name}>
+                          {opt.name}
+                        </option>
+                      ))}
+                    </select>
+                    <svg
+                      width="16"
+                      height="16"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
                 </div>
               )}
             </div>
@@ -295,14 +226,15 @@ const NavbarInner = () => {
             {authLoading ? (
               // Show loading skeleton during auth initialization
               <div className="flex items-center gap-2 px-3 py-2">
-                <div className="w-10 h-10 rounded-full bg-white/20 animate-pulse" />
+                <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
               </div>
             ) : isAuthenticated && user ? (
               <div className="relative">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 text-white hover:bg-white/10 px-3 py-2 rounded-xl transition-all">
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-white/20 border-2 border-white/30">
+                  className="flex items-center gap-2 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-xl transition-all"
+                >
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
                     <Image
                       src="/bx-user.svg"
                       width={35}
@@ -319,7 +251,8 @@ const NavbarInner = () => {
                     stroke="currentColor"
                     className={`transform transition-transform ${
                       isDropdownOpen ? "rotate-180" : ""
-                    }`}>
+                    }`}
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -340,12 +273,14 @@ const NavbarInner = () => {
                       <Link
                         href="/profile"
                         onClick={() => setIsDropdownOpen(false)}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
                         Profile
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition-colors">
+                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition-colors"
+                      >
                         Logout
                       </button>
                     </div>
@@ -353,37 +288,35 @@ const NavbarInner = () => {
                 )}
               </div>
             ) : (
-              <NavLink
-                href="/login"
-                className="flex items-center gap-2 text-white bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-xl transition-all font-medium backdrop-blur-sm border border-white/20">
-                <svg
-                  width="20"
-                  height="20"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                  />
-                </svg>
-                Sign In
-              </NavLink>
+              <div className="flex items-center gap-4">
+                <NavLink
+                  href="/login"
+                  className="text-sm lg:text-base font-medium text-[#4caf4f] hover:text-emerald-700"
+                >
+                  Sign In
+                </NavLink>
+                <Link
+                  href="/register-mosque"
+                  className="text-sm lg:text-base font-semibold bg-[#4caf4f] hover:bg-emerald-700 text-white px-5 py-2 rounded-full transition-colors"
+                >
+                  Daftar Masjid
+                </Link>
+              </div>
             )}
           </div>
 
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden text-white focus:outline-none p-2"
-            aria-label="Toggle menu">
+            className="lg:hidden text-gray-700 focus:outline-none p-2"
+            aria-label="Toggle menu"
+          >
             <svg
               className="w-6 h-6"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24">
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -407,9 +340,10 @@ const NavbarInner = () => {
       <div
         className={`lg:hidden fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
           isOpen ? "translate-x-0" : "translate-x-full"
-        }`}>
+        }`}
+      >
         {/* Sidebar Header */}
-        <div className="bg-[#4caf4f] p-4 text-white">
+        <div className="bg-white p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Image
@@ -419,16 +353,18 @@ const NavbarInner = () => {
                 alt="Eqariah logo"
                 className="w-7 h-7"
               />
-              <span className="text-xl font-bold">Eqariah</span>
+              <span className="text-xl font-bold text-[#4caf4f]">Eqariah</span>
             </div>
             <button
               onClick={closeMenu}
-              className="text-white hover:bg-white/20 p-2 rounded-lg">
+              className="text-gray-700 hover:bg-gray-100 p-2 rounded-lg"
+            >
               <svg
                 className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24">
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -447,37 +383,64 @@ const NavbarInner = () => {
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
               Navigation
             </h3>
-            {mainNavLinks.map(({ href, children, icon }) => (
+            {mainNavLinks.map(({ href, children }) => (
               <NavLink
                 key={href}
                 href={href}
                 onClick={closeMenu}
-                className="w-full p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                icon={icon}>
+                className="block w-full p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
                 {children}
               </NavLink>
             ))}
 
+            <Link
+              href="/register-mosque"
+              onClick={closeMenu}
+              className="block w-full p-3 text-white bg-[#4caf4f] hover:bg-emerald-700 rounded-lg transition-colors font-semibold text-center"
+            >
+              Daftar Masjid
+            </Link>
+
             {/* Bidang Ilmu Dropdown */}
-            {!hideBidangIlmuDropdown && (
+            {showBidangIlmuDropdown && (
               <div className="mt-3">
                 <label
                   htmlFor="navbar_bidang_ilmu"
-                  className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2"
+                >
                   Bidang Ilmu
                 </label>
-                <select
-                  id="navbar_bidang_ilmu"
-                  value={selectedBidangIlmu}
-                  onChange={(e) => handleBidangIlmuChange(e.target.value)}
-                  className="w-full p-3 text-gray-700 bg-white border border-gray-200 rounded-lg">
-                  <option value="">Pilih Bidang Ilmu...</option>
-                  {bidangIlmuOptions.map((opt) => (
-                    <option key={opt.id} value={opt.name}>
-                      {opt.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="navbar_bidang_ilmu"
+                    value={selectedBidangIlmu}
+                    onChange={(e) => handleBidangIlmuChange(e.target.value)}
+                    className="appearance-none w-full p-3 pr-10 text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="">Pilih Bidang Ilmu...</option>
+                    {bidangIlmuOptions.map((opt) => (
+                      <option key={opt.id} value={opt.name}>
+                        {opt.name}
+                      </option>
+                    ))}
+                  </select>
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
               </div>
             )}
           </div>
@@ -508,33 +471,35 @@ const NavbarInner = () => {
                 <NavLink
                   href="/profile"
                   onClick={closeMenu}
-                  className="w-full p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                  icon={
-                    <svg
-                      width="20"
-                      height="20"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                  }>
-                  Profile
-                </NavLink>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  className="w-full p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
+                >
                   <svg
                     width="20"
                     height="20"
                     fill="none"
                     viewBox="0 0 24 24"
-                    stroke="currentColor">
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  <span>Profile</span>
+                </NavLink>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -549,17 +514,16 @@ const NavbarInner = () => {
               <NavLink
                 href="/login"
                 onClick={closeMenu}
-                className="w-full p-3 text-[#4caf4f] hover:bg-green-50 rounded-lg transition-colors font-semibold"
-                icon={
-                  <Image
-                    src="/bx-user.svg"
-                    width={20}
-                    height={20}
-                    alt="User Icon"
-                    className="w-5 h-5"
-                  />
-                }>
-                Sign In
+                className="w-full p-3 text-[#4caf4f] hover:bg-green-50 rounded-lg transition-colors font-semibold flex items-center gap-3"
+              >
+                <Image
+                  src="/bx-user.svg"
+                  width={20}
+                  height={20}
+                  alt="User Icon"
+                  className="w-5 h-5"
+                />
+                <span>Sign In</span>
               </NavLink>
             )}
           </div>

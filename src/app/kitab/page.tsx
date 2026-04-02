@@ -142,7 +142,10 @@ export default function KitabPage() {
                 .join(" • ")}
               imageUrl={null}
               fallback={<BookOpen size={32} />}>
-              <div className="border-t pt-4">
+              <div 
+                className="border-t pt-4 h-60 overflow-y-auto pr-1 [scrollbar-gutter:stable] [scrollbar-width:thin] [scrollbar-color:theme(colors.gray.300)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400"
+              
+              >
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
                   Jadual Kuliah:
                 </h3>
