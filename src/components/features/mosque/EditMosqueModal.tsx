@@ -110,7 +110,7 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
         formDataImage.append("image", file);
 
         const uploadResponse = await axiosInstance.post(
-          "/api/upload/image",
+          "/api/mosque/upload-image",
           formDataImage,
           {
             headers: {
@@ -119,8 +119,8 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
           },
         );
 
-        if (uploadResponse.data.success) {
-          imageUrl = uploadResponse.data.data.image_url;
+        if (uploadResponse.data?.success) {
+          imageUrl = uploadResponse.data?.url || imageUrl;
         } else {
           throw new Error("Failed to upload image");
         }
@@ -184,7 +184,8 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
         <div className="flex flex-col items-center mb-6">
           <div
             onClick={handleImageClick}
-            className="relative w-full h-48 rounded-lg overflow-hidden border-4 border-gray-200 cursor-pointer hover:border-green-500 transition-all group">
+            className="relative w-full h-48 rounded-lg overflow-hidden border-4 border-gray-200 cursor-pointer hover:border-green-500 transition-all group"
+          >
             {preview ? (
               <Image src={preview} alt="Mosque" fill className="object-cover" />
             ) : (
@@ -317,14 +318,16 @@ export const EditMosqueModal: React.FC<EditMosqueModalProps> = ({
             type="button"
             variant="secondary"
             onClick={handleCancel}
-            disabled={loading}>
+            disabled={loading}
+          >
             Cancel
           </Button>
           <Button
             type="submit"
             variant="success"
             disabled={loading || !!imageError}
-            loading={loading}>
+            loading={loading}
+          >
             {loading ? "Saving..." : "Save Changes"}
           </Button>
         </div>

@@ -94,17 +94,17 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
         formDataImage.append("image", file);
 
         const uploadResponse = await axiosInstance.post(
-          "/api/upload/image",
+          "/api/mosque/upload-image",
           formDataImage,
           {
             headers: {
               "Content-Type": "multipart/form-data",
             },
-          }
+          },
         );
 
-        if (uploadResponse.data.success) {
-          avatarUrl = uploadResponse.data.data.image_url;
+        if (uploadResponse.data?.success) {
+          avatarUrl = uploadResponse.data?.url || avatarUrl;
         } else {
           throw new Error("Failed to upload image");
         }
@@ -117,10 +117,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
         ...(avatarUrl && { avatar_url: avatarUrl }),
       };
 
-      const response = await axiosInstance.put(
-        `/api/users/${userData.id}`,
-        updateData
-      );
+      const response = await axiosInstance.put("/api/auth/profile", updateData);
 
       if (response.data.success) {
         setSuccess(true);
@@ -140,7 +137,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     } catch (err: any) {
       console.error("Error updating profile:", err);
       setError(
-        err.response?.data?.error || err.message || "Failed to update profile"
+        err.response?.data?.error || err.message || "Failed to update profile",
       );
     } finally {
       setLoading(false);
@@ -161,13 +158,15 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
       isOpen={isOpen}
       onClose={handleCancel}
       title="Edit Profile"
-      size="md">
+      size="md"
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Avatar Upload */}
         <div className="flex flex-col items-center mb-6">
           <div
             onClick={handleImageClick}
-            className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 cursor-pointer hover:border-green-500 transition-all group">
+            className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 cursor-pointer hover:border-green-500 transition-all group"
+          >
             {preview ? (
               <Image
                 src={preview}
@@ -240,14 +239,16 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
             type="button"
             variant="secondary"
             onClick={handleCancel}
-            disabled={loading}>
+            disabled={loading}
+          >
             Cancel
           </Button>
           <Button
             type="submit"
             variant="success"
             disabled={loading || !!imageError}
-            loading={loading}>
+            loading={loading}
+          >
             {loading ? "Saving..." : "Save Changes"}
           </Button>
         </div>
