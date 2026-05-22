@@ -196,7 +196,7 @@ const Login = () => {
                   Lupa kata laluan?
                 </a>
               </p>
-              <div className="text-center mt-6">
+              <div className="text-center mt-6 hidden">
                 <p className="text-gray-600 text-sm mb-3">
                   Tidak mempunyai akaun?
                 </p>
