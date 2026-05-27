@@ -73,6 +73,7 @@ const DashboardPage = () => {
     useState(false);
   const [announcementTypeFilter, setAnnouncementTypeFilter] =
     useState<string>("all");
+  const [showOtherMosques, setShowOtherMosques] = useState(false);
   const [bidangIlmuOptions, setBidangIlmuOptions] = useState<BidangIlmu[]>([]);
   const [isRegisterBidangIlmuModalOpen, setIsRegisterBidangIlmuModalOpen] =
     useState(false);
@@ -260,8 +261,7 @@ const DashboardPage = () => {
             auth.data.user.role === "mosque_admin" &&
             auth.data.user.affiliated_mosque_id
           ) {
-            // Mosque admin only sees announcements from their mosque
-            fetchAnnouncementsByMosque(auth.data.user.affiliated_mosque_id);
+            // Mosque admin will fetch based on the toggle below
           } else {
             fetchAnnouncements();
           }
@@ -288,6 +288,17 @@ const DashboardPage = () => {
     authsession();
     loadBidangIlmu();
   }, [router]);
+
+  useEffect(() => {
+    if (userRole === "mosque_admin" && affiliatedMosqueId) {
+      if (showOtherMosques) {
+        fetchAnnouncements();
+      } else {
+        fetchAnnouncementsByMosque(affiliatedMosqueId);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showOtherMosques, userRole, affiliatedMosqueId]);
 
   // Scroll listener untuk scroll to top button
   useEffect(() => {
@@ -872,6 +883,25 @@ const DashboardPage = () => {
                     </option>
                   ))}
                 </select>
+                {isAuthenticated && userRole === "mosque_admin" && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-gray-700">
+                      Tampilkan pengumuman masjid lain:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowOtherMosques((prev) => !prev)}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        showOtherMosques
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-700"
+                      }`}>
+                      {showOtherMosques
+                        ? "Ya - Semua masjid"
+                        : "Tidak - Masjid saya saja"}
+                    </button>
+                  </div>
+                )}
                 <span className="text-sm text-gray-600">
                   Menampilkan {filteredAnnouncements.length} dari{" "}
                   {announcements.length} pengumuman
