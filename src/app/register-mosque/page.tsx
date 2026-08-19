@@ -229,7 +229,7 @@ const RegisterMosque = () => {
         const errorMsg =
           response.data?.error?.message ||
           response.data?.error ||
-          "Registration failed";
+          "Pendaftaran akan disahkan oleh pihak admin. Sila tunggu pengesahan daripada pihak admin.";
         throw new Error(errorMsg);
       }
 
