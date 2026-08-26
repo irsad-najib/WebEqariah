@@ -42,6 +42,8 @@ export interface Speaker {
   status: "pending" | "approved" | "rejected";
   created_at: string;
   updated_at: string;
+  created_by?: number;
+  created_by_id?: number;
   approved_by?: number;
   approved_at?: string;
   announcements?: Announcement[];
@@ -57,6 +59,8 @@ export interface Kitab {
   status?: "pending" | "approved" | "rejected";
   created_at?: string;
   updated_at?: string;
+  created_by?: number;
+  created_by_id?: number;
   approved_by?: number;
   approved_at?: string;
   announcements?: Announcement[];
