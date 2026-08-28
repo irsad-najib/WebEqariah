@@ -1,6 +1,13 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
-import { Search, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search,
+  Edit,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  User as UserIcon,
+} from "lucide-react";
 import { axiosInstance } from "@/lib/utils/api";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -1046,6 +1053,9 @@ const AdminDashboard: React.FC = () => {
                               Status
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Dicipta Oleh
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Created At
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1101,6 +1111,23 @@ const AdminDashboard: React.FC = () => {
                                   >
                                     {speaker.status}
                                   </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  {speaker.created_by ? (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                        <UserIcon className="w-4 h-4 text-green-700" />
+                                      </div>
+                                      <span className="text-sm text-gray-700">
+                                        {speaker.created_by_username ||
+                                          `User ID: ${speaker.created_by}`}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-sm text-gray-500">
+                                      -
+                                    </span>
+                                  )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                   {new Date(
@@ -1201,6 +1228,9 @@ const AdminDashboard: React.FC = () => {
                               Status
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Dicipta Oleh
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Created At
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1242,6 +1272,23 @@ const AdminDashboard: React.FC = () => {
                                   >
                                     {kitab.status || "pending"}
                                   </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  {kitab.created_by ? (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                        <UserIcon className="w-4 h-4 text-green-700" />
+                                      </div>
+                                      <span className="text-sm text-gray-700">
+                                        {kitab.created_by_username ||
+                                          `User ID: ${kitab.created_by}`}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-sm text-gray-500">
+                                      -
+                                    </span>
+                                  )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                   {kitab.created_at

@@ -4,6 +4,7 @@ import { Mosque } from "@/components/features/mosque/Mosque";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { KajianSidebar } from "@/components/features/kajian/KajianSidebar";
+import { PrayerInfoBar } from "@/components/features/prayer/PrayerInfoBar";
 // import { UnderConstruction } from "@/components/features/under-construction/underconstruction";
 
 export default function Home() {
@@ -21,8 +22,9 @@ export default function Home() {
 
       <main>
         {/* Hero Section (full viewport minus navbar) */}
-        <div className="min-h-[calc(100vh-64px)] bg-gradient-to-r from-green-600 to-emerald-700 text-white flex items-center">
-          <div className="max-w-screen-2xl mx-auto w-full px-4">
+        <div className="min-h-[calc(100vh-64px)] bg-gradient-to-r from-green-600 to-emerald-700 text-white flex flex-col">
+          <PrayerInfoBar />
+          <div className="max-w-screen-2xl mx-auto w-full px-4 flex flex-1 items-center">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
                 Selamat Datang ke Eqariah
