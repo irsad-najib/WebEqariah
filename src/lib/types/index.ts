@@ -44,6 +44,7 @@ export interface Speaker {
   updated_at: string;
   created_by?: number;
   created_by_username?: string;
+  created_by_id?: number;
   approved_by?: number;
   approved_at?: string;
   announcements?: Announcement[];
@@ -61,6 +62,7 @@ export interface Kitab {
   updated_at?: string;
   created_by?: number;
   created_by_username?: string;
+  created_by_id?: number;
   approved_by?: number;
   approved_at?: string;
   announcements?: Announcement[];

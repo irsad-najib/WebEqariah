@@ -32,9 +32,9 @@ export default function Home() {
               <p className="text-xl md:text-2xl mb-8 text-green-100 drop-shadow-lg">
                 Platform Modern untuk Menghubungkan Masjid dan Jemaah
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex justify-center">
                 <button
-                  onClick={() => router.push("/overview")}
+                  onClick={() => router.push("/masjid")}
                   className="bg-white text-green-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg flex items-center justify-center gap-2">
                   <svg
                     width="20"
@@ -46,28 +46,10 @@ export default function Home() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                   </svg>
-                  Lihat Gambaran Keseluruhan
-                </button>
-                <button
-                  onClick={() => router.push("/instructions")}
-                  className="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white hover:text-green-600 transition-all duration-300 flex items-center justify-center gap-2">
-                  <svg
-                    width="20"
-                    height="20"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
-                  Cara Penggunaan
+                  MULAKAN CARIAN MASJID/SURAU ANDA DI SINI
                 </button>
               </div>
             </div>

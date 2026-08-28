@@ -45,6 +45,18 @@ function getErrorMessage(
   }
   return fallback;
 }
+
+function getCreatorId(item: Speaker | Kitab): number | string | null {
+  return (
+    item.created_by ??
+    item.created_by_id ??
+    (item as Speaker & Kitab & { user_id?: number; author_id?: number })
+      .user_id ??
+    (item as Speaker & Kitab & { user_id?: number; author_id?: number })
+      .author_id ??
+    null
+  );
+}
 // Define props for the Pagination component
 interface PaginationProps {
   currentPage: number;
@@ -1130,6 +1142,9 @@ const AdminDashboard: React.FC = () => {
                                   )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  User ID: {getCreatorId(speaker) ?? "-"}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                   {new Date(
                                     speaker.created_at,
                                   ).toLocaleDateString()}
@@ -1289,6 +1304,9 @@ const AdminDashboard: React.FC = () => {
                                       -
                                     </span>
                                   )}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  User ID: {getCreatorId(kitab) ?? "-"}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                   {kitab.created_at
